@@ -1,35 +1,58 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduQuiz - Trang Chủ</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/Header n footer.css}">
 </head>
 <body>
-
-<!-- HEADER -->
-<header class="header">
-    <div class="logo">EduQuiz</div>
-
-    <nav class="nav">
-        <a href="#">Home</a>
-        <a href="#">My Courses</a>
-    </nav>
-
-    <div class="auth">
-        <span class="bell">🔔</span>
-        <button class="login-btn">Đăng nhập</button>
-    </div>
-</header>
+<!-- HEADER - Chèn từ fragments/Header.html -->
+<div th:replace="~{fragments/Header :: header}"></div>
 
 <!-- HERO SECTION -->
 <section class="hero">
-    <h1>Xây dựng Trang Trắc nghiệm & Kiểm tra (Quiz and Testing Platform)</h1>
-    <p>
-        Xây dựng một ứng dụng trắc nghiệm có khả năng kiểm tra thuật toán
-        và hiển thị kết quả ngay lập tức, sử dụng JavaScript mạnh mẽ.
-    </p>
+    <div class="hero-content">
+        <h1>TẠO BÀI THI TRẮC NGHIỆM ONLINE MIỄN PHÍ VÀ DỄ SỬ DỤNG</h1>
+
+        <ul class="feature-list">
+            <li class="feature-item">
+                <span class="checkmark">✓</span>
+                <span>Dễ dàng tạo hoặc upload file câu hỏi trắc nghiệm</span>
+            </li>
+            <li class="feature-item">
+                <span class="checkmark">✓</span>
+                <span>Nhiều tùy chọn trộn câu hỏi và tự động chấm bài làm</span>
+            </li>
+            <li class="feature-item">
+                <span class="checkmark">✓</span>
+                <span>Tạo bài thi lấy ngẫu nhiên từ ngân hàng câu hỏi trắc nghiệm của bạn</span>
+            </li>
+            <li class="feature-item">
+                <span class="checkmark">✓</span>
+                <span>Tích hợp Chat GPT giúp bạn tự động tạo câu hỏi trắc nghiệm</span>
+            </li>
+            <li class="feature-item">
+                <span class="checkmark">✓</span>
+                <span>Triển khai thi online hoặc làm bài thi online không cần cài đặt ứng dụng</span>
+            </li>
+        </ul>
+
+        <a href="#" class="cta-button">
+            <span class="arrow">→</span>
+            <span>Đăng ký miễn phí</span>
+        </a>
+    </div>
+
+    <div class="hero-illustration">
+        <div class="illustration-wrapper">
+            <!-- Bỏ /static vì Spring Boot tự động map -->
+            <img th:src="@{/img/public.png}"
+                 alt="Online Quiz Illustration"
+                 style="width: 100%; height: auto;">
+        </div>
+    </div>
 </section>
 
 <!-- FEATURES -->
@@ -48,37 +71,9 @@
     </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="footer">
-    <div class="col">
-        <h3>EduQuiz</h3>
-        <p>
-            Nơi mang đến trải nghiệm học tập và kiểm tra hiệu quả.
-            Tại EduQuiz, chúng tôi tin rằng mỗi câu hỏi là một bước tiến trong việc
-            nâng cao kiến thức và kỹ năng.
-        </p>
-    </div>
+<!-- FOOTER - Chèn từ fragments/Footer.html -->
+<div th:replace="~{fragments/Footer :: footer}"></div>
 
-    <div class="col">
-        <h3>Liên hệ</h3>
-        <p>📍 123 Lê Lợi, Quận 1, TP. Hồ Chí Minh</p>
-        <p>📞 0123 456 789</p>
-        <p>📧 support@eduquiz.com</p>
-        <p>⏰ 8:00 – 22:00 hàng ngày</p>
-    </div>
-
-    <div class="col">
-        <h3>Hỗ trợ & Chính sách</h3>
-        <a href="#">Chính sách bảo mật</a><br>
-        <a href="#">Điều khoản sử dụng</a><br>
-        <a href="#">Hướng dẫn học & làm bài</a>
-    </div>
-</footer>
-
-<div class="footer-bottom">
-    © 2025 Quiz Hub. Thiết kế bởi Quiz Hub Team.
-</div>
-
-<script src="app.js"></script>
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>
