@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduQuiz - Trang Chủ</title>
+    <title>EduQuiz - Ứng dựng quản lý, Thi trắc nghiệm</title>
+    <link rel="icon" type="./img/Eduq.png" href="/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Knewave&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/Header n footer.css}">
 </head>
@@ -16,34 +20,61 @@
     <div class="hero-content">
         <h1>TẠO BÀI THI TRẮC NGHIỆM ONLINE MIỄN PHÍ VÀ DỄ SỬ DỤNG</h1>
 
-        <ul class="feature-list">
-            <li class="feature-item">
-                <span class="checkmark">✓</span>
-                <span>Dễ dàng tạo hoặc upload file câu hỏi trắc nghiệm</span>
-            </li>
-            <li class="feature-item">
-                <span class="checkmark">✓</span>
-                <span>Nhiều tùy chọn trộn câu hỏi và tự động chấm bài làm</span>
-            </li>
-            <li class="feature-item">
-                <span class="checkmark">✓</span>
-                <span>Tạo bài thi lấy ngẫu nhiên từ ngân hàng câu hỏi trắc nghiệm của bạn</span>
-            </li>
-            <li class="feature-item">
-                <span class="checkmark">✓</span>
-                <span>Tích hợp Chat GPT giúp bạn tự động tạo câu hỏi trắc nghiệm</span>
-            </li>
-            <li class="feature-item">
-                <span class="checkmark">✓</span>
-                <span>Triển khai thi online hoặc làm bài thi online không cần cài đặt ứng dụng</span>
-            </li>
-        </ul>
+        <div class="short-description__subtext-box-wrapper">
+            <div class="short-description__subtext-box">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Dễ dàng tạo hoặc upload file câu hỏi trắc nghiệm
+                </p>
+            </div>
 
-        <a href="#" class="cta-button">
-            <span class="arrow">→</span>
-            <span>Đăng ký miễn phí</span>
-        </a>
+            <div class="short-description__subtext-box">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Nhiều tùy chọn trộn câu hỏi và tự động chấm bài làm
+                </p>
+            </div>
+
+            <div class="short-description__subtext-box">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Tạo bài thi lấy ngẫu nhiên từ ngân hàng câu hỏi trắc nghiệm của bạn
+                </p>
+            </div>
+
+            <div class="short-description__subtext-box">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Tích hợp Chat GPT giúp bạn tự động tạo câu hỏi trắc nghiệm
+                </p>
+            </div>
+
+            <div class="short-description__subtext-box">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Triển khai thi online hoặc làm bài thi online không cần cài đặt ứng dụng
+                </p>
+            </div>
+
+        </div>
+
     </div>
+
+
+
+    <button class="MuiButtonBase-root MuiButton-root MuiButton-contained register-button" tabindex="0" type="button">
+    <span class="MuiButton-label register-button-label">
+      <span class="register-button-icon">
+        <img src="./IMG/arrowRight.a2f906ef.svg" alt="arrowRight.a2f906ef">
+      </span>
+    <span class="register-button-text">
+      Đăng ký miễn phí
+    </span>
+    </span>
+        <span class="MuiTouchRipple-root"></span>
+    </button>
+
+
 
     <div class="hero-illustration">
         <div class="illustration-wrapper">
@@ -55,21 +86,52 @@
     </div>
 </section>
 
+
+
 <!-- FEATURES -->
 <section class="features">
-    <div class="feature-box">
-        <h3>Kho câu hỏi đa dạng</h3>
-        <p>Hỗ trợ nhiều chủ đề: Toán, Lý, Hóa, CNTT và nhiều hơn nữa.</p>
-    </div>
-    <div class="feature-box">
-        <h3>Kết quả tức thì</h3>
-        <p>Chấm điểm và hiển thị kết quả ngay sau khi làm bài.</p>
-    </div>
-    <div class="feature-box">
-        <h3>Thống kê chi tiết</h3>
-        <p>Theo dõi tiến độ học tập của bạn qua từng bài kiểm tra.</p>
+    <div class="MuiGrid-root feature-description MuiGrid-item MuiGrid-grid-md-5 MuiGrid-grid-lg-5">
+
+        <h2 class="feature-title h1">Thêm câu hỏi trắc nghiệm và tạo bài thi đơn giản hơn bao giờ hết</h2>
+
+        <div class="feature-description__list-box-item">
+            <div class="feature-description__box-item">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Thêm câu hỏi trắc nghiệm bằng tay với nhiều dạng câu hỏi như: câu hỏi lựa chọn một đáp án, câu hỏi lựa chọn nhiều đáp án, câu hỏi upload file...
+                </p>
+            </div>
+
+            <div class="feature-description__box-item">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Thêm câu hỏi từ Ngân Hàng câu hỏi trắc nghiệm, bạn có thể lấy câu hỏi chỉ định từ ngân hàng câu hỏi hoặc cài đặt bài thi online lấy số lượng câu hỏi ngẫu nhiên từ thư viện câu hỏi cho mỗi bài làm khác nhau.
+                </p>
+            </div>
+            <div class="feature-description__box-item">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Tải file danh sách câu hỏi trắc nghiệm có sẵn lên, Ninequiz hỗ trợ các file word, excel, pdf.
+                </p>
+            </div>
+            <div class="feature-description__box-item">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Sử dụng AI tạo câu hỏi theo chủ đề của bạn, ví dụ: "tạo câu hỏi trắc nghiệm hoá học lớp 12".
+                </p>
+            </div>
+            <div class="feature-description__box-item">
+                <img src="./img/check-icon.svg" alt="check-icon">
+                <p>
+                    Tạo câu hỏi từ nội dung của bạn bằng AI, sau khi bạn cung cấp nội dung cho AI, hệ thống sẽ tự động tạo câu hỏi trắc nghiệm từ nội dung tài liệu của bạn.
+                </p>
+            </div>
+        </div>
     </div>
 </section>
+
+
+
 
 <!-- FOOTER - Chèn từ fragments/Footer.html -->
 <div th:replace="~{fragments/Footer :: footer}"></div>
