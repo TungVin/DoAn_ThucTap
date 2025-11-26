@@ -11,4 +11,9 @@ public class HomeController {
         return "index"; // trả về file index.html trong templates
 
     }
+    @GetMapping("/auth") // Thêm phương thức này
+    public String auth() {
+        return "auth"; // Trả về file auth.html trong templates
+
+    }
 }
