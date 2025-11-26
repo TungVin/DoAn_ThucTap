@@ -21,4 +21,9 @@ public class HomeController {
         return "student"; // Trả về file auth.html trong templates
 
     }
+    @GetMapping("/teacher") // Thêm phương thức này
+    public String teacher() {
+        return "teacher"; // Trả về file teacher.html trong templates
+
+    }
 }
