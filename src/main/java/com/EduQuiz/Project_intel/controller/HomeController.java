@@ -26,4 +26,9 @@ public class HomeController {
         return "teacher"; // Trả về file teacher.html trong templates
 
     }
+    @GetMapping("/HTT") // Thêm phương thức này
+    public String ChonHinhThuc() {
+        return "ChonHinhThuc"; // Trả về file teacher.html trong templates
+    }
+
 }
