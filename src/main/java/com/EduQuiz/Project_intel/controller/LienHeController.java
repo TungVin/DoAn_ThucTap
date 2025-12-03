@@ -8,6 +8,6 @@ public class LienHeController {
 
     @GetMapping("/LienHe")
     public String lienHe() {
-        return "LienHe";  // Trả về tên file LienHe.html
+        return "./ChucNang/LienHe";  // Trả về tên file LienHe.html
     }
 }

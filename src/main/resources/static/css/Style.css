@@ -1,0 +1,153 @@
+/* ====== RESET ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #ffffff;
+    color: #222;
+    overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+header {
+    width: 100%;
+    padding: 18px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header nav a {
+    color: #333;
+    margin: 0 18px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+header nav a:hover {
+    color: #4c57ff;
+}
+
+
+/* ===== HERO SECTION ===== */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 80px 130px;
+    gap: 80px;
+}
+
+.hero-content {
+    max-width: 650px;
+}
+
+.hero-content h1 {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-transform: uppercase;
+    margin-bottom: 35px;
+}
+
+
+/* LIST STYLE */
+.short-description__subtext-box-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.short-description__subtext-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.short-description__subtext-box img {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* ===== BUTTON STYLE ===== */
+.register-button {
+    margin-top: 30px;
+    background: linear-gradient(90deg, #4f4fff, #1b1bff);
+    color: white;
+    padding: 14px 38px;
+    font-size: 18px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: 0.3s ease;
+}
+
+.register-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.register-button img {
+    width: 18px;
+}
+
+
+/* ===== IMAGE AREA ===== */
+.hero-illustration img {
+    width: 500px;
+    max-width: 100%;
+}
+
+
+/* ===== FEATURE SECTION ===== */
+.features {
+    padding: 80px 130px;
+}
+
+.feature-title {
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 35px;
+}
+
+.feature-description__list-box-item {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.feature-description__box-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 16px;
+}
+
+.feature-description__box-item img {
+    width: 20px;
+}
+
+
+/* ===== FOOTER ===== */
+footer {
+    width: 100%;
+    padding: 40px 80px;
+    background-color: #f6f6f6;
+    text-align: center;
+    font-size: 14px;
+}
