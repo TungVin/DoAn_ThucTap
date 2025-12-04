@@ -70,7 +70,6 @@ span.remember::before {
   display: inline-block;
   width: 1em;
   height: 1em;
-  border: 2px solid #999;
   vertical-align: top;
   margin-right: 4px;
 }
@@ -384,4 +383,25 @@ button:focus {
       opacity: 0;
       transform: scale(0.8);
     }
+  }
+  /* Alert styles - Thêm vào đầu file auth.css */
+  .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      z-index: 9999;
+      transition: opacity 0.5s;
+      max-width: 400px;
+  }
+
+  .alert-error {
+      background-color: #dc3545;
+  }
+
+  .alert-success {
+      background-color: #28a745;
   }

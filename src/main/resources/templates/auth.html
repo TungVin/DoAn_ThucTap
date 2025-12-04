@@ -1,65 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>Login/Sign up Form with Flip effect</title>
-    <link rel="stylesheet" href="/css/auth.css">  <!-- Đường dẫn CSS -->
+    <title>Đăng nhập / Đăng ký - EduQuiz</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 
 <body>
 
+<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+<div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
 <div id="container">
     <div class="login">
         <div class="content">
-            <h1>Log In</h1>
-            <form>
-                <input type="email" placeholder="email" required>
-                <input type="password" placeholder="password" required>
-                <span class="remember">Remember me</span>
-                <span class="forget">Forgot password?</span>
+            <h1>Đăng nhập</h1>
+            <form th:action="@{/auth/login}" method="post">
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Mật khẩu" required>
+                <label>
+                    <input type="checkbox" name="rememberMe" value="true">
+                    <span class="remember">Ghi nhớ đăng nhập</span>
+                </label>
+                <span class="forget"><a href="#">Quên mật khẩu?</a></span>
                 <span class="clearfix"></span>
-                <button type="submit">Log In</button>
+                <button type="submit">Đăng nhập</button>
             </form>
-            <span class="loginwith">Or Connect with</span>
-            <a href="https://www.facebook.com/emin.qasimovdia">Facebook</a>
-            <a href="https://www.twitter.com/webkoder">Twitter</a>
-            <a href="https://www.github.com/eminqasimov">GitHub</a>
-            <a href="#">LinkedIn</a>
-            <span class="copy">&copy 2019</span>
+            <span class="loginwith">Hoặc đăng nhập với</span>
+            <a href="#">Facebook</a>
+            <a href="#">Google</a>
+            <a href="#">GitHub</a>
+            <span class="copy">&copy; 2024 EduQuiz</span>
         </div>
     </div>
+
     <div class="page front">
         <div class="content">
-            <h1>Hello, friend!</h1>
-            <p>Enter your personal details and start journey with us</p>
-            <button type="button" id="register">Register</button>
+            <h1>Xin chào!</h1>
+            <p>Nhập thông tin của bạn và bắt đầu hành trình cùng chúng tôi</p>
+            <button type="button" id="register">Đăng ký</button>
         </div>
     </div>
+
     <div class="page back">
         <div class="content">
-            <h1>Welcome Back!</h1>
-            <p>To keep connected with us please login with your personal info</p>
-            <button type="button" id="login">Log In</button>
+            <h1>Chào mừng trở lại!</h1>
+            <p>Để tiếp tục kết nối với chúng tôi, vui lòng đăng nhập</p>
+            <button type="button" id="login">Đăng nhập</button>
         </div>
     </div>
+
     <div class="register">
         <div class="content">
-            <h1>Sign Up</h1>
-            <form>
-                <input type="text" placeholder="name" required>
-                <input type="email" placeholder="email" required>
-                <input type="password" placeholder="password" required>
-                <span class="remember">I accept terms</span>
+            <h1>Đăng ký</h1>
+            <form th:action="@{/auth/register}" method="post">
+                <input type="text" name="name" placeholder="Họ và tên" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" required>
+                <label>
+                    <input type="checkbox" name="acceptTerms" value="true" required>
+                    <span class="remember">Tôi chấp nhận điều khoản</span>
+                </label>
                 <span class="clearfix"></span>
-                <button type="submit">Register</button>
+                <button type="submit">Đăng ký</button>
             </form>
         </div>
     </div>
 </div>
 
-<a href="/index" target="_blank" class="version">EduQuiz</a>
-<script src="/js/script.js"></script>  <!-- Đường dẫn JS -->
-</body>
+<a href="/" class="version">← Về trang chủ EduQuiz</a>
 
+<script th:src="@{/js/script.js}"></script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.opacity = '0';
+                setTimeout(function() { alert.remove(); }, 500);
+            }, 3000);
+        });
+    });
+</script>
+
+</body>
 </html>
