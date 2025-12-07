@@ -144,26 +144,26 @@ body {
 
 /* ================= MODAL ================= */
 .modal-overlay {
-    display: none;
+    display: none; /* hidden by default */
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.25);
-    backdrop-filter: blur(3px);
-    z-index: 9999;
-    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
     align-items: center;
-    padding: 20px;
+    justify-content: center;
 }
-.modal-overlay.show { display: flex; }
+.modal-overlay.show {
+    display: flex; /* show when toggled */
+}
 
 .modal-container {
-    width: 85%;
-    height: 90%;
     background: #fff;
-    border-radius: 12px;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     overflow-y: auto;
     animation: modalFade .25s ease;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.15);
 }
 
 @keyframes modalFade {
@@ -339,6 +339,36 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 25px;
+}
+
+/* ===== Modal action buttons: Hủy & Thêm ===== */
+.modal-body .publish-btn {
+    background: #3f4aa0;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.modal-body .publish-btn:hover {
+    background: #2f3a8d;
+}
+
+.modal-body .export-btn {
+    background: #fff;
+    color: #333;
+    border: 1px solid #d0d4db;
+    padding: 10px 16px;
+    border-radius: 6px;
+}
+.modal-body .export-btn:hover {
+    background: #f6f8fb;
+    border-color: #c3c8d2;
+}
+
+/* Align action buttons footer */
+.modal-body .modal-card > div[style*="justify-content:flex-end"] button {
+    min-width: 96px;
 }
 
 /* ================= RESPONSIVE ================= */
