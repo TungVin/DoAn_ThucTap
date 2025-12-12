@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Online Section -->
+<div th:fragment="section" class="section-block section-online">
+    <div class="section" id="onlineLearningSection">
+        <div class="top-action">
+            <h2>Học trực tuyến</h2>
+            <button class="create-btn" id="openAddScheduleModal" type="button">Thêm lịch học +</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div th:if="${#lists.isEmpty(schedules)}" class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có lịch học">
+            <p>Chưa có lịch học trực tuyến nào</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(schedules)}" class="schedule-list">
+            <div class="schedule-item" th:each="s : ${schedules}">
+                <div class="schedule-title" th:text="${s.title}"></div>
+                <div class="schedule-time" th:text="${#temporals.format(s.startTime, 'dd/MM/yyyy HH:mm')} + ' - ' + ${#temporals.format(s.endTime, 'dd/MM/yyyy HH:mm')}"></div>
+                <div class="schedule-platform" th:text="${s.platform}"></div>
+                <div class="schedule-auto" th:text="${s.autoAccept} ? 'Tự động chấp nhận: Bật' : 'Tự động chấp nhận: Tắt'"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Online Modals -->
+<div th:fragment="modals">
+    <!-- Modal thêm lịch học sẽ được thêm ở đây -->
+</div>
+
+</body>
+</html>
+

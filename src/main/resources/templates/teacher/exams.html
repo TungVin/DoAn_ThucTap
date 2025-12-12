@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Exams Section -->
+<div th:fragment="section" class="section-block section-exams">
+    <div class="top-action" id="examsTopAction">
+        <h2>Bài kiểm tra</h2>
+        <button class="create-btn">Tạo bài kiểm tra +</button>
+    </div>
+
+    <div class="section" id="examsOngoingSection">
+        <h3>Đang diễn ra</h3>
+        <div class="divider"></div>
+        <div class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có bài kiểm tra">
+            <p>Hiện tại không có bài trắc nghiệm nào đang diễn ra</p>
+        </div>
+    </div>
+
+    <div class="section" id="examsDraftSection">
+        <h3>Đang soạn</h3>
+        <div class="divider"></div>
+        <div class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có bài kiểm tra">
+            <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Exams Modals -->
+<div th:fragment="modals">
+    <!-- Modal tạo bài kiểm tra sẽ được thêm ở đây -->
+</div>
+
+</body>
+</html>
+

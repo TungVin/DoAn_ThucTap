@@ -1,112 +1,38 @@
 /* ========================= TABS ========================= */
-const tabs = document.querySelectorAll(".tab");
-const sections = document.querySelectorAll(".page-container .section");
-const onlineSection = document.getElementById("onlineLearningSection");
-const quizTopAction = document.querySelector(".page-container > .top-action"); // first top-action belongs to quiz
-const onlineTopAction = onlineSection ? onlineSection.querySelector(".top-action") : null;
-const categoriesSection = document.getElementById("categoriesSection");
-const questionLibrarySection = document.getElementById("questionLibrarySection");
-const classesSection = document.getElementById("classesSection");
+const tabs = document.querySelectorAll('.tabs .tab');
+// Use section-block containers with data-section attributes
+const sections = document.querySelectorAll('.page-container .section-block');
 
-function showOnlyOnline() {
-    // sections
-    sections.forEach(sec => {
-        if (sec === onlineSection) {
-            sec.style.display = "";
-        } else {
-            sec.style.display = "none";
-        }
-    });
-    // top-actions
-    if (quizTopAction) quizTopAction.style.display = "none";
-    if (onlineTopAction) onlineTopAction.style.display = "";
-}
-
-function showOnlyQuiz() {
-    // show quiz sections (assumed first two .section elements are quiz lists)
-    sections.forEach((sec, idx) => {
-        if (idx === 0 || idx === 1) {
-            sec.style.display = "";
-        } else {
-            sec.style.display = "none";
-        }
-    });
-    // top-actions
-    if (quizTopAction) quizTopAction.style.display = "";
-    if (onlineTopAction) onlineTopAction.style.display = "none";
-}
-
-function showOnlyCategories() {
-    sections.forEach(sec => {
-        if (sec === categoriesSection) {
-            sec.style.display = "";
-        } else {
-            sec.style.display = "none";
-        }
-    });
-    if (quizTopAction) quizTopAction.style.display = "none";
-    if (onlineTopAction) onlineTopAction.style.display = "none";
-}
-
-function showOnlyQuestionLibrary() {
-    sections.forEach(sec => {
-        if (sec === questionLibrarySection) {
-            sec.style.display = "";
-        } else {
-            sec.style.display = "none";
-        }
-    });
-    if (quizTopAction) quizTopAction.style.display = "none";
-    if (onlineTopAction) onlineTopAction.style.display = "none";
-}
-
-function showOnlyClasses() {
-    sections.forEach(sec => {
-        if (sec === classesSection) {
-            sec.style.display = "";
-        } else {
-            sec.style.display = "none";
-        }
-    });
-    if (quizTopAction) quizTopAction.style.display = "none";
-    if (onlineTopAction) onlineTopAction.style.display = "none";
-}
-
-function showAllSections() {
-    sections.forEach(sec => { sec.style.display = ""; });
-    if (quizTopAction) quizTopAction.style.display = "";
-    if (onlineTopAction) onlineTopAction.style.display = "";
-}
-
-function applyTabViewByLabel(label) {
-    if (label === "Học trực tuyến") {
-        showOnlyOnline();
-    } else if (label === "Bài kiểm tra") {
-        showOnlyQuiz();
-    } else if (label === "Danh mục") {
-        showOnlyCategories();
-    } else if (label === "Thư viện câu hỏi") {
-        showOnlyQuestionLibrary();
-    } else if (label === "Lớp") {
-        showOnlyClasses();
+function showOnly(targetKey) {
+  // toggle active class on tabs
+  tabs.forEach(t => {
+    t.classList.toggle('active', t.getAttribute('data-target') === targetKey);
+  });
+  // show only matching section by class
+  sections.forEach(sec => {
+    if (sec.classList.contains('section-' + targetKey)) {
+      sec.style.display = '';
     } else {
-        showAllSections();
+      sec.style.display = 'none';
     }
+  });
 }
 
+// Map tab clicks to target keys via data-target
 tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        applyTabViewByLabel(tab.textContent.trim());
-    });
+  tab.addEventListener('click', () => {
+    const key = tab.getAttribute('data-target');
+    showOnly(key);
+  });
 });
 
-// Apply initial view based on the active tab at load
-const activeTab = document.querySelector(".tabs .tab.active");
-if (activeTab) {
-    applyTabViewByLabel(activeTab.textContent.trim());
-}
+// Initial view: based on the tab already marked active (server may set), fallback to first tab
+(function initView(){
+  const activeTab = document.querySelector('.tabs .tab.active');
+  const key = activeTab ? activeTab.getAttribute('data-target') : (tabs[0] ? tabs[0].getAttribute('data-target') : null);
+  if (key) showOnly(key);
+})();
+
 
 
 /* ========================= OPEN & CLOSE MODAL ========================= */
@@ -146,55 +72,58 @@ document.querySelectorAll(".modal-tab").forEach(tab => {
 
 
 /* ========================= SWITCH LOGIC (ON/OFF) ========================= */
-
 // 1) Thời gian làm bài
-const timeLimitToggle = document.getElementById("timeLimitToggle");
-const timeLimitInput = document.getElementById("timeLimitInput");
+const timeLimitToggle = document.getElementById('timeLimitToggle');
+const timeLimitInput = document.getElementById('timeLimitInput');
 
-timeLimitToggle.addEventListener("change", () => {
+if (timeLimitToggle && timeLimitInput) {
+  timeLimitToggle.addEventListener('change', () => {
     timeLimitInput.disabled = !timeLimitToggle.checked;
     if (!timeLimitToggle.checked) {
-        timeLimitInput.value = "";
+      timeLimitInput.value = '';
     }
-});
+  });
+}
 
 // 2) Thời gian bắt đầu làm bài
-const startToggle = document.getElementById("startToggle");
-const startTime = document.getElementById("startTime");
-const startDate = document.getElementById("startDate");
+const startToggle = document.getElementById('startToggle');
+const startTime = document.getElementById('startTime');
+const startDate = document.getElementById('startDate');
 
-startToggle.addEventListener("change", () => {
+if (startToggle && startTime && startDate) {
+  startToggle.addEventListener('change', () => {
     const enable = startToggle.checked;
     startTime.disabled = !enable;
     startDate.disabled = !enable;
 
     if (!enable) {
-        startTime.value = "";
-        startDate.value = "";
+      startTime.value = '';
+      startDate.value = '';
     }
-});
+  });
+}
 
 // 3) Thời gian kết thúc làm bài
-const endToggle = document.getElementById("endToggle");
-const endTime = document.getElementById("endTime");
-const endDate = document.getElementById("endDate");
+const endToggle = document.getElementById('endToggle');
+const endTime = document.getElementById('endTime');
+const endDate = document.getElementById('endDate');
 
-endToggle.addEventListener("change", () => {
+if (endToggle && endTime && endDate) {
+  endToggle.addEventListener('change', () => {
     const enable = endToggle.checked;
     endTime.disabled = !enable;
     endDate.disabled = !enable;
 
     if (!enable) {
-        endTime.value = "";
-        endDate.value = "";
+      endTime.value = '';
+      endDate.value = '';
     }
-});
+  });
+}
 
 
 /* ========================= AUTO SET MIN DATE (KHÔNG CHO CHỌN QUÁ KHỨ) ========================= */
-
-const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
-
+const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
 if (startDate) startDate.min = today;
 if (endDate) endDate.min = today;
 

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Questions Section -->
+<div th:fragment="section" class="section-block section-questions">
+    <div class="section" id="questionLibrarySection">
+        <div class="top-action">
+            <h2>Thư viện câu hỏi</h2>
+            <button class="create-btn" id="openCreateQuestionModal" type="button">Tạo câu hỏi +</button>
+        </div>
+        <div class="divider"></div>
+        <div class="empty-box" th:if="${#lists.isEmpty(questions)}">
+            <img src="/img/empty-quiz.png" alt="Không có câu hỏi">
+            <p>Chưa có câu hỏi nào trong thư viện</p>
+        </div>
+        <div class="question-list" th:if="${!#lists.isEmpty(questions)}">
+            <div class="question-item" th:each="q : ${questions}">
+                <div class="question-title" th:text="${q.title}"></div>
+                <div class="question-category" th:text="${q.category?.name}"></div>
+                <div class="question-type" th:text="${q.type}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Questions Modals -->
+<div th:fragment="modals">
+    <!-- Modal tạo câu hỏi sẽ được thêm ở đây -->
+</div>
+
+</body>
+</html>
+
