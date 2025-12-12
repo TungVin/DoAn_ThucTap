@@ -22,24 +22,24 @@
     </header>
 
     <!-- NAVIGATION TABS -->
-    <div class="tabs">
-        <a class="tab active">Bài kiểm tra</a>
-        <a class="tab">Lịch sử</a>
-        <a class="tab">Danh mục</a>
-        <a class="tab">Học trực tuyến</a>
-        <a class="tab">Thư viện câu hỏi</a>
-        <a class="tab">Lớp</a>
+    <div class="tabs" th:with="activeTab=${activeTab != null ? activeTab : 'exams'}">
+        <a class="tab" th:classappend="${activeTab} == 'exams' ? ' active'" data-target="exams">Bài kiểm tra</a>
+        <a class="tab" th:classappend="${activeTab} == 'history' ? ' active'" data-target="history">Lịch sử</a>
+        <a class="tab" th:classappend="${activeTab} == 'categories' ? ' active'" data-target="categories">Danh mục</a>
+        <a class="tab" th:classappend="${activeTab} == 'online' ? ' active'" data-target="online">Học trực tuyến</a>
+        <a class="tab" th:classappend="${activeTab} == 'questions' ? ' active'" data-target="questions">Thư viện câu hỏi</a>
+        <a class="tab" th:classappend="${activeTab} == 'classes' ? ' active'" data-target="classes">Lớp</a>
     </div>
 
     <!-- PAGE CONTENT -->
     <div class="page-container">
 
-        <div class="top-action">
+        <div class="top-action section-block section-exams" id="examsTopAction">
             <h2>Bài kiểm tra</h2>
             <button class="create-btn">Tạo bài kiểm tra +</button>
         </div>
 
-        <div class="section">
+        <div class="section section-block section-exams" id="examsOngoingSection">
             <h3>Đang diễn ra</h3>
             <div class="divider"></div>
             <div class="empty-box">
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <div class="section">
+        <div class="section section-block section-exams" id="examsDraftSection">
             <h3>Đang soạn</h3>
             <div class="divider"></div>
             <div class="empty-box">
@@ -57,8 +57,62 @@
             </div>
         </div>
 
+        <!-- ==================== LỊCH SỬ ==================== -->
+        <div class="section section-block section-history" id="historySection">
+            <div class="top-action">
+                <h2>Lịch sử</h2>
+            </div>
+            <div class="divider"></div>
+
+            <!-- Câu hỏi đã tạo gần đây -->
+            <h3>Câu hỏi đã tạo gần đây</h3>
+
+            <div th:if="${#lists.isEmpty(historyQuestions)}" class="empty-box">
+                <img src="/images/empty-quiz.png" alt="Không có câu hỏi lịch sử">
+                <p>Chưa có câu hỏi nào được tạo</p>
+            </div>
+
+            <div class="history-question-list" th:if="${!#lists.isEmpty(historyQuestions)}">
+                <div class="history-question-item" th:each="q : ${historyQuestions}">
+                    <div class="history-question-main">
+                        <div class="history-question-title" th:text="${q.title}"></div>
+                        <div class="history-question-meta">
+                            <span th:text="${q.category != null ? q.category.name : 'Không có danh mục'}"></span>
+                            <span>|</span>
+                            <span th:text="${q.type}"></span>
+                            <span th:if="${q.createdAt != null}">
+                                | <span th:text="${#temporals.format(q.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bài kiểm tra đã tạo gần đây -->
+            <h3 style="margin-top:24px;">Bài kiểm tra đã tạo gần đây</h3>
+
+            <div th:if="${#lists.isEmpty(historyExams)}" class="empty-box">
+                <img src="/images/empty-quiz.png" alt="Không có bài kiểm tra lịch sử">
+                <p>Chưa có bài kiểm tra nào được tạo</p>
+            </div>
+
+            <div class="history-exam-list" th:if="${!#lists.isEmpty(historyExams)}">
+                <div class="history-exam-item" th:each="e : ${historyExams}">
+                    <div class="history-exam-main">
+                        <div class="history-exam-title" th:text="${e.title}"></div>
+                        <div class="history-exam-meta">
+                            <span th:text="${e.subject != null ? e.subject : 'Không có môn học'}"></span>
+                            <span th:if="${e.createdAt != null}">
+                                | <span th:text="${#temporals.format(e.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ==================== HỌC TRỰC TUYẾN ==================== -->
-        <div class="section" id="onlineLearningSection">
+        <div class="section section-block section-online" id="onlineLearningSection">
             <div class="top-action">
                 <h2>Học trực tuyến</h2>
                 <button class="create-btn" id="openAddScheduleModal" type="button" onclick="(function(){var m=document.getElementById('addScheduleModal'); if(m){ m.classList.add('show'); m.style.display='flex'; } })()">Thêm lịch học +</button>
@@ -82,7 +136,7 @@
         </div>
 
         <!-- ==================== DANH MỤC ==================== -->
-        <div class="section" id="categoriesSection">
+        <div class="section section-block section-categories" id="categoriesSection">
             <div class="top-action">
                 <h2>Danh mục</h2>
                 <button class="create-btn" id="openAddCategoryModal" type="button" onclick="(function(){var m=document.getElementById('addCategoryModal'); if(m){ m.classList.add('show'); m.style.display='flex'; } })()">Thêm danh mục +</button>
@@ -103,7 +157,7 @@
         </div>
 
         <!-- ==================== THƯ VIỆN CÂU HỎI ==================== -->
-        <div class="section" id="questionLibrarySection">
+        <div class="section section-block section-questions" id="questionLibrarySection">
             <div class="top-action">
                 <h2>Thư viện câu hỏi</h2>
                 <button class="create-btn" id="openCreateQuestionModal" type="button">Tạo câu hỏi +</button>
@@ -118,6 +172,35 @@
                     <div class="question-title" th:text="${q.title}"></div>
                     <div class="question-category" th:text="${q.category?.name}"></div>
                     <div class="question-type" th:text="${q.type}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== LỚP HỌC ==================== -->
+        <div class="section section-block section-classes" id="classesSection">
+            <div class="top-action">
+                <h2>Lớp học</h2>
+                <button class="create-btn" id="openAddClassModal" type="button" onclick="(function(){var m=document.getElementById('addClassModal'); if(m){ m.classList.add('show'); m.style.display='flex'; } })()">Thêm lớp học +</button>
+            </div>
+            <div class="divider"></div>
+
+            <div th:if="${classSuccess}" class="alert success" th:text="${classSuccess}"></div>
+            <div th:if="${classError}" class="alert error" th:text="${classError}"></div>
+
+            <div th:if="${#lists.isEmpty(classes)}" class="empty-box">
+                <img src="/images/empty-quiz.png" alt="Không có lớp học">
+                <p>Chưa có lớp học nào</p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(classes)}" class="class-list">
+                <div class="class-item" th:each="c : ${classes}">
+                    <div class="class-image" th:if="${c.imagePath != null}">
+                        <img th:src="${c.imagePath}" alt="Ảnh lớp">
+                    </div>
+                    <div class="class-info">
+                        <h4 th:text="${c.name}"></h4>
+                        <p th:text="${c.description}"></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -482,6 +565,36 @@
         </div>
     </div>
 
+    <!-- ==================== MODAL THÊM LỚP HỌC ==================== -->
+    <div id="addClassModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <span id="closeAddClassModal" class="close-btn">✕</span>
+                <h3>Thêm lớp học</h3>
+                <div class="modal-actions"></div>
+            </div>
+            <div class="modal-body">
+                <form id="addClassForm" method="post" th:action="@{/teacher/classes}" enctype="multipart/form-data">
+                    <div class="modal-card">
+                        <label>Tên lớp học</label>
+                        <input type="text" name="name" class="input" placeholder="Nhập tên lớp học" required>
+
+                        <label style="margin-top:10px;">Mô tả (tuỳ chọn)</label>
+                        <textarea name="description" class="textarea" placeholder="Mô tả ngắn về lớp học"></textarea>
+
+                        <label style="margin-top:10px;">Ảnh đại diện (tuỳ chọn)</label>
+                        <input type="file" name="image" accept="image/*" class="input">
+
+                        <div style="margin-top:16px; display:flex; gap:10px; justify-content:flex-end;">
+                            <button type="button" class="export-btn" onclick="(function(){var m=document.getElementById('addClassModal'); if(m){ m.classList.remove('show'); m.style.display=''; } })()">Hủy</button>
+                            <button type="submit" class="publish-btn">Thêm</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/teacher.js"></script>
     <script>
         // Compose datetime-local strings acceptable by ISO DATE_TIME for Spring
@@ -608,6 +721,54 @@
           if(closeQBtn) closeQBtn.addEventListener('click', closeModal);
           if(cancelQBtn) cancelQBtn.addEventListener('click', closeModal);
           window.addEventListener('click', (e)=>{ if(e.target===qModal){ closeModal(); } });
+        })();
+
+        // ===================== TAB SWITCHING =====================
+        (function(){
+          const tabEls = document.querySelectorAll('.tabs .tab');
+          const sectionMap = {
+            exams: ['section-exams'],
+            history: ['section-history'],
+            categories: ['section-categories'],
+            online: ['section-online'],
+            questions: ['section-questions'],
+            classes: ['section-classes']
+          };
+
+          function setActiveTab(targetKey){
+            // active class cho tab
+            tabEls.forEach(t=>{
+              if(t.getAttribute('data-target') === targetKey){
+                t.classList.add('active');
+              } else {
+                t.classList.remove('active');
+              }
+            });
+
+            // ẩn/hiện section
+            const allSections = document.querySelectorAll('.section-block');
+            allSections.forEach(sec => {
+              sec.classList.add('hidden-by-tab');
+            });
+
+            const keys = sectionMap[targetKey] || [];
+            keys.forEach(k => {
+              document.querySelectorAll('.' + k).forEach(sec => {
+                sec.classList.remove('hidden-by-tab');
+              });
+            });
+          }
+
+          tabEls.forEach(t => {
+            t.addEventListener('click', () => {
+              const key = t.getAttribute('data-target');
+              setActiveTab(key);
+            });
+          });
+
+          // Khởi tạo: nếu server truyền activeTab thì dùng, mặc định exams
+          const serverActiveTab = /*[[${activeTab}]]*/ 'exams';
+          setActiveTab(serverActiveTab || 'exams');
         })();
     </script>
 </body>

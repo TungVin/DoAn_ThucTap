@@ -6,6 +6,7 @@ const quizTopAction = document.querySelector(".page-container > .top-action"); /
 const onlineTopAction = onlineSection ? onlineSection.querySelector(".top-action") : null;
 const categoriesSection = document.getElementById("categoriesSection");
 const questionLibrarySection = document.getElementById("questionLibrarySection");
+const classesSection = document.getElementById("classesSection");
 
 function showOnlyOnline() {
     // sections
@@ -59,6 +60,18 @@ function showOnlyQuestionLibrary() {
     if (onlineTopAction) onlineTopAction.style.display = "none";
 }
 
+function showOnlyClasses() {
+    sections.forEach(sec => {
+        if (sec === classesSection) {
+            sec.style.display = "";
+        } else {
+            sec.style.display = "none";
+        }
+    });
+    if (quizTopAction) quizTopAction.style.display = "none";
+    if (onlineTopAction) onlineTopAction.style.display = "none";
+}
+
 function showAllSections() {
     sections.forEach(sec => { sec.style.display = ""; });
     if (quizTopAction) quizTopAction.style.display = "";
@@ -74,6 +87,8 @@ function applyTabViewByLabel(label) {
         showOnlyCategories();
     } else if (label === "Thư viện câu hỏi") {
         showOnlyQuestionLibrary();
+    } else if (label === "Lớp") {
+        showOnlyClasses();
     } else {
         showAllSections();
     }
