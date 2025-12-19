@@ -36,14 +36,6 @@ public class TeacherScheduleController {
         this.questionService = questionService;
     }
 
-    @GetMapping("/teacher")
-    public String teacher(Model model) {
-        model.addAttribute("schedules", scheduleService.findAll());
-        model.addAttribute("classes", classRoomService.findAll());
-        model.addAttribute("questions", questionService.findAllOrdered());
-        model.addAttribute("historyQuestions", questionService.findAllOrdered());
-        return "teacher";
-    }
 
     @PostMapping("/teacher/schedules")
     public String addSchedule(
