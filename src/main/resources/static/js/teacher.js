@@ -223,3 +223,59 @@ startDate.addEventListener("change", () => {
     typeSelect.addEventListener('change', ()=>renderTypeUI(typeSelect.value));
   }
 })();
+
+/* ===================== CATEGORY MODAL ===================== */
+(function(){
+  const modal = document.getElementById('addCategoryModal');
+  const openBtn = document.getElementById('openAddCategoryModal');
+  const closeBtn = document.getElementById('closeCategoryModal');
+  const cancelBtn = document.getElementById('cancelCategoryBtn');
+
+  function open(){ if(modal){ modal.classList.add('show'); modal.style.display='flex'; } }
+  function close(){ if(modal){ modal.classList.remove('show'); modal.style.display=''; } }
+
+  if(openBtn) openBtn.addEventListener('click', open);
+  if(closeBtn) closeBtn.addEventListener('click', close);
+  if(cancelBtn) cancelBtn.addEventListener('click', close);
+  window.addEventListener('click', (e)=>{ if(e.target===modal){ close(); } });
+})();
+
+/* ===================== CLASS MODAL ===================== */
+(function(){
+  const modal = document.getElementById('addClassModal');
+  const openBtn = document.getElementById('openAddClassModal');
+  const closeBtn = document.getElementById('closeClassModal');
+  const cancelBtn = document.getElementById('cancelClassBtn');
+
+  function open(){ if(modal){ modal.classList.add('show'); modal.style.display='flex'; } }
+  function close(){ if(modal){ modal.classList.remove('show'); modal.style.display=''; } }
+
+  if(openBtn) openBtn.addEventListener('click', open);
+  if(closeBtn) closeBtn.addEventListener('click', close);
+  if(cancelBtn) cancelBtn.addEventListener('click', close);
+  window.addEventListener('click', (e)=>{ if(e.target===modal){ close(); } });
+})();
+
+/* ===================== ONLINE SCHEDULE MODAL ===================== */
+(function(){
+  const modal = document.getElementById('addScheduleModal');
+  const openBtn = document.getElementById('openAddScheduleModal');
+  const closeBtn = document.getElementById('closeScheduleModal');
+  const cancelBtn = document.getElementById('cancelScheduleBtn');
+
+  function open(){ if(modal){ modal.classList.add('show'); modal.style.display='flex'; } }
+  function close(){ if(modal){ modal.classList.remove('show'); modal.style.display=''; } }
+
+  if(openBtn) openBtn.addEventListener('click', open);
+  if(closeBtn) closeBtn.addEventListener('click', close);
+  if(cancelBtn) cancelBtn.addEventListener('click', close);
+  window.addEventListener('click', (e)=>{ if(e.target===modal){ close(); } });
+
+  // Set minimum date to today for schedule dates
+  const today = new Date().toISOString().split('T')[0];
+  const startDateInput = document.getElementById('scheduleStartDate');
+  const endDateInput = document.getElementById('scheduleEndDate');
+  if(startDateInput) startDateInput.min = today;
+  if(endDateInput) endDateInput.min = today;
+})();
+
