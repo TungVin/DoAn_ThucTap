@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Categories Section -->
+<div th:fragment="section" class="section-block section-categories">
+    <div class="section" id="categoriesSection">
+        <div class="top-action">
+            <h2>Danh mục</h2>
+            <button class="create-btn" id="openAddCategoryModal" type="button">Thêm danh mục +</button>
+        </div>
+        <div class="divider"></div>
+
+        <div th:if="${#lists.isEmpty(categories)}" class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có danh mục">
+            <p>Chưa có danh mục nào</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(categories)}" class="category-list">
+            <div class="category-item" th:each="c : ${categories}">
+                <div class="category-name" th:text="${c.name}"></div>
+                <div class="category-desc" th:text="${c.description}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Categories Modals -->
+<div th:fragment="modals">
+    <!-- Modal thêm danh mục -->
+    <div class="modal-overlay" id="addCategoryModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Thêm danh mục mới</h3>
+                <span class="close-btn" id="closeCategoryModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm" method="post" action="/teacher/categories/create">
+                    <div class="form-group">
+                        <label for="categoryName">Tên danh mục *</label>
+                        <input type="text" id="categoryName" name="name" class="input" required placeholder="Nhập tên danh mục">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoryDescription">Mô tả</label>
+                        <textarea id="categoryDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả danh mục"></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelCategoryBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Thêm danh mục</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

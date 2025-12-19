@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Online Section -->
+<div th:fragment="section" class="section-block section-online">
+    <div class="section" id="onlineLearningSection">
+        <div class="top-action">
+            <h2>Học trực tuyến</h2>
+            <button class="create-btn" id="openAddScheduleModal" type="button">Thêm lịch học +</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div th:if="${#lists.isEmpty(schedules)}" class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có lịch học">
+            <p>Chưa có lịch học trực tuyến nào</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(schedules)}" class="schedule-list">
+            <div class="schedule-item" th:each="s : ${schedules}">
+                <div class="schedule-title" th:text="${s.title}"></div>
+                <div class="schedule-time" th:text="${#temporals.format(s.startTime, 'dd/MM/yyyy HH:mm')} + ' - ' + ${#temporals.format(s.endTime, 'dd/MM/yyyy HH:mm')}"></div>
+                <div class="schedule-platform" th:text="${s.platform}"></div>
+                <div class="schedule-auto" th:text="${s.autoAccept} ? 'Tự động chấp nhận: Bật' : 'Tự động chấp nhận: Tắt'"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Online Modals -->
+<div th:fragment="modals">
+    <!-- Modal thêm lịch học trực tuyến -->
+    <div class="modal-overlay" id="addScheduleModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Thêm lịch học trực tuyến</h3>
+                <span class="close-btn" id="closeScheduleModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addScheduleForm" method="post" action="/teacher/online/create">
+                    <div class="form-group">
+                        <label for="scheduleTitle">Tiêu đề *</label>
+                        <input type="text" id="scheduleTitle" name="title" class="input" required placeholder="Nhập tiêu đề buổi học">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scheduleClass">Lớp học *</label>
+                        <select id="scheduleClass" name="classId" class="input" required>
+                            <option value="">-- Chọn lớp học --</option>
+                            <option th:each="cls : ${classes}" th:value="${cls.id}" th:text="${cls.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="schedulePlatform">Nền tảng *</label>
+                        <select id="schedulePlatform" name="platform" class="input" required>
+                            <option value="">-- Chọn nền tảng --</option>
+                            <option value="Zoom">Zoom</option>
+                            <option value="Google Meet">Google Meet</option>
+                            <option value="Microsoft Teams">Microsoft Teams</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scheduleMeetingLink">Link cuộc họp</label>
+                        <input type="url" id="scheduleMeetingLink" name="meetingLink" class="input" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời gian bắt đầu *</label>
+                        <div class="datetime-group">
+                            <input type="date" id="scheduleStartDate" name="startDate" class="input" required>
+                            <input type="time" id="scheduleStartTime" name="startTime" class="input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời gian kết thúc *</label>
+                        <div class="datetime-group">
+                            <input type="date" id="scheduleEndDate" name="endDate" class="input" required>
+                            <input type="time" id="scheduleEndTime" name="endTime" class="input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="scheduleAutoAccept" name="autoAccept" value="true">
+                            Tự động chấp nhận học sinh tham gia
+                        </label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelScheduleBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Thêm lịch học</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

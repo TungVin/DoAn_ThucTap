@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Exams Section -->
+<div th:fragment="section" class="section-block section-exams">
+    <div class="top-action" id="examsTopAction">
+        <h2>Bài kiểm tra</h2>
+        <button class="create-btn">Tạo bài kiểm tra +</button>
+    </div>
+
+    <div class="section" id="examsOngoingSection">
+        <h3>Đang diễn ra</h3>
+        <div class="divider"></div>
+        <div class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có bài kiểm tra">
+            <p>Hiện tại không có bài trắc nghiệm nào đang diễn ra</p>
+        </div>
+    </div>
+
+    <div class="section" id="examsDraftSection">
+        <h3>Đang soạn</h3>
+        <div class="divider"></div>
+        <div class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có bài kiểm tra">
+            <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Exams Modals -->
+<div th:fragment="modals">
+    <!-- Modal tạo bài kiểm tra -->
+    <div class="modal-overlay" id="createQuizModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Tạo bài kiểm tra mới</h3>
+                <span class="close-btn" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="createQuizForm" method="post" action="/teacher/exams/create">
+                    <div class="form-group">
+                        <label for="quizTitle">Tên bài kiểm tra *</label>
+                        <input type="text" id="quizTitle" name="title" class="input" required placeholder="Nhập tên bài kiểm tra">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quizDescription">Mô tả</label>
+                        <textarea id="quizDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả bài kiểm tra"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quizCategory">Danh mục</label>
+                        <select id="quizCategory" name="categoryId" class="input">
+                            <option value="">-- Chọn danh mục --</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group switch-group">
+                        <label>
+                            <input type="checkbox" id="timeLimitToggle" name="hasTimeLimit">
+                            Giới hạn thời gian làm bài
+                        </label>
+                        <input type="number" id="timeLimitInput" name="timeLimit" class="input" disabled placeholder="Số phút">
+                    </div>
+
+                    <div class="form-group switch-group">
+                        <label>
+                            <input type="checkbox" id="startToggle" name="hasStartTime">
+                            Thời gian bắt đầu
+                        </label>
+                        <div class="datetime-group">
+                            <input type="date" id="startDate" name="startDate" class="input" disabled>
+                            <input type="time" id="startTime" name="startTime" class="input" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group switch-group">
+                        <label>
+                            <input type="checkbox" id="endToggle" name="hasEndTime">
+                            Thời gian kết thúc
+                        </label>
+                        <div class="datetime-group">
+                            <input type="date" id="endDate" name="endDate" class="input" disabled>
+                            <input type="time" id="endTime" name="endTime" class="input" disabled>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelQuizBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Tạo bài kiểm tra</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

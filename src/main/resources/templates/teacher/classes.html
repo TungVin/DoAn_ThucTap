@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Classes Section -->
+<div th:fragment="section" class="section-block section-classes">
+    <div class="section" id="classesSection">
+        <div class="top-action">
+            <h2>Lớp học</h2>
+            <button class="create-btn" id="openAddClassModal" type="button">Thêm lớp học +</button>
+        </div>
+        <div class="divider"></div>
+
+        <div th:if="${classSuccess}" class="alert success" th:text="${classSuccess}"></div>
+        <div th:if="${classError}" class="alert error" th:text="${classError}"></div>
+
+        <div th:if="${#lists.isEmpty(classes)}" class="empty-box">
+            <img src="/img/empty-quiz.png" alt="Không có lớp học">
+            <p>Chưa có lớp học nào</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(classes)}" class="class-list">
+            <div class="class-item" th:each="c : ${classes}">
+                <div class="class-image" th:if="${c.imagePath != null}">
+                    <img th:src="${c.imagePath}" alt="Ảnh lớp">
+                </div>
+                <div class="class-info">
+                    <h4 th:text="${c.name}"></h4>
+                    <p th:text="${c.description}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Classes Modals -->
+<div th:fragment="modals">
+    <!-- Modal thêm lớp học -->
+    <div class="modal-overlay" id="addClassModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Thêm lớp học mới</h3>
+                <span class="close-btn" id="closeClassModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addClassForm" method="post" action="/teacher/classes/create" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="className">Tên lớp học *</label>
+                        <input type="text" id="className" name="name" class="input" required placeholder="Nhập tên lớp học">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="classDescription">Mô tả</label>
+                        <textarea id="classDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả lớp học"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="classImage">Hình ảnh lớp học</label>
+                        <input type="file" id="classImage" name="image" class="input" accept="image/*">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelClassBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Thêm lớp học</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+

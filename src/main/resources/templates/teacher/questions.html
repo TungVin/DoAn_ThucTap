@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Fragment: Questions Section -->
+<div th:fragment="section" class="section-block section-questions">
+    <div class="section" id="questionLibrarySection">
+        <div class="top-action">
+            <h2>Thư viện câu hỏi</h2>
+            <button class="create-btn" id="openCreateQuestionModal" type="button">Tạo câu hỏi +</button>
+        </div>
+        <div class="divider"></div>
+        <div class="empty-box" th:if="${#lists.isEmpty(questions)}">
+            <img src="/img/empty-quiz.png" alt="Không có câu hỏi">
+            <p>Chưa có câu hỏi nào trong thư viện</p>
+        </div>
+        <div class="question-list" th:if="${!#lists.isEmpty(questions)}">
+            <div class="question-item" th:each="q : ${questions}">
+                <div class="question-title" th:text="${q.title}"></div>
+                <div class="question-category" th:text="${q.category?.name}"></div>
+                <div class="question-type" th:text="${q.type}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fragment: Questions Modals -->
+<div th:fragment="modals">
+    <!-- Modal tạo câu hỏi -->
+    <div class="modal-overlay" id="createQuestionModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Tạo câu hỏi mới</h3>
+                <span class="close-btn" id="closeCreateQuestionModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="createQuestionForm" method="post" action="/teacher/questions/create">
+                    <div class="form-group">
+                        <label for="questionTitle">Câu hỏi *</label>
+                        <textarea id="questionTitle" name="title" class="input" rows="2" required placeholder="Nhập nội dung câu hỏi"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="questionCategory">Danh mục</label>
+                        <select id="questionCategory" name="categoryId" class="input">
+                            <option value="">-- Chọn danh mục --</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="questionTypeSelect">Loại câu hỏi *</label>
+                        <select id="questionTypeSelect" name="type" class="input" required>
+                            <option value="single_choice">Trắc nghiệm (1 đáp án đúng)</option>
+                            <option value="multiple_choice">Trắc nghiệm (nhiều đáp án đúng)</option>
+                            <option value="short_answer">Câu trả lời ngắn</option>
+                            <option value="best_short_answer">Câu trả lời ngắn tốt nhất</option>
+                            <option value="match_pairs">Nối cặp</option>
+                            <option value="yes_no">Có/Không</option>
+                            <option value="true_false">Đúng/Sai</option>
+                        </select>
+                    </div>
+
+                    <div id="questionOptionsArea">
+                        <!-- Dynamic content will be inserted here by JavaScript -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="questionPoints">Điểm</label>
+                        <input type="number" id="questionPoints" name="points" class="input" value="1" min="0" step="0.5">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelCreateQuestionBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Tạo câu hỏi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
