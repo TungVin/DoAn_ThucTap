@@ -307,21 +307,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Event delegation for edit and delete buttons
-    document.addEventListener('click', function(e) {
-        const editBtn = e.target.closest('.btn-edit');
-        if (editBtn && editBtn.closest('.schedule-card')) {
-            console.log('Edit schedule button clicked:', editBtn.dataset);
-            openEditScheduleModal(editBtn);
-        }
+    // Event delegation for edit and delete buttons - ONLY for online schedules
+    const onlineSection = document.getElementById('onlineLearningSection');
+    if (onlineSection) {
+        onlineSection.addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.btn-edit');
+            if (editBtn && editBtn.closest('.schedule-card')) {
+                console.log('Edit schedule button clicked:', editBtn.dataset);
+                openEditScheduleModal(editBtn);
+                return; // Stop propagation
+            }
 
-        const deleteBtn = e.target.closest('.btn-delete');
-        if (deleteBtn && deleteBtn.closest('.schedule-card')) {
-            const scheduleId = parseInt(deleteBtn.dataset.scheduleId);
-            const scheduleTitle = deleteBtn.dataset.scheduleTitle;
-            confirmDeleteSchedule(scheduleId, scheduleTitle);
-        }
-    });
+            const deleteBtn = e.target.closest('.btn-delete');
+            if (deleteBtn && deleteBtn.closest('.schedule-card')) {
+                const scheduleId = parseInt(deleteBtn.dataset.scheduleId);
+                const scheduleTitle = deleteBtn.dataset.scheduleTitle;
+                confirmDeleteSchedule(scheduleId, scheduleTitle);
+                return; // Stop propagation
+            }
+        });
+    }
 
     // Open edit schedule modal
     function openEditScheduleModal(editBtn) {

@@ -247,21 +247,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Event delegation for edit buttons
-    document.addEventListener('click', function(e) {
-        const editBtn = e.target.closest('.btn-edit');
-        if (editBtn) {
-            console.log('Edit button clicked:', editBtn.dataset);
-            openEditClassModal(editBtn);
-        }
+    // Event delegation for edit buttons - ONLY for classes
+    const classesSection = document.getElementById('classesSection');
+    if (classesSection) {
+        classesSection.addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.btn-edit');
+            if (editBtn && editBtn.closest('.class-card')) {
+                console.log('Edit class button clicked:', editBtn.dataset);
+                openEditClassModal(editBtn);
+                return; // Stop propagation
+            }
 
-        const deleteBtn = e.target.closest('.btn-delete');
-        if (deleteBtn) {
-            const classId = parseInt(deleteBtn.dataset.classId);
-            const className = deleteBtn.dataset.className;
-            confirmDeleteClass(classId, className);
-        }
-    });
+            const deleteBtn = e.target.closest('.btn-delete');
+            if (deleteBtn && deleteBtn.closest('.class-card')) {
+                const classId = parseInt(deleteBtn.dataset.classId);
+                const className = deleteBtn.dataset.className;
+                confirmDeleteClass(classId, className);
+                return; // Stop propagation
+            }
+        });
+    }
 
     // Open edit class modal
     function openEditClassModal(editBtn) {

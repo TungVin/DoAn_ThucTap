@@ -225,21 +225,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Event delegation for edit and delete buttons
-    document.addEventListener('click', function(e) {
-        const editBtn = e.target.closest('.btn-edit');
-        if (editBtn && editBtn.closest('.category-card')) {
-            console.log('Edit category button clicked:', editBtn.dataset);
-            openEditCategoryModal(editBtn);
-        }
+    // Event delegation for edit and delete buttons - ONLY for categories
+    const categoriesSection = document.getElementById('categoriesSection');
+    if (categoriesSection) {
+        categoriesSection.addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.btn-edit');
+            if (editBtn && editBtn.closest('.category-card')) {
+                console.log('Edit category button clicked:', editBtn.dataset);
+                openEditCategoryModal(editBtn);
+                return; // Stop propagation
+            }
 
-        const deleteBtn = e.target.closest('.btn-delete');
-        if (deleteBtn && deleteBtn.closest('.category-card')) {
-            const categoryId = parseInt(deleteBtn.dataset.categoryId);
-            const categoryName = deleteBtn.dataset.categoryName;
-            confirmDeleteCategory(categoryId, categoryName);
-        }
-    });
+            const deleteBtn = e.target.closest('.btn-delete');
+            if (deleteBtn && deleteBtn.closest('.category-card')) {
+                const categoryId = parseInt(deleteBtn.dataset.categoryId);
+                const categoryName = deleteBtn.dataset.categoryName;
+                confirmDeleteCategory(categoryId, categoryName);
+                return; // Stop propagation
+            }
+        });
+    }
 
     // Open edit category modal
     function openEditCategoryModal(editBtn) {
