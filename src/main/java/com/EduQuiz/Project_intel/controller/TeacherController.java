@@ -282,5 +282,59 @@ public class TeacherController {
 
         return "redirect:/teacher?activeTab=online";
     }
+
+    @PostMapping("/online/update")
+    public String updateSchedule(@RequestParam Long id,
+                                 @RequestParam String title,
+                                 @RequestParam String platform,
+                                 @RequestParam String startDate,
+                                 @RequestParam String startTime,
+                                 @RequestParam String endDate,
+                                 @RequestParam String endTime,
+                                 @RequestParam(required = false) String autoAccept,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            Schedule schedule = scheduleService.findById(id);
+            if (schedule == null) {
+                redirectAttributes.addFlashAttribute("scheduleError", "Không tìm thấy lịch học!");
+                return "redirect:/teacher?activeTab=online";
+            }
+
+            LocalDateTime startDateTime = LocalDateTime.of(
+                LocalDate.parse(startDate),
+                LocalTime.parse(startTime)
+            );
+
+            LocalDateTime endDateTime = LocalDateTime.of(
+                LocalDate.parse(endDate),
+                LocalTime.parse(endTime)
+            );
+
+            schedule.setTitle(title);
+            schedule.setPlatform(platform.toLowerCase().replace(" ", "_"));
+            schedule.setStartTime(startDateTime);
+            schedule.setEndTime(endDateTime);
+            schedule.setAutoAccept("true".equals(autoAccept));
+
+            scheduleService.save(schedule);
+            redirectAttributes.addFlashAttribute("scheduleSuccess", "Cập nhật lịch học thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("scheduleError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=online";
+    }
+
+    @PostMapping("/online/delete")
+    public String deleteSchedule(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        try {
+            scheduleService.deleteById(id);
+            redirectAttributes.addFlashAttribute("scheduleSuccess", "Xóa lịch học thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("scheduleError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=online";
+    }
 }
 

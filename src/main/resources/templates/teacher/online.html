@@ -12,17 +12,80 @@
 
         <div class="divider"></div>
 
+        <div th:if="${scheduleSuccess}" class="alert success" th:text="${scheduleSuccess}"></div>
+        <div th:if="${scheduleError}" class="alert error" th:text="${scheduleError}"></div>
+
         <div th:if="${#lists.isEmpty(schedules)}" class="empty-box">
             <img src="/img/empty-quiz.png" alt="Không có lịch học">
             <p>Chưa có lịch học trực tuyến nào</p>
         </div>
 
-        <div th:if="${!#lists.isEmpty(schedules)}" class="schedule-list">
-            <div class="schedule-item" th:each="s : ${schedules}">
-                <div class="schedule-title" th:text="${s.title}"></div>
-                <div class="schedule-time" th:text="${#temporals.format(s.startTime, 'dd/MM/yyyy HH:mm')} + ' - ' + ${#temporals.format(s.endTime, 'dd/MM/yyyy HH:mm')}"></div>
-                <div class="schedule-platform" th:text="${s.platform}"></div>
-                <div class="schedule-auto" th:text="${s.autoAccept} ? 'Tự động chấp nhận: Bật' : 'Tự động chấp nhận: Tắt'"></div>
+        <div th:if="${!#lists.isEmpty(schedules)}" class="schedule-grid">
+            <div class="schedule-card" th:each="s : ${schedules}">
+                <div class="schedule-card-header">
+                    <div class="schedule-platform-badge" th:classappend="${s.platform == 'zoom' ? 'badge-zoom' : (s.platform == 'google_meet' ? 'badge-meet' : 'badge-teams')}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                            <polyline points="17 2 12 7 7 2"></polyline>
+                        </svg>
+                        <span th:text="${s.platform}">Zoom</span>
+                    </div>
+                    <div class="schedule-card-actions">
+                        <button class="btn-icon btn-edit"
+                                th:data-schedule-id="${s.id}"
+                                th:data-schedule-title="${s.title}"
+                                th:data-schedule-platform="${s.platform}"
+                                th:data-schedule-start="${s.startTime}"
+                                th:data-schedule-end="${s.endTime}"
+                                th:data-schedule-auto="${s.autoAccept}"
+                                title="Chỉnh sửa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-icon btn-delete"
+                                th:data-schedule-id="${s.id}"
+                                th:data-schedule-title="${s.title}"
+                                title="Xóa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="schedule-card-body">
+                    <h3 class="schedule-card-title" th:text="${s.title}">Tiêu đề buổi học</h3>
+                    <div class="schedule-card-info">
+                        <div class="info-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>Bắt đầu: <strong th:text="${#temporals.format(s.startTime, 'dd/MM/yyyy HH:mm')}">26/12/2024 09:00</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>Kết thúc: <strong th:text="${#temporals.format(s.endTime, 'dd/MM/yyyy HH:mm')}">26/12/2024 11:00</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="schedule-card-footer">
+                    <span class="auto-accept-badge" th:classappend="${s.autoAccept ? 'badge-on' : 'badge-off'}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path th:if="${s.autoAccept}" d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline th:if="${s.autoAccept}" points="22 4 12 14.01 9 11.01"></polyline>
+                            <circle th:unless="${s.autoAccept}" cx="12" cy="12" r="10"></circle>
+                            <line th:unless="${s.autoAccept}" x1="15" y1="9" x2="9" y2="15"></line>
+                            <line th:unless="${s.autoAccept}" x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                        <span th:text="${s.autoAccept ? 'Tự động chấp nhận' : 'Chấp nhận thủ công'}">Tự động chấp nhận</span>
+                    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -45,14 +108,6 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="scheduleClass">Lớp học *</label>
-                        <select id="scheduleClass" name="classId" class="input" required>
-                            <option value="">-- Chọn lớp học --</option>
-                            <option th:each="cls : ${classes}" th:value="${cls.id}" th:text="${cls.name}"></option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
                         <label for="schedulePlatform">Nền tảng *</label>
                         <select id="schedulePlatform" name="platform" class="input" required>
                             <option value="">-- Chọn nền tảng --</option>
@@ -61,11 +116,6 @@
                             <option value="Microsoft Teams">Microsoft Teams</option>
                             <option value="Khác">Khác</option>
                         </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="scheduleMeetingLink">Link cuộc họp</label>
-                        <input type="url" id="scheduleMeetingLink" name="meetingLink" class="input" placeholder="https://...">
                     </div>
 
                     <div class="form-group">
@@ -99,7 +149,223 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal chỉnh sửa lịch học -->
+    <div class="modal-overlay" id="editScheduleModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Chỉnh sửa lịch học</h3>
+                <span class="close-btn" id="closeEditScheduleModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editScheduleForm" method="post" action="/teacher/online/update">
+                    <input type="hidden" id="editScheduleId" name="id">
+
+                    <div class="form-group">
+                        <label for="editScheduleTitle">Tiêu đề *</label>
+                        <input type="text" id="editScheduleTitle" name="title" class="input" required placeholder="Nhập tiêu đề buổi học">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editSchedulePlatform">Nền tảng *</label>
+                        <select id="editSchedulePlatform" name="platform" class="input" required>
+                            <option value="">-- Chọn nền tảng --</option>
+                            <option value="Zoom">Zoom</option>
+                            <option value="Google Meet">Google Meet</option>
+                            <option value="Microsoft Teams">Microsoft Teams</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời gian bắt đầu *</label>
+                        <div class="datetime-group">
+                            <input type="date" id="editScheduleStartDate" name="startDate" class="input" required>
+                            <input type="time" id="editScheduleStartTime" name="startTime" class="input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời gian kết thúc *</label>
+                        <div class="datetime-group">
+                            <input type="date" id="editScheduleEndDate" name="endDate" class="input" required>
+                            <input type="time" id="editScheduleEndTime" name="endTime" class="input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="editScheduleAutoAccept" name="autoAccept" value="true">
+                            Tự động chấp nhận học sinh tham gia
+                        </label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelEditScheduleBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa -->
+    <div class="modal-overlay" id="deleteScheduleModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-topbar">
+                <h3>Xác nhận xóa lịch học</h3>
+                <span class="close-btn" id="closeDeleteScheduleModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin: 0 0 20px; color: #555;">Bạn có chắc chắn muốn xóa lịch học <strong id="deleteScheduleTitle"></strong>?</p>
+                <p style="margin: 0 0 20px; color: #d9534f; font-size: 14px;">⚠️ Hành động này không thể hoàn tác!</p>
+
+                <form id="deleteScheduleForm" method="post" action="/teacher/online/delete">
+                    <input type="hidden" id="deleteScheduleId" name="id">
+
+                    <div class="modal-footer" style="margin-top: 0; padding-top: 0; border-top: none;">
+                        <button type="button" class="btn-secondary" id="cancelDeleteScheduleBtn">Hủy</button>
+                        <button type="submit" class="btn-danger">Xóa lịch học</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script th:fragment="scripts">
+// Online schedules management scripts
+document.addEventListener('DOMContentLoaded', function() {
+    const addScheduleModal = document.getElementById('addScheduleModal');
+    const editScheduleModal = document.getElementById('editScheduleModal');
+    const deleteScheduleModal = document.getElementById('deleteScheduleModal');
+
+    // Open add schedule modal
+    const openAddScheduleBtn = document.getElementById('openAddScheduleModal');
+    if (openAddScheduleBtn) {
+        openAddScheduleBtn.addEventListener('click', () => {
+            addScheduleModal.classList.add('show');
+        });
+    }
+
+    // Close add schedule modal
+    const closeScheduleModal = document.getElementById('closeScheduleModal');
+    const cancelScheduleBtn = document.getElementById('cancelScheduleBtn');
+
+    if (closeScheduleModal) {
+        closeScheduleModal.addEventListener('click', () => {
+            addScheduleModal.classList.remove('show');
+        });
+    }
+
+    if (cancelScheduleBtn) {
+        cancelScheduleBtn.addEventListener('click', () => {
+            addScheduleModal.classList.remove('show');
+        });
+    }
+
+    // Close edit schedule modal
+    const closeEditScheduleModal = document.getElementById('closeEditScheduleModal');
+    const cancelEditScheduleBtn = document.getElementById('cancelEditScheduleBtn');
+
+    if (closeEditScheduleModal) {
+        closeEditScheduleModal.addEventListener('click', () => {
+            editScheduleModal.classList.remove('show');
+        });
+    }
+
+    if (cancelEditScheduleBtn) {
+        cancelEditScheduleBtn.addEventListener('click', () => {
+            editScheduleModal.classList.remove('show');
+        });
+    }
+
+    // Close delete schedule modal
+    const closeDeleteScheduleModal = document.getElementById('closeDeleteScheduleModal');
+    const cancelDeleteScheduleBtn = document.getElementById('cancelDeleteScheduleBtn');
+
+    if (closeDeleteScheduleModal) {
+        closeDeleteScheduleModal.addEventListener('click', () => {
+            deleteScheduleModal.classList.remove('show');
+        });
+    }
+
+    if (cancelDeleteScheduleBtn) {
+        cancelDeleteScheduleBtn.addEventListener('click', () => {
+            deleteScheduleModal.classList.remove('show');
+        });
+    }
+
+    // Close modals on background click
+    [addScheduleModal, editScheduleModal, deleteScheduleModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        }
+    });
+
+    // Event delegation for edit and delete buttons
+    document.addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.btn-edit');
+        if (editBtn && editBtn.closest('.schedule-card')) {
+            console.log('Edit schedule button clicked:', editBtn.dataset);
+            openEditScheduleModal(editBtn);
+        }
+
+        const deleteBtn = e.target.closest('.btn-delete');
+        if (deleteBtn && deleteBtn.closest('.schedule-card')) {
+            const scheduleId = parseInt(deleteBtn.dataset.scheduleId);
+            const scheduleTitle = deleteBtn.dataset.scheduleTitle;
+            confirmDeleteSchedule(scheduleId, scheduleTitle);
+        }
+    });
+
+    // Open edit schedule modal
+    function openEditScheduleModal(editBtn) {
+        const scheduleId = editBtn.dataset.scheduleId;
+        const scheduleTitle = editBtn.dataset.scheduleTitle;
+        const schedulePlatform = editBtn.dataset.schedulePlatform;
+        const scheduleStart = editBtn.dataset.scheduleStart;
+        const scheduleEnd = editBtn.dataset.scheduleEnd;
+        const scheduleAuto = editBtn.dataset.scheduleAuto;
+
+        console.log('Opening edit modal with data:', {
+            scheduleId, scheduleTitle, schedulePlatform, scheduleStart, scheduleEnd, scheduleAuto
+        });
+
+        document.getElementById('editScheduleId').value = scheduleId;
+        document.getElementById('editScheduleTitle').value = scheduleTitle || '';
+        document.getElementById('editSchedulePlatform').value = schedulePlatform || '';
+
+        // Parse datetime
+        if (scheduleStart) {
+            const startDate = new Date(scheduleStart);
+            document.getElementById('editScheduleStartDate').value = startDate.toISOString().split('T')[0];
+            document.getElementById('editScheduleStartTime').value = startDate.toTimeString().slice(0, 5);
+        }
+
+        if (scheduleEnd) {
+            const endDate = new Date(scheduleEnd);
+            document.getElementById('editScheduleEndDate').value = endDate.toISOString().split('T')[0];
+            document.getElementById('editScheduleEndTime').value = endDate.toTimeString().slice(0, 5);
+        }
+
+        document.getElementById('editScheduleAutoAccept').checked = scheduleAuto === 'true';
+
+        editScheduleModal.classList.add('show');
+    }
+
+    // Confirm delete schedule
+    function confirmDeleteSchedule(scheduleId, scheduleTitle) {
+        document.getElementById('deleteScheduleId').value = scheduleId;
+        document.getElementById('deleteScheduleTitle').textContent = scheduleTitle;
+        deleteScheduleModal.classList.add('show');
+    }
+});
+</script>
 
 </body>
 </html>
