@@ -166,6 +166,48 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=classes";
     }
 
+    @PostMapping("/classes/update")
+    public String updateClass(@RequestParam Long id,
+                              @RequestParam String name,
+                              @RequestParam(required = false) String description,
+                              @RequestParam(required = false) MultipartFile image,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            ClassRoom classRoom = classRoomService.findById(id);
+            if (classRoom == null) {
+                redirectAttributes.addFlashAttribute("classError", "Không tìm thấy lớp học!");
+                return "redirect:/teacher?activeTab=classes";
+            }
+
+            classRoom.setName(name);
+            classRoom.setDescription(description);
+
+            if (image != null && !image.isEmpty()) {
+                String imagePath = fileStorageService.storeClassImage(image);
+                classRoom.setImagePath(imagePath);
+            }
+
+            classRoomService.save(classRoom);
+            redirectAttributes.addFlashAttribute("classSuccess", "Cập nhật lớp học thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("classError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=classes";
+    }
+
+    @PostMapping("/classes/delete")
+    public String deleteClass(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        try {
+            classRoomService.deleteById(id);
+            redirectAttributes.addFlashAttribute("classSuccess", "Xóa lớp học thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("classError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=classes";
+    }
+
     // ==================== ONLINE SCHEDULES ====================
     @PostMapping("/online/create")
     public String createSchedule(@RequestParam String title,

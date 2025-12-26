@@ -54,35 +54,6 @@ public class TeacherScheduleController {
         s.setAutoAccept(autoAccept);
         scheduleService.save(s);
         model.addAttribute("schedules", scheduleService.findAll());
-        return "redirect:/teacher";
-    }
-
-    @PostMapping("/teacher/classes")
-    public String addClass(
-            @RequestParam("name") String name,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            RedirectAttributes redirectAttributes
-    ) {
-        if (name == null || name.trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("classError", "Tên lớp không được để trống");
-            return "redirect:/teacher";
-        }
-
-        ClassRoom classRoom = new ClassRoom();
-        classRoom.setName(name.trim());
-        classRoom.setDescription(description);
-
-        try {
-            String imagePath = fileStorageService.storeClassImage(image);
-            classRoom.setImagePath(imagePath);
-        } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("classError", "Tải ảnh thất bại. Vui lòng thử lại.");
-            return "redirect:/teacher";
-        }
-
-        classRoomService.save(classRoom);
-        redirectAttributes.addFlashAttribute("classSuccess", "Tạo lớp học thành công");
-        return "redirect:/teacher";
+        return "redirect:/teacher?activeTab=online";
     }
 }

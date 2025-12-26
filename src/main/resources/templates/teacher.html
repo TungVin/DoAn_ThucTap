@@ -12,7 +12,9 @@
 
     <!-- HEADER -->
     <header class="header">
-        <div class="logo">EduQuiz</div>
+        <a href="/">
+            <div class="logo">EduQuiz</div>
+        </a>
 
         <nav class="nav-right">
             <a class="icon-btn bell">🔔 Thông báo</a>
@@ -53,5 +55,8 @@
     <div th:replace="~{teacher/classes :: modals}"></div>
 
     <script src="/js/teacher.js"></script>
+
+    <!-- Include scripts từ các fragments -->
+    <div th:replace="~{teacher/classes :: scripts}"></div>
 </body>
 </html>
