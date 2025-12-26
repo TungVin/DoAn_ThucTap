@@ -11,15 +11,57 @@
         </div>
         <div class="divider"></div>
 
+        <div th:if="${categorySuccess}" class="alert success" th:text="${categorySuccess}"></div>
+        <div th:if="${categoryError}" class="alert error" th:text="${categoryError}"></div>
+
         <div th:if="${#lists.isEmpty(categories)}" class="empty-box">
             <img src="/img/empty-quiz.png" alt="Không có danh mục">
             <p>Chưa có danh mục nào</p>
         </div>
 
-        <div th:if="${!#lists.isEmpty(categories)}" class="category-list">
-            <div class="category-item" th:each="c : ${categories}">
-                <div class="category-name" th:text="${c.name}"></div>
-                <div class="category-desc" th:text="${c.description}"></div>
+        <div th:if="${!#lists.isEmpty(categories)}" class="category-grid">
+            <div class="category-card" th:each="c : ${categories}">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="category-card-actions">
+                        <button class="btn-icon btn-edit"
+                                th:data-category-id="${c.id}"
+                                th:data-category-name="${c.name}"
+                                th:data-category-description="${c.description}"
+                                title="Chỉnh sửa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-icon btn-delete"
+                                th:data-category-id="${c.id}"
+                                th:data-category-name="${c.name}"
+                                title="Xóa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="category-card-body">
+                    <h3 class="category-card-title" th:text="${c.name}">Tên danh mục</h3>
+                    <p class="category-card-description" th:text="${c.description ?: 'Chưa có mô tả'}">Mô tả danh mục</p>
+                </div>
+                <div class="category-card-footer">
+                    <span class="category-card-date" th:if="${c.createdAt}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                    </span>
+                </div>
             </div>
         </div>
     </div>

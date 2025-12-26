@@ -118,6 +118,42 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=categories";
     }
 
+    @PostMapping("/categories/update")
+    public String updateCategory(@RequestParam Long id,
+                                 @RequestParam String name,
+                                 @RequestParam(required = false) String description,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            Category category = categoryService.findById(id);
+            if (category == null) {
+                redirectAttributes.addFlashAttribute("categoryError", "Không tìm thấy danh mục!");
+                return "redirect:/teacher?activeTab=categories";
+            }
+
+            category.setName(name);
+            category.setDescription(description);
+            categoryService.save(category);
+
+            redirectAttributes.addFlashAttribute("categorySuccess", "Cập nhật danh mục thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("categoryError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=categories";
+    }
+
+    @PostMapping("/categories/delete")
+    public String deleteCategory(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.deleteById(id);
+            redirectAttributes.addFlashAttribute("categorySuccess", "Xóa danh mục thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("categoryError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=categories";
+    }
+
     // ==================== QUESTIONS ====================
     @PostMapping("/questions/create")
     public String createQuestion(@RequestParam String title,
