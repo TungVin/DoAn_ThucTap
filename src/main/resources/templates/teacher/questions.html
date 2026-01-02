@@ -10,15 +10,73 @@
             <button class="create-btn" id="openCreateQuestionModal" type="button">Tạo câu hỏi +</button>
         </div>
         <div class="divider"></div>
-        <div class="empty-box" th:if="${#lists.isEmpty(questions)}">
+
+        <div th:if="${questionSuccess}" class="alert success" th:text="${questionSuccess}"></div>
+        <div th:if="${questionError}" class="alert error" th:text="${questionError}"></div>
+
+        <div th:if="${#lists.isEmpty(questions)}" class="empty-box">
             <img src="/img/empty-quiz.png" alt="Không có câu hỏi">
             <p>Chưa có câu hỏi nào trong thư viện</p>
         </div>
-        <div class="question-list" th:if="${!#lists.isEmpty(questions)}">
-            <div class="question-item" th:each="q : ${questions}">
-                <div class="question-title" th:text="${q.title}"></div>
-                <div class="question-category" th:text="${q.category?.name}"></div>
-                <div class="question-type" th:text="${q.type}"></div>
+
+        <div th:if="${!#lists.isEmpty(questions)}" class="question-grid">
+            <div class="question-card" th:each="q : ${questions}">
+                <div class="question-card-header">
+                    <div class="question-type-badge" th:classappend="${'badge-' + q.type}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        <span th:text="${q.type == 'single_choice' ? 'Trắc nghiệm' :
+                                        q.type == 'multiple_choice' ? 'Nhiều đáp án' :
+                                        q.type == 'short_answer' ? 'Trả lời ngắn' :
+                                        q.type == 'true_false' ? 'Đúng/Sai' : 'Khác'}">Loại</span>
+                    </div>
+                    <div class="question-card-actions">
+                        <button class="btn-icon btn-edit-question"
+                                th:data-question-id="${q.id}"
+                                th:data-question-title="${q.title}"
+                                th:data-question-content="${q.content}"
+                                th:data-question-type="${q.type}"
+                                th:data-question-category="${q.category?.id}"
+                                title="Chỉnh sửa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-icon btn-delete-question"
+                                th:data-question-id="${q.id}"
+                                th:data-question-title="${q.title}"
+                                title="Xóa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="question-card-body">
+                    <h3 class="question-card-title" th:text="${q.title}">Câu hỏi</h3>
+                    <p class="question-card-content" th:text="${q.content ?: 'Chưa có nội dung chi tiết'}">Nội dung câu hỏi</p>
+                    <div class="question-card-meta">
+                        <span class="question-category-tag" th:if="${q.category != null}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span th:text="${q.category.name}">Danh mục</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="question-card-footer">
+                    <span class="question-card-date" th:if="${q.createdAt}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span th:text="${#temporals.format(q.createdAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -36,8 +94,13 @@
             <div class="modal-body">
                 <form id="createQuestionForm" method="post" action="/teacher/questions/create">
                     <div class="form-group">
-                        <label for="questionTitle">Câu hỏi *</label>
-                        <textarea id="questionTitle" name="title" class="input" rows="2" required placeholder="Nhập nội dung câu hỏi"></textarea>
+                        <label for="questionTitle">Tiêu đề câu hỏi *</label>
+                        <input type="text" id="questionTitle" name="title" class="input" required placeholder="Nhập tiêu đề câu hỏi">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="questionContent">Nội dung câu hỏi *</label>
+                        <textarea id="questionContent" name="content" class="input" rows="4" required placeholder="Nhập nội dung chi tiết câu hỏi"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -61,15 +124,6 @@
                         </select>
                     </div>
 
-                    <div id="questionOptionsArea">
-                        <!-- Dynamic content will be inserted here by JavaScript -->
-                    </div>
-
-                    <div class="form-group">
-                        <label for="questionPoints">Điểm</label>
-                        <input type="number" id="questionPoints" name="points" class="input" value="1" min="0" step="0.5">
-                    </div>
-
                     <div class="modal-footer">
                         <button type="button" class="btn-secondary" id="cancelCreateQuestionBtn">Hủy</button>
                         <button type="submit" class="btn-primary">Tạo câu hỏi</button>
@@ -78,7 +132,200 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal chỉnh sửa câu hỏi -->
+    <div class="modal-overlay" id="editQuestionModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Chỉnh sửa câu hỏi</h3>
+                <span class="close-btn" id="closeEditQuestionModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editQuestionForm" method="post" action="/teacher/questions/update">
+                    <input type="hidden" id="editQuestionId" name="id">
+
+                    <div class="form-group">
+                        <label for="editQuestionTitle">Tiêu đề câu hỏi *</label>
+                        <input type="text" id="editQuestionTitle" name="title" class="input" required placeholder="Nhập tiêu đề câu hỏi">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editQuestionContent">Nội dung câu hỏi *</label>
+                        <textarea id="editQuestionContent" name="content" class="input" rows="4" required placeholder="Nhập nội dung chi tiết câu hỏi"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editQuestionCategory">Danh mục</label>
+                        <select id="editQuestionCategory" name="categoryId" class="input">
+                            <option value="">-- Chọn danh mục --</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editQuestionType">Loại câu hỏi *</label>
+                        <select id="editQuestionType" name="type" class="input" required>
+                            <option value="single_choice">Trắc nghiệm (1 đáp án đúng)</option>
+                            <option value="multiple_choice">Trắc nghiệm (nhiều đáp án đúng)</option>
+                            <option value="short_answer">Câu trả lời ngắn</option>
+                            <option value="best_short_answer">Câu trả lời ngắn tốt nhất</option>
+                            <option value="match_pairs">Nối cặp</option>
+                            <option value="yes_no">Có/Không</option>
+                            <option value="true_false">Đúng/Sai</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelEditQuestionBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa -->
+    <div class="modal-overlay" id="deleteQuestionModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-topbar">
+                <h3>Xác nhận xóa câu hỏi</h3>
+                <span class="close-btn" id="closeDeleteQuestionModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin: 0 0 20px; color: #555;">Bạn có chắc chắn muốn xóa câu hỏi <strong id="deleteQuestionTitle"></strong>?</p>
+                <p style="margin: 0 0 20px; color: #d9534f; font-size: 14px;">⚠️ Hành động này không thể hoàn tác!</p>
+
+                <form id="deleteQuestionForm" method="post" action="/teacher/questions/delete">
+                    <input type="hidden" id="deleteQuestionId" name="id">
+
+                    <div class="modal-footer" style="margin-top: 0; padding-top: 0; border-top: none;">
+                        <button type="button" class="btn-secondary" id="cancelDeleteQuestionBtn">Hủy</button>
+                        <button type="submit" class="btn-danger">Xóa câu hỏi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script th:fragment="scripts">
+// Questions management scripts
+document.addEventListener('DOMContentLoaded', function() {
+    const createQuestionModal = document.getElementById('createQuestionModal');
+    const editQuestionModal = document.getElementById('editQuestionModal');
+    const deleteQuestionModal = document.getElementById('deleteQuestionModal');
+
+    // Open create question modal
+    const openCreateQuestionBtn = document.getElementById('openCreateQuestionModal');
+    if (openCreateQuestionBtn) {
+        openCreateQuestionBtn.addEventListener('click', () => {
+            createQuestionModal.classList.add('show');
+        });
+    }
+
+    // Close create question modal
+    const closeCreateQuestionModal = document.getElementById('closeCreateQuestionModal');
+    const cancelCreateQuestionBtn = document.getElementById('cancelCreateQuestionBtn');
+
+    if (closeCreateQuestionModal) {
+        closeCreateQuestionModal.addEventListener('click', () => {
+            createQuestionModal.classList.remove('show');
+        });
+    }
+
+    if (cancelCreateQuestionBtn) {
+        cancelCreateQuestionBtn.addEventListener('click', () => {
+            createQuestionModal.classList.remove('show');
+        });
+    }
+
+    // Close edit question modal
+    const closeEditQuestionModal = document.getElementById('closeEditQuestionModal');
+    const cancelEditQuestionBtn = document.getElementById('cancelEditQuestionBtn');
+
+    if (closeEditQuestionModal) {
+        closeEditQuestionModal.addEventListener('click', () => {
+            editQuestionModal.classList.remove('show');
+        });
+    }
+
+    if (cancelEditQuestionBtn) {
+        cancelEditQuestionBtn.addEventListener('click', () => {
+            editQuestionModal.classList.remove('show');
+        });
+    }
+
+    // Close delete question modal
+    const closeDeleteQuestionModal = document.getElementById('closeDeleteQuestionModal');
+    const cancelDeleteQuestionBtn = document.getElementById('cancelDeleteQuestionBtn');
+
+    if (closeDeleteQuestionModal) {
+        closeDeleteQuestionModal.addEventListener('click', () => {
+            deleteQuestionModal.classList.remove('show');
+        });
+    }
+
+    if (cancelDeleteQuestionBtn) {
+        cancelDeleteQuestionBtn.addEventListener('click', () => {
+            deleteQuestionModal.classList.remove('show');
+        });
+    }
+
+    // Edit question buttons
+    document.querySelectorAll('.btn-edit-question').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const questionId = this.getAttribute('data-question-id');
+            const questionTitle = this.getAttribute('data-question-title');
+            const questionContent = this.getAttribute('data-question-content');
+            const questionType = this.getAttribute('data-question-type');
+            const questionCategory = this.getAttribute('data-question-category');
+
+            document.getElementById('editQuestionId').value = questionId;
+            document.getElementById('editQuestionTitle').value = questionTitle;
+            document.getElementById('editQuestionContent').value = questionContent || '';
+            document.getElementById('editQuestionType').value = questionType;
+
+            if (questionCategory && questionCategory !== 'null') {
+                document.getElementById('editQuestionCategory').value = questionCategory;
+            } else {
+                document.getElementById('editQuestionCategory').value = '';
+            }
+
+            editQuestionModal.classList.add('show');
+        });
+    });
+
+    // Delete question buttons
+    document.querySelectorAll('.btn-delete-question').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const questionId = this.getAttribute('data-question-id');
+            const questionTitle = this.getAttribute('data-question-title');
+
+            document.getElementById('deleteQuestionId').value = questionId;
+            document.getElementById('deleteQuestionTitle').textContent = questionTitle;
+
+            deleteQuestionModal.classList.add('show');
+        });
+    });
+
+    // Close modals on outside click
+    [createQuestionModal, editQuestionModal, deleteQuestionModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        }
+    });
+});
+</script>
 
 </body>
 </html>

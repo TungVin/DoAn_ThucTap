@@ -157,19 +157,73 @@ public class TeacherController {
     // ==================== QUESTIONS ====================
     @PostMapping("/questions/create")
     public String createQuestion(@RequestParam String title,
+                                @RequestParam String content,
                                 @RequestParam String type,
-                                @RequestParam(required = false) Long categoryId,
-                                @RequestParam(required = false) Double points,
+                                @RequestParam(required = false) String categoryId,
                                 RedirectAttributes redirectAttributes) {
         try {
             Category category = null;
-            if (categoryId != null) {
-                category = categoryRepository.findById(categoryId).orElse(null);
+            if (categoryId != null && !categoryId.isEmpty()) {
+                try {
+                    Long catId = Long.parseLong(categoryId);
+                    category = categoryRepository.findById(catId).orElse(null);
+                } catch (NumberFormatException e) {
+                    // Ignore invalid category ID
+                }
             }
 
-            // For now, content = title (can be enhanced later)
-            questionService.createQuestion(title, title, type, category, null, null, null);
+            questionService.createQuestion(title, content, type, category, null, null, null);
             redirectAttributes.addFlashAttribute("questionSuccess", "Tạo câu hỏi thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("questionError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=questions";
+    }
+
+    @PostMapping("/questions/update")
+    public String updateQuestion(@RequestParam Long id,
+                                 @RequestParam String title,
+                                 @RequestParam String content,
+                                 @RequestParam String type,
+                                 @RequestParam(required = false) String categoryId,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            Question question = questionService.findById(id);
+            if (question == null) {
+                redirectAttributes.addFlashAttribute("questionError", "Không tìm thấy câu hỏi!");
+                return "redirect:/teacher?activeTab=questions";
+            }
+
+            Category category = null;
+            if (categoryId != null && !categoryId.isEmpty()) {
+                try {
+                    Long catId = Long.parseLong(categoryId);
+                    category = categoryRepository.findById(catId).orElse(null);
+                } catch (NumberFormatException e) {
+                    // Ignore invalid category ID
+                }
+            }
+
+            question.setTitle(title);
+            question.setContent(content);
+            question.setType(type);
+            question.setCategory(category);
+
+            questionService.save(question);
+            redirectAttributes.addFlashAttribute("questionSuccess", "Cập nhật câu hỏi thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("questionError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=questions";
+    }
+
+    @PostMapping("/questions/delete")
+    public String deleteQuestion(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        try {
+            questionService.deleteById(id);
+            redirectAttributes.addFlashAttribute("questionSuccess", "Xóa câu hỏi thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("questionError", "Lỗi: " + e.getMessage());
         }

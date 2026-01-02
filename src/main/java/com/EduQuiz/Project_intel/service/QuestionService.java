@@ -20,8 +20,16 @@ public class QuestionService {
         return questionRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    public Question findById(Long id) {
+        return questionRepository.findById(id).orElse(null);
+    }
+
     public Question save(Question question) {
         return questionRepository.save(question);
+    }
+
+    public void deleteById(Long id) {
+        questionRepository.deleteById(id);
     }
 
     public Question createQuestion(String title, String content, String type, Category category,
