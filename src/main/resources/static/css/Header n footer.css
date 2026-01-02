@@ -28,6 +28,11 @@ a {
     z-index: 1000;
 }
 
+.header a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .logo {
     font-size: 1.8rem;
     font-weight: 700;

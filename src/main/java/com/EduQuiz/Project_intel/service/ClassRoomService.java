@@ -19,8 +19,16 @@ public class ClassRoomService {
         return classRoomRepository.findAll();
     }
 
+    public ClassRoom findById(Long id) {
+        return classRoomRepository.findById(id).orElse(null);
+    }
+
     public ClassRoom save(ClassRoom classRoom) {
         return classRoomRepository.save(classRoom);
+    }
+
+    public void deleteById(Long id) {
+        classRoomRepository.deleteById(id);
     }
 }
 

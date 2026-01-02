@@ -12,7 +12,9 @@
 
     <!-- HEADER -->
     <header class="header">
-        <div class="logo">EduQuiz</div>
+        <a href="/">
+            <div class="logo">EduQuiz</div>
+        </a>
 
         <nav class="nav-right">
             <a class="icon-btn bell">🔔 Thông báo</a>
@@ -34,12 +36,12 @@
     <!-- PAGE CONTENT -->
     <div class="page-container">
         <!-- Include các fragments từ thư mục teacher/ -->
-        <div th:replace="~{teacher/exams :: section}"></div>
-        <div th:replace="~{teacher/history :: section}"></div>
-        <div th:replace="~{teacher/categories :: section}"></div>
-        <div th:replace="~{teacher/online :: section}"></div>
-        <div th:replace="~{teacher/questions :: section}"></div>
-        <div th:replace="~{teacher/classes :: section}"></div>
+        <div th:replace="~{teacher/exams :: section}" th:style="${activeTab != 'exams' ? 'display:none' : ''}"></div>
+        <div th:replace="~{teacher/history :: section}" th:style="${activeTab != 'history' ? 'display:none' : ''}"></div>
+        <div th:replace="~{teacher/categories :: section}" th:style="${activeTab != 'categories' ? 'display:none' : ''}"></div>
+        <div th:replace="~{teacher/online :: section}" th:style="${activeTab != 'online' ? 'display:none' : ''}"></div>
+        <div th:replace="~{teacher/questions :: section}" th:style="${activeTab != 'questions' ? 'display:none' : ''}"></div>
+        <div th:replace="~{teacher/classes :: section}" th:style="${activeTab != 'classes' ? 'display:none' : ''}"></div>
     </div>
 
     <!-- FOOTER -->
@@ -53,5 +55,12 @@
     <div th:replace="~{teacher/classes :: modals}"></div>
 
     <script src="/js/teacher.js"></script>
+
+    <!-- Include scripts từ các fragments -->
+    <div th:replace="~{teacher/exams :: scripts}"></div>
+    <div th:replace="~{teacher/classes :: scripts}"></div>
+    <div th:replace="~{teacher/categories :: scripts}"></div>
+    <div th:replace="~{teacher/online :: scripts}"></div>
+    <div th:replace="~{teacher/questions :: scripts}"></div>
 </body>
 </html>

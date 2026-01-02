@@ -24,6 +24,11 @@ body {
     align-items: center;
 }
 
+.header a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .logo {
     color: #fff;
     font-size: 22px;

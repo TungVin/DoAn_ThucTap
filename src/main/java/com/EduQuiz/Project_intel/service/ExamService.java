@@ -21,6 +21,14 @@ public class ExamService {
         return examRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    public Exam findById(Long id) {
+        return examRepository.findById(id).orElse(null);
+    }
+
+    public void deleteById(Long id) {
+        examRepository.deleteById(id);
+    }
+
     public List<Exam> findByStatus(String status) {
         return examRepository.findByStatus(status);
     }
@@ -34,6 +42,8 @@ public class ExamService {
             if (!exam.getEndTime().isAfter(exam.getStartTime())) {
                 throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
             }
+            // Tự động cập nhật status dựa trên thời gian
+            exam.updateStatus();
         }
 
         return examRepository.save(exam);
@@ -49,6 +59,12 @@ public class ExamService {
         exam.setStartTime(startTime);
         exam.setEndTime(endTime);
         exam.setStatus("draft");
+
+        // Tự động cập nhật status nếu có thời gian
+        if (startTime != null && endTime != null) {
+            exam.updateStatus();
+        }
+
         return save(exam);
     }
 }

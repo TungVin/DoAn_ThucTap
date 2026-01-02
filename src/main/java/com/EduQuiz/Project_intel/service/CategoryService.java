@@ -18,6 +18,10 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
+    public Category findById(Long id) {
+        return categoryRepository.findById(id).orElse(null);
+    }
+
     public Category create(String name, String description) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Tên danh mục không được để trống");
@@ -29,6 +33,14 @@ public class CategoryService {
         c.setName(name.trim());
         c.setDescription(description);
         return categoryRepository.save(c);
+    }
+
+    public Category save(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    public void deleteById(Long id) {
+        categoryRepository.deleteById(id);
     }
 }
 

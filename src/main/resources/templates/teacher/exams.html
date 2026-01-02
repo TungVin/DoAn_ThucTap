@@ -4,26 +4,106 @@
 
 <!-- Fragment: Exams Section -->
 <div th:fragment="section" class="section-block section-exams">
-    <div class="top-action" id="examsTopAction">
-        <h2>Bài kiểm tra</h2>
-        <button class="create-btn">Tạo bài kiểm tra +</button>
-    </div>
-
-    <div class="section" id="examsOngoingSection">
-        <h3>Đang diễn ra</h3>
-        <div class="divider"></div>
-        <div class="empty-box">
-            <img src="/img/empty-quiz.png" alt="Không có bài kiểm tra">
-            <p>Hiện tại không có bài trắc nghiệm nào đang diễn ra</p>
+    <div class="section" id="examsSection">
+        <div class="top-action">
+            <h2>Bài kiểm tra</h2>
+            <button class="create-btn" id="openCreateExamModal" type="button">Tạo bài kiểm tra +</button>
         </div>
-    </div>
-
-    <div class="section" id="examsDraftSection">
-        <h3>Đang soạn</h3>
         <div class="divider"></div>
-        <div class="empty-box">
+
+        <div th:if="${examSuccess}" class="alert success" th:text="${examSuccess}"></div>
+        <div th:if="${examError}" class="alert error" th:text="${examError}"></div>
+
+        <div th:if="${#lists.isEmpty(exams)}" class="empty-box">
             <img src="/img/empty-quiz.png" alt="Không có bài kiểm tra">
-            <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
+            <p>Chưa có bài kiểm tra nào</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(exams)}" class="exam-grid">
+            <div class="exam-card" th:each="exam : ${exams}">
+                <div class="exam-card-header">
+                    <div class="exam-status-badge"
+                         th:classappend="${exam.status == 'published' ? 'badge-published' :
+                                         exam.status == 'draft' ? 'badge-draft' :
+                                         exam.status == 'ongoing' ? 'badge-ongoing' : 'badge-ended'}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <span th:text="${exam.status == 'published' ? 'Đã công bố' :
+                                       exam.status == 'draft' ? 'Bản nháp' :
+                                       exam.status == 'ongoing' ? 'Đang diễn ra' :
+                                       exam.status == 'ended' ? 'Đã kết thúc' : 'Chưa rõ'}">Status</span>
+                    </div>
+                    <div class="exam-card-actions">
+                        <button class="btn-icon btn-edit-exam"
+                                th:data-exam-id="${exam.id}"
+                                th:data-exam-title="${exam.title}"
+                                th:data-exam-description="${exam.description}"
+                                th:data-exam-category="${exam.category?.id}"
+                                th:data-exam-time-limit="${exam.timeLimit}"
+                                th:data-exam-start-time="${exam.startTime}"
+                                th:data-exam-end-time="${exam.endTime}"
+                                title="Chỉnh sửa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                        </button>
+                        <button class="btn-icon btn-delete-exam"
+                                th:data-exam-id="${exam.id}"
+                                th:data-exam-title="${exam.title}"
+                                title="Xóa">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="exam-card-body">
+                    <h3 class="exam-card-title" th:text="${exam.title}">Tên bài kiểm tra</h3>
+                    <p class="exam-card-description" th:text="${exam.description ?: 'Chưa có mô tả'}">Mô tả bài kiểm tra</p>
+                    <div class="exam-card-meta">
+                        <span class="exam-meta-item" th:if="${exam.category != null}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span th:text="${exam.category.name}">Danh mục</span>
+                        </span>
+                        <span class="exam-meta-item" th:if="${exam.timeLimit != null}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span th:text="${exam.timeLimit + ' phút'}">Thời gian</span>
+                        </span>
+                        <span class="exam-meta-item" th:if="${exam.startTime != null}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span th:text="'Bắt đầu: ' + ${#temporals.format(exam.startTime, 'dd/MM/yyyy HH:mm')}">Bắt đầu</span>
+                        </span>
+                        <span class="exam-meta-item" th:if="${exam.endTime != null}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                            <span th:text="'Kết thúc: ' + ${#temporals.format(exam.endTime, 'dd/MM/yyyy HH:mm')}">Kết thúc</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="exam-card-footer">
+                    <span class="exam-card-date" th:if="${exam.createdAt}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span th:text="${#temporals.format(exam.createdAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -31,27 +111,27 @@
 <!-- Fragment: Exams Modals -->
 <div th:fragment="modals">
     <!-- Modal tạo bài kiểm tra -->
-    <div class="modal-overlay" id="createQuizModal">
+    <div class="modal-overlay" id="createExamModal">
         <div class="modal-container">
             <div class="modal-topbar">
                 <h3>Tạo bài kiểm tra mới</h3>
-                <span class="close-btn" id="closeModal">&times;</span>
+                <span class="close-btn" id="closeCreateExamModal">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="createQuizForm" method="post" action="/teacher/exams/create">
+                <form id="createExamForm" method="post" action="/teacher/exams/create">
                     <div class="form-group">
-                        <label for="quizTitle">Tên bài kiểm tra *</label>
-                        <input type="text" id="quizTitle" name="title" class="input" required placeholder="Nhập tên bài kiểm tra">
+                        <label for="examTitle">Tên bài kiểm tra *</label>
+                        <input type="text" id="examTitle" name="title" class="input" required placeholder="Nhập tên bài kiểm tra">
                     </div>
 
                     <div class="form-group">
-                        <label for="quizDescription">Mô tả</label>
-                        <textarea id="quizDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả bài kiểm tra"></textarea>
+                        <label for="examDescription">Mô tả</label>
+                        <textarea id="examDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả bài kiểm tra"></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="quizCategory">Danh mục</label>
-                        <select id="quizCategory" name="categoryId" class="input">
+                        <label for="examCategory">Danh mục</label>
+                        <select id="examCategory" name="categoryId" class="input">
                             <option value="">-- Chọn danh mục --</option>
                             <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
                         </select>
@@ -88,14 +168,279 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn-secondary" id="cancelQuizBtn">Hủy</button>
+                        <button type="button" class="btn-secondary" id="cancelCreateExamBtn">Hủy</button>
                         <button type="submit" class="btn-primary">Tạo bài kiểm tra</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Modal chỉnh sửa bài kiểm tra -->
+    <div class="modal-overlay" id="editExamModal">
+        <div class="modal-container">
+            <div class="modal-topbar">
+                <h3>Chỉnh sửa bài kiểm tra</h3>
+                <span class="close-btn" id="closeEditExamModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="editExamForm" method="post" action="/teacher/exams/update">
+                    <input type="hidden" id="editExamId" name="id">
+
+                    <div class="form-group">
+                        <label for="editExamTitle">Tên bài kiểm tra *</label>
+                        <input type="text" id="editExamTitle" name="title" class="input" required placeholder="Nhập tên bài kiểm tra">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editExamDescription">Mô tả</label>
+                        <textarea id="editExamDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả bài kiểm tra"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editExamCategory">Danh mục</label>
+                        <select id="editExamCategory" name="categoryId" class="input">
+                            <option value="">-- Chọn danh mục --</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editExamTimeLimit">Giới hạn thời gian (phút)</label>
+                        <input type="number" id="editExamTimeLimit" name="timeLimit" class="input" placeholder="Số phút (để trống nếu không giới hạn)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editStartDate">Thời gian bắt đầu</label>
+                        <div class="datetime-group">
+                            <input type="date" id="editStartDate" name="startDate" class="input">
+                            <input type="time" id="editStartTime" name="startTime" class="input">
+                        </div>
+                        <small style="color: #666; font-size: 13px;">Để trống nếu không có thời gian bắt đầu cụ thể</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEndDate">Thời gian kết thúc</label>
+                        <div class="datetime-group">
+                            <input type="date" id="editEndDate" name="endDate" class="input">
+                            <input type="time" id="editEndTime" name="endTime" class="input">
+                        </div>
+                        <small style="color: #666; font-size: 13px;">Để trống nếu không có thời gian kết thúc cụ thể</small>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelEditExamBtn">Hủy</button>
+                        <button type="submit" class="btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa -->
+    <div class="modal-overlay" id="deleteExamModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-topbar">
+                <h3>Xác nhận xóa bài kiểm tra</h3>
+                <span class="close-btn" id="closeDeleteExamModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin: 0 0 20px; color: #555;">Bạn có chắc chắn muốn xóa bài kiểm tra <strong id="deleteExamTitle"></strong>?</p>
+                <p style="margin: 0 0 20px; color: #d9534f; font-size: 14px;">⚠️ Hành động này không thể hoàn tác!</p>
+
+                <form id="deleteExamForm" method="post" action="/teacher/exams/delete">
+                    <input type="hidden" id="deleteExamId" name="id">
+
+                    <div class="modal-footer" style="margin-top: 0; padding-top: 0; border-top: none;">
+                        <button type="button" class="btn-secondary" id="cancelDeleteExamBtn">Hủy</button>
+                        <button type="submit" class="btn-danger">Xóa bài kiểm tra</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script th:fragment="scripts">
+// Exams management scripts
+document.addEventListener('DOMContentLoaded', function() {
+    const createExamModal = document.getElementById('createExamModal');
+    const editExamModal = document.getElementById('editExamModal');
+    const deleteExamModal = document.getElementById('deleteExamModal');
+
+    // Open create exam modal
+    const openCreateExamBtn = document.getElementById('openCreateExamModal');
+    if (openCreateExamBtn) {
+        openCreateExamBtn.addEventListener('click', () => {
+            createExamModal.classList.add('show');
+        });
+    }
+
+    // Close create exam modal
+    const closeCreateExamModal = document.getElementById('closeCreateExamModal');
+    const cancelCreateExamBtn = document.getElementById('cancelCreateExamBtn');
+
+    if (closeCreateExamModal) {
+        closeCreateExamModal.addEventListener('click', () => {
+            createExamModal.classList.remove('show');
+        });
+    }
+
+    if (cancelCreateExamBtn) {
+        cancelCreateExamBtn.addEventListener('click', () => {
+            createExamModal.classList.remove('show');
+        });
+    }
+
+    // Toggle inputs for time limit
+    const timeLimitToggle = document.getElementById('timeLimitToggle');
+    const timeLimitInput = document.getElementById('timeLimitInput');
+    if (timeLimitToggle) {
+        timeLimitToggle.addEventListener('change', function() {
+            timeLimitInput.disabled = !this.checked;
+        });
+    }
+
+    // Toggle inputs for start time
+    const startToggle = document.getElementById('startToggle');
+    const startDate = document.getElementById('startDate');
+    const startTime = document.getElementById('startTime');
+    if (startToggle) {
+        startToggle.addEventListener('change', function() {
+            startDate.disabled = !this.checked;
+            startTime.disabled = !this.checked;
+        });
+    }
+
+    // Toggle inputs for end time
+    const endToggle = document.getElementById('endToggle');
+    const endDate = document.getElementById('endDate');
+    const endTime = document.getElementById('endTime');
+    if (endToggle) {
+        endToggle.addEventListener('change', function() {
+            endDate.disabled = !this.checked;
+            endTime.disabled = !this.checked;
+        });
+    }
+
+    // Close edit exam modal
+    const closeEditExamModal = document.getElementById('closeEditExamModal');
+    const cancelEditExamBtn = document.getElementById('cancelEditExamBtn');
+
+    if (closeEditExamModal) {
+        closeEditExamModal.addEventListener('click', () => {
+            editExamModal.classList.remove('show');
+        });
+    }
+
+    if (cancelEditExamBtn) {
+        cancelEditExamBtn.addEventListener('click', () => {
+            editExamModal.classList.remove('show');
+        });
+    }
+
+    // Close delete exam modal
+    const closeDeleteExamModal = document.getElementById('closeDeleteExamModal');
+    const cancelDeleteExamBtn = document.getElementById('cancelDeleteExamBtn');
+
+    if (closeDeleteExamModal) {
+        closeDeleteExamModal.addEventListener('click', () => {
+            deleteExamModal.classList.remove('show');
+        });
+    }
+
+    if (cancelDeleteExamBtn) {
+        cancelDeleteExamBtn.addEventListener('click', () => {
+            deleteExamModal.classList.remove('show');
+        });
+    }
+
+    // Edit exam buttons
+    document.querySelectorAll('.btn-edit-exam').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const examId = this.getAttribute('data-exam-id');
+            const examTitle = this.getAttribute('data-exam-title');
+            const examDescription = this.getAttribute('data-exam-description');
+            const examCategory = this.getAttribute('data-exam-category');
+            const examTimeLimit = this.getAttribute('data-exam-time-limit');
+            const examStartTime = this.getAttribute('data-exam-start-time');
+            const examEndTime = this.getAttribute('data-exam-end-time');
+
+            document.getElementById('editExamId').value = examId;
+            document.getElementById('editExamTitle').value = examTitle;
+            document.getElementById('editExamDescription').value = examDescription || '';
+
+            if (examCategory && examCategory !== 'null') {
+                document.getElementById('editExamCategory').value = examCategory;
+            } else {
+                document.getElementById('editExamCategory').value = '';
+            }
+
+            if (examTimeLimit && examTimeLimit !== 'null') {
+                document.getElementById('editExamTimeLimit').value = examTimeLimit;
+            } else {
+                document.getElementById('editExamTimeLimit').value = '';
+            }
+
+            // Parse and fill start time
+            if (examStartTime && examStartTime !== 'null') {
+                const startDateTime = new Date(examStartTime);
+                const startDate = startDateTime.toISOString().split('T')[0];
+                const startTime = startDateTime.toTimeString().slice(0, 5);
+                document.getElementById('editStartDate').value = startDate;
+                document.getElementById('editStartTime').value = startTime;
+            } else {
+                document.getElementById('editStartDate').value = '';
+                document.getElementById('editStartTime').value = '';
+            }
+
+            // Parse and fill end time
+            if (examEndTime && examEndTime !== 'null') {
+                const endDateTime = new Date(examEndTime);
+                const endDate = endDateTime.toISOString().split('T')[0];
+                const endTime = endDateTime.toTimeString().slice(0, 5);
+                document.getElementById('editEndDate').value = endDate;
+                document.getElementById('editEndTime').value = endTime;
+            } else {
+                document.getElementById('editEndDate').value = '';
+                document.getElementById('editEndTime').value = '';
+            }
+
+            editExamModal.classList.add('show');
+        });
+    });
+
+    // Delete exam buttons
+    document.querySelectorAll('.btn-delete-exam').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const examId = this.getAttribute('data-exam-id');
+            const examTitle = this.getAttribute('data-exam-title');
+
+            document.getElementById('deleteExamId').value = examId;
+            document.getElementById('deleteExamTitle').textContent = examTitle;
+
+            deleteExamModal.classList.add('show');
+        });
+    });
+
+    // Close modals on outside click
+    [createExamModal, editExamModal, deleteExamModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        }
+    });
+});
+</script>
 
 </body>
 </html>

@@ -105,5 +105,36 @@ public class Exam {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    /**
+     * Tự động cập nhật trạng thái dựa trên thời gian hiện tại
+     */
+    public void updateStatus() {
+        if (startTime == null || endTime == null) {
+            // Nếu không có thời gian, giữ nguyên status hiện tại
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.isBefore(startTime)) {
+            // Chưa đến giờ bắt đầu
+            this.status = "draft";
+        } else if (now.isAfter(endTime)) {
+            // Đã kết thúc
+            this.status = "ended";
+        } else {
+            // Đang diễn ra
+            this.status = "ongoing";
+        }
+    }
+
+    /**
+     * Get status với tự động cập nhật
+     */
+    public String getCurrentStatus() {
+        updateStatus();
+        return this.status;
+    }
 }
 

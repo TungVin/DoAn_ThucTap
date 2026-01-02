@@ -20,6 +20,10 @@ public class ScheduleService {
         return scheduleRepository.findAll();
     }
 
+    public Schedule findById(Long id) {
+        return scheduleRepository.findById(id).orElse(null);
+    }
+
     public Schedule save(Schedule schedule) {
         if (schedule.getTitle() == null || schedule.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Tiêu đề không được để trống");
@@ -34,5 +38,9 @@ public class ScheduleService {
             throw new IllegalArgumentException("Hình thức học không hợp lệ");
         }
         return scheduleRepository.save(schedule);
+    }
+
+    public void deleteById(Long id) {
+        scheduleRepository.deleteById(id);
     }
 }
