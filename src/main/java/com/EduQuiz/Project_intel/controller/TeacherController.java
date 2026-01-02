@@ -103,6 +103,97 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=exams";
     }
 
+    @PostMapping("/exams/update")
+    public String updateExam(@RequestParam Long id,
+                            @RequestParam String title,
+                            @RequestParam(required = false) String description,
+                            @RequestParam(required = false) String categoryId,
+                            @RequestParam(required = false) String timeLimit,
+                            @RequestParam(required = false) String startDate,
+                            @RequestParam(required = false) String startTime,
+                            @RequestParam(required = false) String endDate,
+                            @RequestParam(required = false) String endTime,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            Exam exam = examService.findById(id);
+            if (exam == null) {
+                redirectAttributes.addFlashAttribute("examError", "Không tìm thấy bài kiểm tra!");
+                return "redirect:/teacher?activeTab=exams";
+            }
+
+            Category category = null;
+            if (categoryId != null && !categoryId.isEmpty()) {
+                try {
+                    Long catId = Long.parseLong(categoryId);
+                    category = categoryRepository.findById(catId).orElse(null);
+                } catch (NumberFormatException e) {
+                    // Ignore invalid category ID
+                }
+            }
+
+            Integer finalTimeLimit = null;
+            if (timeLimit != null && !timeLimit.isEmpty()) {
+                try {
+                    finalTimeLimit = Integer.parseInt(timeLimit);
+                } catch (NumberFormatException e) {
+                    // Ignore invalid time limit
+                }
+            }
+
+            // Parse start time
+            LocalDateTime startDateTime = null;
+            if (startDate != null && !startDate.isEmpty() && startTime != null && !startTime.isEmpty()) {
+                try {
+                    startDateTime = LocalDateTime.of(
+                        LocalDate.parse(startDate),
+                        LocalTime.parse(startTime)
+                    );
+                } catch (Exception e) {
+                    // Ignore invalid start time
+                }
+            }
+
+            // Parse end time
+            LocalDateTime endDateTime = null;
+            if (endDate != null && !endDate.isEmpty() && endTime != null && !endTime.isEmpty()) {
+                try {
+                    endDateTime = LocalDateTime.of(
+                        LocalDate.parse(endDate),
+                        LocalTime.parse(endTime)
+                    );
+                } catch (Exception e) {
+                    // Ignore invalid end time
+                }
+            }
+
+            exam.setTitle(title);
+            exam.setDescription(description);
+            exam.setCategory(category);
+            exam.setTimeLimit(finalTimeLimit);
+            exam.setStartTime(startDateTime);
+            exam.setEndTime(endDateTime);
+
+            examService.save(exam);
+            redirectAttributes.addFlashAttribute("examSuccess", "Cập nhật bài kiểm tra thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("examError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=exams";
+    }
+
+    @PostMapping("/exams/delete")
+    public String deleteExam(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        try {
+            examService.deleteById(id);
+            redirectAttributes.addFlashAttribute("examSuccess", "Xóa bài kiểm tra thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("examError", "Lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/teacher?activeTab=exams";
+    }
+
     // ==================== CATEGORIES ====================
     @PostMapping("/categories/create")
     public String createCategory(@RequestParam String name,

@@ -57,6 +57,7 @@
     <script src="/js/teacher.js"></script>
 
     <!-- Include scripts từ các fragments -->
+    <div th:replace="~{teacher/exams :: scripts}"></div>
     <div th:replace="~{teacher/classes :: scripts}"></div>
     <div th:replace="~{teacher/categories :: scripts}"></div>
     <div th:replace="~{teacher/online :: scripts}"></div>
