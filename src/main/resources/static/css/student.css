@@ -1,6 +1,4 @@
-/* =========================================
-   RESET + BASE
-========================================= */
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -13,20 +11,13 @@ body {
 
 .tab-content { flex-grow: 1; }
 
-/* =========================================
-   HEADER
-========================================= */
+
 .header {
     background: #f65c57;
     padding: 12px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.header a {
-    text-decoration: none;
-    color: inherit;
 }
 
 .logo {
@@ -48,9 +39,7 @@ body {
     border-radius: 50%;
 }
 
-/* =========================================
-   TABS – CENTER, CHUYÊN NGHIỆP
-========================================= */
+
 .tabs {
     display: flex;
     justify-content: center;
@@ -76,9 +65,7 @@ body {
     color: #000;
 }
 
-/* =========================================
-   CONTENT WRAPPER
-========================================= */
+
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
@@ -89,9 +76,7 @@ body {
     padding: 30px 0;
 }
 
-/* =========================================
-   SECTION BOX
-========================================= */
+
 .section {
     background: #fff;
     padding: 30px 35px;
@@ -121,9 +106,7 @@ body {
     opacity: 0.9;
 }
 
-/* =========================================
-   FILTER BAR + POPUP
-========================================= */
+
 .history-top {
     display: flex;
     justify-content: space-between;
@@ -200,13 +183,11 @@ body {
     cursor: pointer;
 }
 
-/* =========================================
-   JOIN CLASS BUTTON (CENTER)
-========================================= */
+
 .join-class-btn {
     width: 100%;
     display: flex;
-    justify-content: center;   /* Đưa nút ra giữa */
+    justify-content: center;
     margin-bottom: 25px;
 }
 
@@ -228,9 +209,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* =========================================
-   JOIN POPUP
-========================================= */
+
 .overlay {
     position: fixed;
     top: 0;
@@ -290,9 +269,7 @@ body {
     gap: 12px;
 }
 
-/* =========================================
-   FOOTER
-========================================= */
+
 .footer {
     background: #f65c57;
     padding: 50px 0 20px;
@@ -314,4 +291,23 @@ body {
     text-align: center;
     padding-top: 12px;
     opacity: 0.9;
+}
+
+
+.swal2-popup {
+    border-radius: 16px !important;
+    font-family: inherit !important;
+}
+
+.swal2-title {
+    font-size: 20px !important;
+}
+
+.swal2-html-container {
+    font-size: 14px !important;
+}
+
+.swal2-confirm {
+    border-radius: 999px !important;
+    padding: 8px 22px !important;
 }
