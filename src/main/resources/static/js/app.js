@@ -110,3 +110,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+
+
+// ====== SEARCH CLEAR BUTTON ======
+const searchInput = document.getElementById("searchInput");
+const clearSearchBtn = document.getElementById("clearSearchBtn");
+const searchWrapper = document.querySelector(".search-wrapper");
+
+if (searchInput && clearSearchBtn && searchWrapper) {
+  const toggleClearBtn = () => {
+    if (searchInput.value.trim() !== "") {
+      searchWrapper.classList.add("has-value");
+    } else {
+      searchWrapper.classList.remove("has-value");
+    }
+  };
+
+  // hiện / ẩn nút X khi gõ
+  searchInput.addEventListener("input", toggleClearBtn);
+
+  // click X để xóa text
+  clearSearchBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    searchInput.focus();
+    toggleClearBtn();
+    // TODO: nếu bạn có logic filter, có thể gọi lại hàm load dữ liệu tại đây
+  });
+
+  // khởi tạo
+  toggleClearBtn();
+}

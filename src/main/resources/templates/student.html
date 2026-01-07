@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduQuiz - Trang Chủ</title>
     <link rel="stylesheet" href="/css/student.css">
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -33,7 +40,7 @@
         <div class="section">
             <h3>Lịch học</h3>
             <div class="empty-box">
-                <img src="/images/no-class.png" class="empty-img">
+                <img src="/img/hientaikhongcolophoc.svg" class="empty-img" alt="Không có lớp học">
                 <p>Hiện tại không có lớp học</p>
             </div>
         </div>
@@ -41,7 +48,7 @@
         <div class="section">
             <h3>Bài kiểm tra</h3>
             <div class="empty-box">
-                <img src="/images/no-quiz.png" class="empty-img">
+                <img src="/img/empty-quiz.png" class="empty-img" alt="Không có bài trắc nghiệm">
                 <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
             </div>
         </div>
@@ -53,28 +60,50 @@
     <div class="content">
 
         <div class="history-top">
-            <input type="text" class="search-input" placeholder="Nhập từ khóa">
-            <button class="filter-btn">Lọc ⌄</button>
+    <div class="search-wrapper">
+        <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="Nhập từ khóa"
+        >
 
-            <div class="filter-box hide" id="filterBox">
-                <div class="filter-field">
-                    <label>Loại bài</label>
-                    <select id="filterType">
-                        <option value="">-- Chọn loại --</option>
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                    </select>
-                </div>
+        <button type="button" class="clear-search-btn" id="clearSearchBtn">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
 
-                <div class="filter-actions">
-                    <button id="cancelFilter" class="btn-cancel">Hủy</button>
-                    <button id="applyFilter" class="btn-apply">Filter</button>
-                </div>
-            </div>
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    </div>
+
+    <button class="filter-btn" type="button">
+  <i class="fa-solid fa-filter"></i>
+  <span>Lọc</span>
+  <i class="fa-solid fa-chevron-down"></i>
+</button>
+
+
+
+    <div class="filter-box hide" id="filterBox">
+        <div class="filter-field">
+            <label>Loại bài</label>
+            <select id="filterType">
+                <option value="">-- Chọn loại --</option>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+            </select>
         </div>
 
+        <div class="filter-actions">
+            <button id="cancelFilter" class="btn-cancel">Hủy</button>
+            <button id="applyFilter" class="btn-apply">Filter</button>
+        </div>
+    </div>
+</div>
+
+
+
         <div class="empty-box">
-            <img src="/images/no-quiz.png" class="empty-img">
+            <img src="/img/empty-quiz.png" class="empty-img" alt="Không có bài trắc nghiệm">
             <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
         </div>
 
@@ -89,7 +118,7 @@
         </div>
 
         <div class="empty-box">
-            <img src="/images/no-class.png" class="empty-img">
+            <img src="/img/no-class.svg" class="empty-img" alt="Không có lớp">
             <p>Hiện tại không có lớp. Liên hệ người quản lý để được thêm vào</p>
         </div>
 

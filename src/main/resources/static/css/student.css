@@ -1,3 +1,4 @@
+/* ====== BASE ====== */
 
 body {
     margin: 0;
@@ -11,6 +12,8 @@ body {
 
 .tab-content { flex-grow: 1; }
 
+
+/* ====== HEADER ====== */
 
 .header {
     background: #f65c57;
@@ -31,14 +34,26 @@ body {
     gap: 20px;
 }
 
-.icon-btn { color: #fff; cursor: pointer; }
+.icon-btn {
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+.icon-btn:hover {
+    opacity: 1;
+}
 
 .avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.6);
 }
 
+
+/* ====== TABS ====== */
 
 .tabs {
     display: flex;
@@ -53,18 +68,22 @@ body {
     cursor: pointer;
     font-size: 16px;
     padding-bottom: 6px;
-    color: #444;
+    color: #555;
     transition: 0.25s ease;
 }
 
-.tab:hover { color: #000; }
+.tab:hover {
+    color: #111;
+}
 
 .tab.active {
     border-bottom: 3px solid #f65c57;
     font-weight: bold;
-    color: #000;
+    color: #111;
 }
 
+
+/* ====== LAYOUT ====== */
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
@@ -77,13 +96,15 @@ body {
 }
 
 
+/* ====== CARD / SECTION ====== */
+
 .section {
     background: #fff;
     padding: 30px 35px;
     margin-bottom: 25px;
     border-radius: 14px;
     border: 1px solid #eee;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
 }
 
 .section h3 {
@@ -95,17 +116,45 @@ body {
     color: #333;
 }
 
+
+/* ====== EMPTY STATE (Không có lớp / bài) ====== */
+
+/* EMPTY STATE – căn giữa và đồng bộ chiều cao, kích thước icon */
 .empty-box {
+    margin-top: 18px;
+    background: linear-gradient(135deg, #ffffff, #f9fafb);
+    border-radius: 16px;
+    border: 1px dashed #e5e7eb;
+
+    /* căn giữa hoàn toàn */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 32px 24px;
+    min-height: 220px;           /* 2 khung cao bằng nhau */
     text-align: center;
-    padding: 35px 0;
-    border: none !important;
 }
 
 .empty-img {
-    width: 150px;
-    opacity: 0.9;
+    width: 120px;                /* icon đồng size cho cả 2 hình */
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 12px;
+    opacity: 0.96;
+    filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.12));
 }
 
+.empty-box p {
+    margin: 0;
+    font-size: 15px;
+    color: #4b5563;
+    max-width: 360px;            /* tránh dòng chữ quá dài */
+}
+
+
+/* ====== HISTORY / FILTER ====== */
 
 .history-top {
     display: flex;
@@ -115,22 +164,100 @@ body {
     position: relative;
 }
 
-.search-input {
-    width: 260px;
-    padding: 10px;
-    border: none;
-    border-bottom: 1px solid #ddd;
-    outline: none;
-    font-size: 15px;
+/* wrapper để đặt icon & nút X bên trong input */
+.search-wrapper {
+    position: relative;
+    display: inline-block;
 }
 
-.filter-btn {
-    background: #eee;
-    padding: 7px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
+/* ô search bo tròn, chừa chỗ bên phải cho X + icon */
+.search-input {
+    width: 260px;
+    padding: 9px 60px 9px 12px;  /* 60px bên phải cho X + kính lúp */
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    outline: none;
+    font-size: 15px;
+    background: #fff;
+    transition: 0.2s ease;
 }
+
+.search-input:focus {
+    border-color: #3f4aa0;
+    box-shadow: 0 0 0 3px rgba(63, 74, 160, 0.12);
+}
+
+/* icon kính lúp nằm sát mép phải */
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* nút X – nằm giữa input và icon kính lúp */
+.clear-search-btn {
+    position: absolute;
+    right: 34px;                  /* giữa input và search-icon */
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #9CA3AF;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    display: none;                /* mặc định ẩn */
+}
+
+/* khi có value thì hiện nút X */
+.search-wrapper.has-value .clear-search-btn {
+    display: block;
+}
+
+
+.filter-btn{
+  background: #f3f4f6;                 /* xám nhạt sang */
+  border: 1px solid #e5e7eb;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+
+  transition: 0.18s ease;
+}
+
+.filter-btn i{
+  font-size: 14px;
+  color: #6b7280;                      /* icon xám đậm */
+  line-height: 1;
+}
+
+.filter-btn:hover{
+  background: #eef2ff;                 /* hover nhẹ */
+  border-color: rgba(63, 74, 160, 0.25);
+}
+
+.filter-btn:active{
+  transform: translateY(1px);
+}
+
+.filter-btn:focus{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(63, 74, 160, 0.12);
+}
+
 
 .filter-box {
     position: absolute;
@@ -158,6 +285,7 @@ body {
     padding: 8px;
     border-radius: 6px;
     border: 1px solid #ccc;
+    font-size: 14px;
 }
 
 .filter-actions {
@@ -172,6 +300,11 @@ body {
     border-radius: 6px;
     border: none;
     cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-cancel:hover {
+    background: #cfcfcf;
 }
 
 .btn-apply {
@@ -181,8 +314,15 @@ body {
     border-radius: 6px;
     border: none;
     cursor: pointer;
+    font-size: 14px;
 }
 
+.btn-apply:hover {
+    background: #33408f;
+}
+
+
+/* ====== JOIN CLASS BUTTON ====== */
 
 .join-class-btn {
     width: 100%;
@@ -209,6 +349,8 @@ body {
     transform: translateY(-2px);
 }
 
+
+/* ====== POPUP JOIN CLASS ====== */
 
 .overlay {
     position: fixed;
@@ -263,12 +405,18 @@ body {
     font-size: 15px;
 }
 
+.popup-field input:focus {
+    border-bottom-color: #3f4aa0;
+}
+
 .popup-actions {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
 }
 
+
+/* ====== FOOTER ====== */
 
 .footer {
     background: #f65c57;
@@ -282,17 +430,40 @@ body {
     width: 85%;
     margin: auto;
     justify-content: space-between;
+    gap: 20px;
 }
 
 .footer-col { width: 33%; }
-.footer-col a { color: #fff; }
+
+.footer-col h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.footer-col p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.footer-col a {
+    color: #fff;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.footer-col a:hover {
+    text-decoration: underline;
+}
 
 .footer-bottom {
     text-align: center;
     padding-top: 12px;
     opacity: 0.9;
+    font-size: 13px;
 }
 
+
+/* ====== SWEETALERT2 ====== */
 
 .swal2-popup {
     border-radius: 16px !important;
