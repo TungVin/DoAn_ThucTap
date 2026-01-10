@@ -309,6 +309,19 @@ document.addEventListener('DOMContentLoaded', function() {
         startToggle.addEventListener('change', function() {
             startDate.disabled = !this.checked;
             startTime.disabled = !this.checked;
+
+            // Auto-fill with current date/time if enabled and empty
+            if (this.checked) {
+                const now = new Date();
+                if (!startDate.value) {
+                    startDate.value = now.toISOString().split('T')[0];
+                }
+                if (!startTime.value) {
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    startTime.value = `${hours}:${minutes}`;
+                }
+            }
         });
     }
 
@@ -320,6 +333,51 @@ document.addEventListener('DOMContentLoaded', function() {
         endToggle.addEventListener('change', function() {
             endDate.disabled = !this.checked;
             endTime.disabled = !this.checked;
+
+            // Auto-fill with current date/time if enabled and empty
+            if (this.checked) {
+                const now = new Date();
+                if (!endDate.value) {
+                    endDate.value = now.toISOString().split('T')[0];
+                }
+                if (!endTime.value) {
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    endTime.value = `${hours}:${minutes}`;
+                }
+            }
+        });
+    }
+
+    // Auto-fill date/time on form submit if checkbox is checked but fields are empty
+    const createExamForm = document.getElementById('createExamForm');
+    if (createExamForm) {
+        createExamForm.addEventListener('submit', function(e) {
+            const now = new Date();
+            const currentDate = now.toISOString().split('T')[0];
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const currentTime = `${hours}:${minutes}`;
+
+            // Auto-fill start date/time if toggle is checked but empty
+            if (startToggle.checked) {
+                if (!startDate.value) {
+                    startDate.value = currentDate;
+                }
+                if (!startTime.value) {
+                    startTime.value = currentTime;
+                }
+            }
+
+            // Auto-fill end date/time if toggle is checked but empty
+            if (endToggle.checked) {
+                if (!endDate.value) {
+                    endDate.value = currentDate;
+                }
+                if (!endTime.value) {
+                    endTime.value = currentTime;
+                }
+            }
         });
     }
 
