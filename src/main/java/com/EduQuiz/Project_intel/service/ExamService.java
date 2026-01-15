@@ -1,5 +1,6 @@
 package com.EduQuiz.Project_intel.service;
 
+import com.EduQuiz.Project_intel.dto.ExamCardDTO;
 import com.EduQuiz.Project_intel.dto.ExamUpsertForm;
 import com.EduQuiz.Project_intel.model.Category;
 import com.EduQuiz.Project_intel.model.Exam;
@@ -8,6 +9,7 @@ import com.EduQuiz.Project_intel.repository.ExamRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,19 +21,78 @@ public class ExamService {
     private final CategoryRepository categoryRepository;
 
     private static final DateTimeFormatter DATE_TIME_FMT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final DateTimeFormatter CARD_DATE_FMT = DateTimeFormatter.ofPattern("'Thg' MM dd");
 
     public ExamService(ExamRepository examRepository, CategoryRepository categoryRepository) {
         this.examRepository = examRepository;
         this.categoryRepository = categoryRepository;
     }
 
-    // Lấy tất cả exam
+    // ================== LIST CARD (CHO TRANG DTO) ==================
+
+    @Transactional(readOnly = true)
+    public List<ExamCardDTO> getCards() {
+        return examRepository.findAll()
+                .stream()
+                .map(this::toCard)
+                .toList();
+    }
+
+    private ExamCardDTO toCard(Exam e) {
+        String title = (e.getTitle() == null || e.getTitle().isBlank()) ? "(Chưa đặt tên)" : e.getTitle();
+
+        String timeLabel = (e.getTimeLimit() == null) ? "Không giới hạn" : (e.getTimeLimit() + " phút");
+
+        // ưu tiên createdAt nếu có, không có thì dùng hôm nay
+        String dateLabel;
+        if (getCreatedAtLocalDate(e) != null) {
+            dateLabel = getCreatedAtLocalDate(e).format(CARD_DATE_FMT);
+        } else {
+            dateLabel = LocalDate.now().format(CARD_DATE_FMT);
+        }
+
+        // statusLabel: nếu bạn chưa có status trong entity -> để mặc định
+        String statusLabel = "Bản nháp";
+
+        int questionCount = 0;
+        String thumbUrl = null;
+
+        return new ExamCardDTO(
+                e.getId(),
+                title,
+                timeLabel,
+                dateLabel,
+                statusLabel,
+                questionCount,
+                thumbUrl
+        );
+    }
+
+    /**
+     * Helper: tránh lỗi nếu Exam của bạn chưa có createdAt hoặc kiểu khác.
+     * Nếu entity Exam có getCreatedAt() trả về LocalDateTime thì sẽ dùng được.
+     */
+    private LocalDate getCreatedAtLocalDate(Exam e) {
+        try {
+            // nếu Exam có getCreatedAt(): LocalDateTime
+            var createdAt = e.getCreatedAt();
+            if (createdAt == null) return null;
+            return createdAt.toLocalDate();
+        } catch (Exception ex) {
+            // Exam chưa có field createdAt hoặc kiểu khác
+            return null;
+        }
+    }
+
+    // ================== LIST ENTITY (CHO FRAGMENT NINEQUIZ ĐANG DÙNG Exam) ==================
+
     @Transactional(readOnly = true)
     public List<Exam> getAll() {
         return examRepository.findAll();
     }
 
-    // Tạo mới từ form
+    // ================== CREATE / UPDATE ==================
+
     @Transactional
     public Long createFromForm(ExamUpsertForm form) {
         Exam exam = new Exam();
@@ -40,7 +101,6 @@ public class ExamService {
         return exam.getId();
     }
 
-    // Lấy form để edit
     @Transactional(readOnly = true)
     public ExamUpsertForm getFormById(Long id) {
         Exam exam = examRepository.findById(id).orElseThrow();
@@ -54,7 +114,6 @@ public class ExamService {
             f.setCategoryId(exam.getCategory().getId());
         }
 
-        // ========== THỜI GIAN ==========
         if (exam.getTimeLimit() != null) {
             f.setTimeLimitEnabled(true);
             f.setTimeLimit(exam.getTimeLimit());
@@ -72,7 +131,6 @@ public class ExamService {
             f.setEndTime(exam.getEndTime().toLocalTime().toString().substring(0, 5));
         }
 
-        // ========== CÀI ĐẶT NÂNG CAO ==========
         if (exam.getResultDisplayMode() != null) {
             f.setResultDisplayMode(exam.getResultDisplayMode());
         }
@@ -104,7 +162,6 @@ public class ExamService {
         return f;
     }
 
-    // Cập nhật từ form
     @Transactional
     public void updateFromForm(Long id, ExamUpsertForm form) {
         Exam exam = examRepository.findById(id).orElseThrow();
@@ -112,12 +169,19 @@ public class ExamService {
         examRepository.save(exam);
     }
 
-    // Ánh xạ dữ liệu từ form -> entity
+    // ================== DELETE ==================
+
+    @Transactional
+    public void deleteById(Long id) {
+        examRepository.deleteById(id);
+    }
+
+    // ================== APPLY FORM ==================
+
     private void applyForm(Exam exam, ExamUpsertForm f) {
         exam.setTitle(f.getTitle());
         exam.setDescription(f.getDescription());
 
-        // Category
         if (f.getCategoryId() != null) {
             Category cat = categoryRepository.findById(f.getCategoryId()).orElseThrow();
             exam.setCategory(cat);
@@ -125,7 +189,6 @@ public class ExamService {
             exam.setCategory(null);
         }
 
-        // ========== THỜI GIAN ==========
         if (!f.isTimeLimitEnabled()) {
             exam.setTimeLimit(null);
         } else {
@@ -140,46 +203,38 @@ public class ExamService {
             throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
         }
 
-        // ========== CÀI ĐẶT NÂNG CAO ==========
-        // Khi nào hiển thị kết quả
         if (f.getResultDisplayMode() != null) {
             exam.setResultDisplayMode(f.getResultDisplayMode());
         } else if (exam.getResultDisplayMode() == null) {
             exam.setResultDisplayMode(Exam.ResultDisplayMode.AFTER_TEACHER_REVIEW);
         }
 
-        // Tự động chia điểm
         exam.setAutoDivideScore(f.isAutoDivideScore());
 
-        // Điểm tối đa
         if (f.getMaxScore() != null) {
             exam.setMaxScore(f.getMaxScore());
         } else if (exam.getMaxScore() == null) {
             exam.setMaxScore(10);
         }
 
-        // Số lần nộp bài
         if (f.getMaxAttempts() != null) {
             exam.setMaxAttempts(f.getMaxAttempts());
         } else if (exam.getMaxAttempts() == null) {
             exam.setMaxAttempts(1);
         }
 
-        // Kiểu số thứ tự câu hỏi
         if (f.getQuestionNumberStyle() != null && !f.getQuestionNumberStyle().isBlank()) {
             exam.setQuestionNumberStyle(f.getQuestionNumberStyle());
         } else if (exam.getQuestionNumberStyle() == null) {
             exam.setQuestionNumberStyle("LETTER");
         }
 
-        // Số câu trên 1 trang
         if (f.getQuestionsPerPage() != null) {
             exam.setQuestionsPerPage(f.getQuestionsPerPage());
         } else if (exam.getQuestionsPerPage() == null) {
             exam.setQuestionsPerPage(50);
         }
 
-        // Số đáp án trên 1 hàng
         if (f.getAnswersPerRow() != null) {
             exam.setAnswersPerRow(f.getAnswersPerRow());
         } else if (exam.getAnswersPerRow() == null) {
