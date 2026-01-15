@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <!-- (Nếu có Spring Security CSRF, thêm meta để JS đọc) -->
+  <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
+  <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
+
   <link rel="stylesheet" th:href="@{/css/exam-editor.css}">
   <title th:text="${mode == 'create' ? 'Tạo bài kiểm tra' : 'Chỉnh sửa bài kiểm tra'}">Exam</title>
 </head>
@@ -14,7 +19,10 @@
   <form th:with="actionUrl=${mode == 'create'} ? '/teacher/exams' : '/teacher/exams/' + examId"
         th:action="@{${actionUrl}}"
         method="post"
-        th:object="${form}">
+        th:object="${form}"
+
+        <!-- để JS biết API upload -->
+        data-upload-url="/api/uploads">
 
     <!-- TOPBAR -->
     <div class="topbar">
@@ -143,27 +151,17 @@
       <div class="card">
         <div class="card-title">Cài đặt nâng cao</div>
 
-        <!-- Thời điểm hiển thị kết quả -->
         <label class="field">
           <span>Thời điểm hiển thị kết quả</span>
           <select class="input" th:field="*{resultDisplayMode}">
-            <option th:value="AFTER_TEACHER_REVIEW">
-              Sau khi giáo viên chấm bài
-            </option>
-            <option th:value="AFTER_EXAM_TIME_END">
-              Sau khi kết thúc thời gian làm bài
-            </option>
-            <option th:value="AFTER_SUBMIT">
-              Sau khi học sinh nộp bài
-            </option>
+            <option th:value="AFTER_TEACHER_REVIEW">Sau khi giáo viên chấm bài</option>
+            <option th:value="AFTER_EXAM_TIME_END">Sau khi kết thúc thời gian làm bài</option>
+            <option th:value="AFTER_SUBMIT">Sau khi học sinh nộp bài</option>
           </select>
-          <div class="muted small">
-          </div>
         </label>
 
         <hr class="sep"/>
 
-        <!-- Tự động chia điểm + điểm tối đa -->
         <div class="switch-row">
           <label class="toggle-switch">
             <input type="checkbox" th:field="*{autoDivideScore}" id="autoDivideScore">
@@ -182,7 +180,6 @@
 
         <hr class="sep"/>
 
-        <!-- Số lần nộp -->
         <label class="field">
           <span>Số lần nộp bài tối đa</span>
           <input class="input" type="number" min="1" th:field="*{maxAttempts}"
@@ -192,7 +189,6 @@
 
         <hr class="sep"/>
 
-        <!-- Hiển thị câu hỏi & câu trả lời -->
         <label class="field">
           <span>Kiểu số thứ tự câu hỏi</span>
           <select class="input" th:field="*{questionNumberStyle}">
@@ -246,6 +242,35 @@
       </div>
 
     </section>
+
+    <!-- ========= TEMPLATE: 1 dòng đáp án có upload ========= -->
+    <template id="answerRowTemplate">
+      <div class="answer-row">
+        <!-- radio/checkbox chọn đáp án đúng (JS quyết định type) -->
+        <input class="answer-correct" type="radio">
+
+        <!-- nội dung đáp án -->
+        <input class="input answer-text" type="text" placeholder="Câu trả lời...">
+
+        <!-- lưu URL file sau khi upload -->
+        <input class="answer-attachment-url" type="hidden">
+
+        <!-- file input ẩn -->
+        <input class="answer-file" type="file"
+               accept="image/*,application/pdf"
+               hidden>
+
+        <!-- icon upload -->
+        <button type="button" class="btn-upload-icon" title="Tải file lên">
+          <!-- đổi icon theo project bạn -->
+          <img th:src="@{/img/management-image.svg}" alt="upload" style="width:18px;height:18px;">
+        </button>
+
+        <!-- hiển thị trạng thái / tên file -->
+        <span class="upload-status muted small"></span>
+      </div>
+    </template>
+
   </form>
 </div>
 
