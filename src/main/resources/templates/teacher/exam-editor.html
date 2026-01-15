@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" th:href="@{/css/exam-editor.css}">
+  <title th:text="${mode == 'create' ? 'Tạo bài kiểm tra' : 'Chỉnh sửa bài kiểm tra'}">Exam</title>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- 1 FORM DUY NHẤT -->
+  <form th:with="actionUrl=${mode == 'create'} ? '/teacher/exams' : '/teacher/exams/' + examId"
+        th:action="@{${actionUrl}}"
+        method="post"
+        th:object="${form}">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="breadcrumb">
+          <a th:href="@{/teacher(activeTab='exams')}">Bài kiểm tra</a>
+          <span> / </span>
+          <span th:text="${mode == 'create' ? 'Tạo mới' : 'Cài đặt'}">Tạo mới</span>
+        </div>
+
+        <h1 th:text="${mode == 'create' ? 'Tạo bài kiểm tra' : 'Cài đặt bài kiểm tra'}">Tạo bài kiểm tra</h1>
+        <p class="muted">Thiết lập thông tin và thời gian. Bạn có thể chỉnh sửa bất kỳ lúc nào.</p>
+      </div>
+
+      <div class="actions">
+        <a class="btn ghost" th:href="@{/teacher(activeTab='exams')}">Quay lại</a>
+        <button class="btn primary" type="submit"
+                th:text="${mode == 'create' ? 'Tạo bài kiểm tra' : 'Lưu thay đổi'}">
+          Lưu
+        </button>
+      </div>
+    </div>
+
+    <!-- HÀNG TRÊN: 2 CỘT (Thông tin chung + Thời gian) -->
+    <div class="grid">
+
+      <!-- LEFT -->
+      <section class="card">
+        <div class="card-title">Thông tin chung</div>
+
+        <label class="field">
+          <span>Tiêu đề <b>*</b></span>
+          <input class="input" th:field="*{title}" placeholder="Ví dụ: Kiểm tra chương 1" required>
+        </label>
+
+        <label class="field">
+          <span>Mô tả</span>
+          <textarea class="textarea" th:field="*{description}" placeholder="Mô tả ngắn về bài kiểm tra..."></textarea>
+        </label>
+
+        <label class="field">
+          <span>Danh mục</span>
+          <select class="input" th:field="*{categoryId}">
+            <option value="">-- Chọn danh mục --</option>
+            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+          </select>
+        </label>
+      </section>
+
+      <!-- RIGHT: share + time -->
+      <section class="stack">
+
+        <!-- SHARE (chỉ edit mới có) -->
+        <div class="card" th:if="${mode == 'edit'}">
+          <div class="card-title">Chia sẻ</div>
+          <div class="share-row">
+            <input class="input" id="shareLink" th:value="${shareLink}" readonly>
+            <button type="button" class="btn small" id="copyLinkBtn">Copy</button>
+          </div>
+          <p class="muted small">Gửi link này cho học sinh để vào làm bài.</p>
+        </div>
+
+        <!-- TIME SETTINGS -->
+        <div class="card">
+          <div class="card-title">Cài đặt thời gian</div>
+
+          <!-- Giới hạn thời gian -->
+          <div class="switch-row">
+            <label class="toggle-switch">
+              <input type="checkbox" th:field="*{timeLimitEnabled}" id="timeLimitEnabled">
+              <span class="toggle-track"></span>
+            </label>
+            <label class="switch-text" for="timeLimitEnabled">
+              <div class="label">Giới hạn thời gian làm bài</div>
+              <div class="muted small">Tính từ lúc học sinh bắt đầu làm.</div>
+            </label>
+          </div>
+
+          <div class="row">
+            <input class="input" type="number" min="1" th:field="*{timeLimit}" id="timeLimit" placeholder="Số phút">
+          </div>
+
+          <hr class="sep"/>
+
+          <!-- Thời gian bắt đầu -->
+          <div class="switch-row">
+            <label class="toggle-switch">
+              <input type="checkbox" th:field="*{startEnabled}" id="startEnabled">
+              <span class="toggle-track"></span>
+            </label>
+            <label class="switch-text" for="startEnabled">
+              <div class="label">Thời gian bắt đầu</div>
+              <div class="muted small">Không cho bắt đầu trước mốc này.</div>
+            </label>
+          </div>
+
+          <div class="row two">
+            <input class="input" type="date" th:field="*{startDate}" id="startDate">
+            <input class="input" type="time" th:field="*{startTime}" id="startTime">
+          </div>
+
+          <!-- Thời gian kết thúc -->
+          <div class="switch-row">
+            <label class="toggle-switch">
+              <input type="checkbox" th:field="*{endEnabled}" id="endEnabled">
+              <span class="toggle-track"></span>
+            </label>
+            <label class="switch-text" for="endEnabled">
+              <div class="label">Thời gian kết thúc</div>
+              <div class="muted small">Hết hạn sau thời điểm này.</div>
+            </label>
+          </div>
+
+          <div class="row two">
+            <input class="input" type="date" th:field="*{endDate}" id="endDate">
+            <input class="input" type="time" th:field="*{endTime}" id="endTime">
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- HÀNG DƯỚI: FULL WIDTH (Cài đặt nâng cao + Phần 1) -->
+    <section class="stack stack-wide">
+
+      <!-- ADVANCED -->
+      <div class="card">
+        <div class="card-title">Cài đặt nâng cao</div>
+
+        <!-- Thời điểm hiển thị kết quả -->
+        <label class="field">
+          <span>Thời điểm hiển thị kết quả</span>
+          <select class="input" th:field="*{resultDisplayMode}">
+            <option th:value="AFTER_TEACHER_REVIEW">
+              Sau khi giáo viên chấm bài
+            </option>
+            <option th:value="AFTER_EXAM_TIME_END">
+              Sau khi kết thúc thời gian làm bài
+            </option>
+            <option th:value="AFTER_SUBMIT">
+              Sau khi học sinh nộp bài
+            </option>
+          </select>
+          <div class="muted small">
+            Giống NineQuiz: điều khiển khi nào học sinh xem được điểm và đáp án.
+          </div>
+        </label>
+
+        <hr class="sep"/>
+
+        <!-- Tự động chia điểm + điểm tối đa -->
+        <div class="switch-row">
+          <label class="toggle-switch">
+            <input type="checkbox" th:field="*{autoDivideScore}" id="autoDivideScore">
+            <span class="toggle-track"></span>
+          </label>
+          <label class="switch-text" for="autoDivideScore">
+            <div class="label">Hệ thống tự động chia điểm</div>
+            <div class="muted small">Chia đều tổng điểm cho các câu hỏi trắc nghiệm.</div>
+          </label>
+        </div>
+
+        <div class="row">
+          <input class="input" type="number" min="1" th:field="*{maxScore}" id="maxScore"
+                 placeholder="Điểm tối đa (ví dụ 10)">
+        </div>
+
+        <hr class="sep"/>
+
+        <!-- Số lần nộp -->
+        <label class="field">
+          <span>Số lần nộp bài tối đa</span>
+          <input class="input" type="number" min="1" th:field="*{maxAttempts}"
+                 placeholder="Ví dụ: 1, 2, 3...">
+          <div class="muted small">Giới hạn số lần học sinh được phép làm lại bài.</div>
+        </label>
+
+        <hr class="sep"/>
+
+        <!-- Hiển thị câu hỏi & câu trả lời -->
+        <label class="field">
+          <span>Kiểu số thứ tự câu hỏi</span>
+          <select class="input" th:field="*{questionNumberStyle}">
+            <option value="NUMBER">1. 2. 3.</option>
+            <option value="LETTER">A. B. C.</option>
+            <option value="NONE">Không hiển thị</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Số câu hỏi trên 1 trang</span>
+          <select class="input" th:field="*{questionsPerPage}">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="0">Tất cả trong 1 trang</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Số câu trả lời trên 1 hàng</span>
+          <select class="input" th:field="*{answersPerRow}">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- PHẦN 1: CÂU HỎI -->
+      <div class="card" id="questionSection">
+        <div class="question-section-header">
+          <div class="card-title">Phần 1</div>
+          <select class="input small" id="part1Mode">
+            <option value="none">Không trộn</option>
+            <option value="shuffle_questions">Trộn thứ tự câu hỏi</option>
+            <option value="shuffle_answers">Trộn thứ tự đáp án</option>
+            <option value="shuffle_all">Trộn cả câu hỏi & đáp án</option>
+          </select>
+        </div>
+
+        <div id="questionList" class="question-list">
+          <!-- JS render câu hỏi vào đây -->
+        </div>
+
+        <button type="button" class="btn ghost full" id="addQuestionBtn">
+          + Thêm câu hỏi
+        </button>
+      </div>
+
+    </section>
+  </form>
+</div>
+
+<script th:src="@{/js/exam-editor.js}"></script>
+</body>
+</html>

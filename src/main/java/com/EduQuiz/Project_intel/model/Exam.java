@@ -7,6 +7,13 @@ import java.time.LocalDateTime;
 @Table(name = "exams")
 public class Exam {
 
+    // ===== Enum cấu hình hiển thị kết quả =====
+    public enum ResultDisplayMode {
+        AFTER_TEACHER_REVIEW,   // Sau khi giáo viên chấm bài
+        AFTER_EXAM_TIME_END,    // Sau khi kết thúc thời gian làm bài
+        AFTER_SUBMIT            // Sau khi học sinh nộp bài
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,6 +28,7 @@ public class Exam {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    // Thời gian làm bài (phút)
     private Integer timeLimit; // in minutes
 
     private LocalDateTime startTime;
@@ -28,12 +36,44 @@ public class Exam {
     private LocalDateTime endTime;
 
     @Column(nullable = false)
-    private String status = "draft"; // draft, ongoing, completed
+    private String status = "draft"; // draft, ongoing, ended
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters and Setters
+    // ===== CÀI ĐẶT NÂNG CAO =====
+
+    // Khi nào hiển thị kết quả
+    @Enumerated(EnumType.STRING)
+    @Column(name = "result_display_mode")
+    private ResultDisplayMode resultDisplayMode = ResultDisplayMode.AFTER_TEACHER_REVIEW;
+
+    // Hệ thống tự động chia điểm
+    @Column(name = "auto_divide_score")
+    private Boolean autoDivideScore = Boolean.TRUE;
+
+    // Điểm tối đa cho bài kiểm tra
+    @Column(name = "max_score")
+    private Integer maxScore = 10;
+
+    // Số lần nộp bài
+    @Column(name = "max_attempts")
+    private Integer maxAttempts = 1;
+
+    // Kiểu đánh số câu hỏi: NUMBER (1,2,3), LETTER (A,B,C), NONE
+    @Column(name = "question_number_style")
+    private String questionNumberStyle = "LETTER";
+
+    // Số câu hỏi trên 1 trang (0 = tất cả)
+    @Column(name = "questions_per_page")
+    private Integer questionsPerPage = 50;
+
+    // Số đáp án trên 1 hàng
+    @Column(name = "answers_per_row")
+    private Integer answersPerRow = 1;
+
+    // ===== Getters và Setters =====
+
     public Long getId() {
         return id;
     }
@@ -106,6 +146,62 @@ public class Exam {
         this.createdAt = createdAt;
     }
 
+    public ResultDisplayMode getResultDisplayMode() {
+        return resultDisplayMode;
+    }
+
+    public void setResultDisplayMode(ResultDisplayMode resultDisplayMode) {
+        this.resultDisplayMode = resultDisplayMode;
+    }
+
+    public Boolean getAutoDivideScore() {
+        return autoDivideScore;
+    }
+
+    public void setAutoDivideScore(Boolean autoDivideScore) {
+        this.autoDivideScore = autoDivideScore;
+    }
+
+    public Integer getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(Integer maxScore) {
+        this.maxScore = maxScore;
+    }
+
+    public Integer getMaxAttempts() {
+        return maxAttempts;
+    }
+
+    public void setMaxAttempts(Integer maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+
+    public String getQuestionNumberStyle() {
+        return questionNumberStyle;
+    }
+
+    public void setQuestionNumberStyle(String questionNumberStyle) {
+        this.questionNumberStyle = questionNumberStyle;
+    }
+
+    public Integer getQuestionsPerPage() {
+        return questionsPerPage;
+    }
+
+    public void setQuestionsPerPage(Integer questionsPerPage) {
+        this.questionsPerPage = questionsPerPage;
+    }
+
+    public Integer getAnswersPerRow() {
+        return answersPerRow;
+    }
+
+    public void setAnswersPerRow(Integer answersPerRow) {
+        this.answersPerRow = answersPerRow;
+    }
+
     /**
      * Tự động cập nhật trạng thái dựa trên thời gian hiện tại
      */
@@ -137,4 +233,3 @@ public class Exam {
         return this.status;
     }
 }
-

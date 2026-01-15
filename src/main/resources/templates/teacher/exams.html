@@ -7,7 +7,7 @@
     <div class="section" id="examsSection">
         <div class="top-action">
             <h2>Bài kiểm tra</h2>
-            <button class="create-btn" id="openCreateExamModal" type="button">Tạo bài kiểm tra +</button>
+            <a class="create-btn" th:href="@{/teacher/exams/new}">Tạo bài kiểm tra +</a>
         </div>
         <div class="divider"></div>
 
@@ -110,132 +110,7 @@
 
 <!-- Fragment: Exams Modals -->
 <div th:fragment="modals">
-    <!-- Modal tạo bài kiểm tra -->
-    <div class="modal-overlay" id="createExamModal">
-        <div class="modal-container">
-            <div class="modal-topbar">
-                <h3>Tạo bài kiểm tra mới</h3>
-                <span class="close-btn" id="closeCreateExamModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="createExamForm" method="post" action="/teacher/exams/create">
-                    <div class="form-group">
-                        <label for="examTitle">Tên bài kiểm tra *</label>
-                        <input type="text" id="examTitle" name="title" class="input" required placeholder="Nhập tên bài kiểm tra">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="examDescription">Mô tả</label>
-                        <textarea id="examDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả bài kiểm tra"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="examCategory">Danh mục</label>
-                        <select id="examCategory" name="categoryId" class="input">
-                            <option value="">-- Chọn danh mục --</option>
-                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
-                        </select>
-                    </div>
-
-                    <div class="form-group switch-group">
-                        <label>
-                            <input type="checkbox" id="timeLimitToggle" name="hasTimeLimit">
-                            Giới hạn thời gian làm bài
-                        </label>
-                        <input type="number" id="timeLimitInput" name="timeLimit" class="input" disabled placeholder="Số phút">
-                    </div>
-
-                    <div class="form-group switch-group">
-                        <label>
-                            <input type="checkbox" id="startToggle" name="hasStartTime">
-                            Thời gian bắt đầu
-                        </label>
-                        <div class="datetime-group">
-                            <input type="date" id="startDate" name="startDate" class="input" disabled>
-                            <input type="time" id="startTime" name="startTime" class="input" disabled>
-                        </div>
-                    </div>
-
-                    <div class="form-group switch-group">
-                        <label>
-                            <input type="checkbox" id="endToggle" name="hasEndTime">
-                            Thời gian kết thúc
-                        </label>
-                        <div class="datetime-group">
-                            <input type="date" id="endDate" name="endDate" class="input" disabled>
-                            <input type="time" id="endTime" name="endTime" class="input" disabled>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn-secondary" id="cancelCreateExamBtn">Hủy</button>
-                        <button type="submit" class="btn-primary">Tạo bài kiểm tra</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal chỉnh sửa bài kiểm tra -->
-    <div class="modal-overlay" id="editExamModal">
-        <div class="modal-container">
-            <div class="modal-topbar">
-                <h3>Chỉnh sửa bài kiểm tra</h3>
-                <span class="close-btn" id="closeEditExamModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="editExamForm" method="post" action="/teacher/exams/update">
-                    <input type="hidden" id="editExamId" name="id">
-
-                    <div class="form-group">
-                        <label for="editExamTitle">Tên bài kiểm tra *</label>
-                        <input type="text" id="editExamTitle" name="title" class="input" required placeholder="Nhập tên bài kiểm tra">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editExamDescription">Mô tả</label>
-                        <textarea id="editExamDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả bài kiểm tra"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editExamCategory">Danh mục</label>
-                        <select id="editExamCategory" name="categoryId" class="input">
-                            <option value="">-- Chọn danh mục --</option>
-                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editExamTimeLimit">Giới hạn thời gian (phút)</label>
-                        <input type="number" id="editExamTimeLimit" name="timeLimit" class="input" placeholder="Số phút (để trống nếu không giới hạn)">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editStartDate">Thời gian bắt đầu</label>
-                        <div class="datetime-group">
-                            <input type="date" id="editStartDate" name="startDate" class="input">
-                            <input type="time" id="editStartTime" name="startTime" class="input">
-                        </div>
-                        <small style="color: #666; font-size: 13px;">Để trống nếu không có thời gian bắt đầu cụ thể</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editEndDate">Thời gian kết thúc</label>
-                        <div class="datetime-group">
-                            <input type="date" id="editEndDate" name="endDate" class="input">
-                            <input type="time" id="editEndTime" name="endTime" class="input">
-                        </div>
-                        <small style="color: #666; font-size: 13px;">Để trống nếu không có thời gian kết thúc cụ thể</small>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn-secondary" id="cancelEditExamBtn">Hủy</button>
-                        <button type="submit" class="btn-primary">Lưu thay đổi</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Modal xác nhận xóa -->
     <div class="modal-overlay" id="deleteExamModal">
@@ -309,19 +184,6 @@ document.addEventListener('DOMContentLoaded', function() {
         startToggle.addEventListener('change', function() {
             startDate.disabled = !this.checked;
             startTime.disabled = !this.checked;
-
-            // Auto-fill with current date/time if enabled and empty
-            if (this.checked) {
-                const now = new Date();
-                if (!startDate.value) {
-                    startDate.value = now.toISOString().split('T')[0];
-                }
-                if (!startTime.value) {
-                    const hours = String(now.getHours()).padStart(2, '0');
-                    const minutes = String(now.getMinutes()).padStart(2, '0');
-                    startTime.value = `${hours}:${minutes}`;
-                }
-            }
         });
     }
 
@@ -333,51 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
         endToggle.addEventListener('change', function() {
             endDate.disabled = !this.checked;
             endTime.disabled = !this.checked;
-
-            // Auto-fill with current date/time if enabled and empty
-            if (this.checked) {
-                const now = new Date();
-                if (!endDate.value) {
-                    endDate.value = now.toISOString().split('T')[0];
-                }
-                if (!endTime.value) {
-                    const hours = String(now.getHours()).padStart(2, '0');
-                    const minutes = String(now.getMinutes()).padStart(2, '0');
-                    endTime.value = `${hours}:${minutes}`;
-                }
-            }
-        });
-    }
-
-    // Auto-fill date/time on form submit if checkbox is checked but fields are empty
-    const createExamForm = document.getElementById('createExamForm');
-    if (createExamForm) {
-        createExamForm.addEventListener('submit', function(e) {
-            const now = new Date();
-            const currentDate = now.toISOString().split('T')[0];
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const currentTime = `${hours}:${minutes}`;
-
-            // Auto-fill start date/time if toggle is checked but empty
-            if (startToggle.checked) {
-                if (!startDate.value) {
-                    startDate.value = currentDate;
-                }
-                if (!startTime.value) {
-                    startTime.value = currentTime;
-                }
-            }
-
-            // Auto-fill end date/time if toggle is checked but empty
-            if (endToggle.checked) {
-                if (!endDate.value) {
-                    endDate.value = currentDate;
-                }
-                if (!endTime.value) {
-                    endTime.value = currentTime;
-                }
-            }
         });
     }
 
