@@ -16,12 +16,11 @@
 <div class="page">
 
   <!-- 1 FORM DUY NHẤT -->
+  <!-- Form để tạo/chỉnh sửa bài kiểm tra, data-upload-url để JS biết API upload -->
   <form th:with="actionUrl=${mode == 'create'} ? '/teacher/exams' : '/teacher/exams/' + examId"
         th:action="@{${actionUrl}}"
         method="post"
         th:object="${form}"
-
-        <!-- để JS biết API upload -->
         data-upload-url="/api/uploads">
 
     <!-- TOPBAR -->
