@@ -19,12 +19,13 @@
             <form th:action="@{/auth/login}" method="post">
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Mật khẩu" required>
-                <label>
-                    <input type="checkbox" name="rememberMe" value="true">
-                    <span class="remember">Ghi nhớ đăng nhập</span>
-                </label>
-                <span class="forget"><a href="#">Quên mật khẩu?</a></span>
-                <span class="clearfix"></span>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
+                    <label style="display: flex; align-items: center; margin: 0;">
+                        <input type="checkbox" name="rememberMe" value="true" style="width: auto; margin: 0 8px 0 0;">
+                        <span style="margin: 0; font-size: 1.4em;">Ghi nhớ đăng nhập</span>
+                    </label>
+                    <span class="forget"><a href="#">Quên mật khẩu?</a></span>
+                </div>
                 <button type="submit">Đăng nhập</button>
             </form>
             <span class="loginwith">Hoặc đăng nhập với</span>
@@ -63,11 +64,10 @@
                     <option value="STUDENT">👨‍🎓 Học sinh</option>
                     <option value="TEACHER">👨‍🏫 Giáo viên</option>
                 </select>
-                <label>
-                    <input type="checkbox" name="acceptTerms" value="true" required>
-                    <span class="remember">Tôi chấp nhận điều khoản</span>
+                <label style="display: flex; align-items: center; margin: 15px 0;">
+                    <input type="checkbox" name="acceptTerms" value="true" required style="width: auto; margin: 0 8px 0 0;">
+                    <span style="margin: 0;">Tôi chấp nhận điều khoản</span>
                 </label>
-                <span class="clearfix"></span>
                 <button type="submit">Đăng ký</button>
             </form>
         </div>
