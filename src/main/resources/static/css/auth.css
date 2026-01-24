@@ -52,6 +52,51 @@ form input {
   margin: 8px 0;
   width: 100%;
   font-size: 1.4em;
+  transition: all 0.3s ease;
+}
+
+form input:hover:not([type="checkbox"]) {
+  background: #e0e0e0;
+}
+
+form input:focus:not([type="checkbox"]) {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 2px #ff4b2b;
+}
+
+form select.role-select {
+  background: #eee;
+  border: none;
+  padding: 12px 15px;
+  margin: 8px 0;
+  width: 100%;
+  font-size: 1.4em;
+  cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  transition: all 0.3s ease;
+}
+
+form select.role-select:hover {
+  background: #e0e0e0;
+}
+
+form select.role-select:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 2px #ff4b2b;
+}
+
+form select.role-select option {
+  font-size: 1em;
+  padding: 10px;
+  background: white;
+}
+
+form select.role-select option:disabled {
+  color: #999;
 }
 
 span {
@@ -389,19 +434,63 @@ button:focus {
       position: fixed;
       top: 20px;
       right: 20px;
-      padding: 15px 20px;
-      border-radius: 5px;
+      padding: 15px 25px;
+      border-radius: 8px;
       color: white;
-      font-weight: bold;
+      font-size: 1.4em;
+      font-weight: 600;
       z-index: 9999;
-      transition: opacity 0.5s;
       max-width: 400px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+  }
+
+  .alert::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      display: inline-block;
   }
 
   .alert-error {
-      background-color: #dc3545;
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  }
+
+  .alert-error::before {
+      content: '✖';
+      font-size: 1.2em;
   }
 
   .alert-success {
-      background-color: #28a745;
+      background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+  }
+
+  .alert-success::before {
+      content: '✓';
+      font-size: 1.2em;
+  }
+
+  @keyframes slideIn {
+      from {
+          transform: translateX(400px);
+          opacity: 0;
+      }
+      to {
+          transform: translateX(0);
+          opacity: 1;
+      }
+  }
+
+  @keyframes slideOut {
+      from {
+          transform: translateX(0);
+          opacity: 1;
+      }
+      to {
+          transform: translateX(400px);
+          opacity: 0;
+      }
   }

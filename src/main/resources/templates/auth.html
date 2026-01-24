@@ -58,6 +58,11 @@
                 <input type="text" name="name" placeholder="Họ và tên" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" required>
+                <select name="role" class="role-select" required>
+                    <option value="">Chọn vai trò</option>
+                    <option value="STUDENT">👨‍🎓 Học sinh</option>
+                    <option value="TEACHER">👨‍🏫 Giáo viên</option>
+                </select>
                 <label>
                     <input type="checkbox" name="acceptTerms" value="true" required>
                     <span class="remember">Tôi chấp nhận điều khoản</span>
@@ -77,10 +82,22 @@
     window.addEventListener('DOMContentLoaded', function() {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
+            // Tự động đóng sau 5 giây
             setTimeout(function() {
-                alert.style.opacity = '0';
-                setTimeout(function() { alert.remove(); }, 500);
-            }, 3000);
+                alert.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(function() {
+                    alert.remove();
+                }, 300);
+            }, 5000);
+
+            // Cho phép click để đóng ngay lập tức
+            alert.style.cursor = 'pointer';
+            alert.addEventListener('click', function() {
+                alert.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(function() {
+                    alert.remove();
+                }, 300);
+            });
         });
     });
 </script>
