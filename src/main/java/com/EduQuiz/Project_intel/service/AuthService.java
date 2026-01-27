@@ -13,53 +13,43 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired(required = false)
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // =========================
+    // REGISTER
+    // =========================
     public User register(RegisterRequest request) {
-        // Kiểm tra email đã tồn tại
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email đã được sử dụng");
         }
 
-        // Kiểm tra độ dài mật khẩu
         if (request.getPassword().length() < 6) {
             throw new RuntimeException("Mật khẩu phải có ít nhất 6 ký tự");
         }
 
-        // Tạo user mới
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-
-        // Mã hóa mật khẩu nếu có passwordEncoder, nếu không lưu trực tiếp
-        if (passwordEncoder != null) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-        } else {
-            user.setPassword(request.getPassword());
-        }
-
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRoleEnum());
 
         return userRepository.save(user);
     }
 
+    // =========================
+    // LOGIN
+    // =========================
     public User login(String email, String password) {
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Email hoặc mật khẩu không đúng"));
 
-        // Kiểm tra mật khẩu
-        if (passwordEncoder != null) {
-            if (!passwordEncoder.matches(password, user.getPassword())) {
-                throw new RuntimeException("Email hoặc mật khẩu không đúng");
-            }
-        } else {
-            if (!password.equals(user.getPassword())) {
-                throw new RuntimeException("Email hoặc mật khẩu không đúng");
-            }
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Email hoặc mật khẩu không đúng");
         }
 
         return user;
     }
 }
-

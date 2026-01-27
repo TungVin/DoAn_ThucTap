@@ -2,6 +2,7 @@ package com.EduQuiz.Project_intel.controller;
 
 import com.EduQuiz.Project_intel.model.*;
 import com.EduQuiz.Project_intel.service.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +38,24 @@ public class TeacherController {
         this.fileStorageService = fileStorageService;
     }
 
+    // ==================== MAIN PAGE ====================
     @GetMapping
-    public String teacherPage(@RequestParam(defaultValue = "exams") String activeTab, Model model) {
-        model.addAttribute("activeTab", activeTab);
+    public String teacherPage(
+            @RequestParam(defaultValue = "exams") String activeTab,
+            Model model,
+            HttpSession session
+    ) {
+        // ====== CHỈ THÊM PHẦN KIỂM TRA ĐĂNG NHẬP ======
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/auth";
+        }
+        if (user.getRole() != Role.TEACHER) {
+            return "redirect:/student";
+        }
+        // ====== HẾT PHẦN SỬA ======
 
+        model.addAttribute("activeTab", activeTab);
         model.addAttribute("exams", examService.getAll());
         model.addAttribute("categories", categoryService.getAll());
         model.addAttribute("questions", questionService.findAllOrdered());
@@ -130,7 +145,6 @@ public class TeacherController {
             }
 
             Category category = parseCategory(categoryId);
-
             question.setTitle(title);
             question.setContent(content);
             question.setType(type);
@@ -222,9 +236,7 @@ public class TeacherController {
     // ==================== ONLINE SCHEDULES ====================
     @PostMapping("/online/create")
     public String createSchedule(@RequestParam String title,
-                                 @RequestParam(required = false) Long classId,
                                  @RequestParam String platform,
-                                 @RequestParam(required = false) String meetingLink,
                                  @RequestParam String startDate,
                                  @RequestParam String startTime,
                                  @RequestParam String endDate,
@@ -250,40 +262,6 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=online";
     }
 
-    @PostMapping("/online/update")
-    public String updateSchedule(@RequestParam Long id,
-                                 @RequestParam String title,
-                                 @RequestParam String platform,
-                                 @RequestParam String startDate,
-                                 @RequestParam String startTime,
-                                 @RequestParam String endDate,
-                                 @RequestParam String endTime,
-                                 @RequestParam(required = false) String autoAccept,
-                                 RedirectAttributes redirectAttributes) {
-        try {
-            Schedule schedule = scheduleService.findById(id);
-            if (schedule == null) {
-                redirectAttributes.addFlashAttribute("scheduleError", "Không tìm thấy lịch học!");
-                return "redirect:/teacher?activeTab=online";
-            }
-
-            LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(startDate), LocalTime.parse(startTime));
-            LocalDateTime endDateTime = LocalDateTime.of(LocalDate.parse(endDate), LocalTime.parse(endTime));
-
-            schedule.setTitle(title);
-            schedule.setPlatform(platform.toLowerCase().replace(" ", "_"));
-            schedule.setStartTime(startDateTime);
-            schedule.setEndTime(endDateTime);
-            schedule.setAutoAccept("true".equals(autoAccept));
-
-            scheduleService.save(schedule);
-            redirectAttributes.addFlashAttribute("scheduleSuccess", "Cập nhật lịch học thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("scheduleError", "Lỗi: " + e.getMessage());
-        }
-        return "redirect:/teacher?activeTab=online";
-    }
-
     @PostMapping("/online/delete")
     public String deleteSchedule(@RequestParam Long id, RedirectAttributes redirectAttributes) {
         try {
@@ -299,8 +277,7 @@ public class TeacherController {
     private Category parseCategory(String categoryId) {
         if (categoryId == null || categoryId.isBlank()) return null;
         try {
-            Long catId = Long.parseLong(categoryId);
-            return categoryService.findById(catId);
+            return categoryService.findById(Long.parseLong(categoryId));
         } catch (NumberFormatException e) {
             return null;
         }

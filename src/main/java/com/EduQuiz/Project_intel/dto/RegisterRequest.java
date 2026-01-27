@@ -1,27 +1,14 @@
 package com.EduQuiz.Project_intel.dto;
 
-import com.EduQuiz.Project_intel.model.User;
+import com.EduQuiz.Project_intel.model.Role;
 
 public class RegisterRequest {
+
     private String name;
     private String email;
     private String password;
-    private String role; // "STUDENT" hoặc "TEACHER"
-    private Boolean acceptTerms;
+    private Role role;
 
-    // Constructors
-    public RegisterRequest() {
-    }
-
-    public RegisterRequest(String name, String email, String password, String role, Boolean acceptTerms) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.acceptTerms = acceptTerms;
-    }
-
-    // Getters and Setters
     public String getName() {
         return name;
     }
@@ -46,27 +33,11 @@ public class RegisterRequest {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRoleEnum() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
-
-    public Boolean getAcceptTerms() {
-        return acceptTerms;
-    }
-
-    public void setAcceptTerms(Boolean acceptTerms) {
-        this.acceptTerms = acceptTerms;
-    }
-
-    public User.Role getRoleEnum() {
-        if ("TEACHER".equalsIgnoreCase(role)) {
-            return User.Role.TEACHER;
-        }
-        return User.Role.STUDENT; // Mặc định là học sinh
-    }
 }
-

@@ -1,6 +1,6 @@
 package com.EduQuiz.Project_intel.service;
 
-import com.EduQuiz.Project_intel.entity.LienHe;
+import com.EduQuiz.Project_intel.model.LienHe;
 import com.EduQuiz.Project_intel.repository.LienHeRepository;
 import org.springframework.stereotype.Service;
 

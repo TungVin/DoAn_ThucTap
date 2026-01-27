@@ -1,53 +1,26 @@
 package com.EduQuiz.Project_intel.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    public enum Role {
-        STUDENT,  // Học sinh
-        TEACHER   // Giáo viên
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
-    // Constructors
-    public User() {
-    }
-
-    public User(String name, String email, String password, Role role) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-    // Getters and Setters
+    // ===== getter & setter =====
     public Long getId() {
         return id;
     }
@@ -87,13 +60,4 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
-

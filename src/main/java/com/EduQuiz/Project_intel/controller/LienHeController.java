@@ -1,6 +1,6 @@
 package com.EduQuiz.Project_intel.controller;
 
-import com.EduQuiz.Project_intel.entity.LienHe;
+import com.EduQuiz.Project_intel.model.LienHe;
 import com.EduQuiz.Project_intel.service.LienHeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

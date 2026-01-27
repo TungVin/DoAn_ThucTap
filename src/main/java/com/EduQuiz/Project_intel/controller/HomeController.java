@@ -8,22 +8,16 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "index"; // trả về file index.html trong templates
-    }
-
-    @GetMapping("/auth")
-    public String auth() {
-        return "auth"; // Trả về file auth.html trong templates
+        return "index";
     }
 
     @GetMapping("/student")
     public String student() {
-        return "student"; // Trả về file student.html trong templates
+        return "student";
     }
 
     @GetMapping("/HTT")
-    public String ChonHinhThuc() {
-        return "ChonHinhThuc"; // Trả về file ChonHinhThuc.html trong templates
+    public String chonHinhThuc() {
+        return "ChonHinhThuc";
     }
-
 }
