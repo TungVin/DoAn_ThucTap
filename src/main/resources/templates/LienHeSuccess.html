@@ -1,10 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Đã gửi liên hệ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .box {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,.1);
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: white;
+            background: #6c63ff;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
-$END$
+<div class="box">
+    <h2>✅ Gửi liên hệ thành công</h2>
+    <p>Cảm ơn bạn đã liên hệ với EduQuiz.<br>Chúng tôi sẽ phản hồi sớm nhất.</p>
+    <a th:href="@{/lien-he}">Quay lại trang Liên hệ</a>
+</div>
 </body>
 </html>
