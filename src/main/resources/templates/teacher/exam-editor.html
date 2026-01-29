@@ -4,10 +4,11 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <!-- (Nếu có Spring Security CSRF, thêm meta để JS đọc) -->
+  <!-- CSRF Token (nếu có Spring Security CSRF) -->
   <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
   <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
 
+  <!-- CSS -->
   <link rel="stylesheet" th:href="@{/css/exam-editor.css}">
   <title th:text="${mode == 'create' ? 'Tạo bài kiểm tra' : 'Chỉnh sửa bài kiểm tra'}">Exam</title>
 </head>
@@ -15,9 +16,8 @@
 
 <div class="page">
 
-  <!-- 1 FORM DUY NHẤT -->
-  <!-- Form để tạo/chỉnh sửa bài kiểm tra, data-upload-url để JS biết API upload -->
-  <form th:with="actionUrl=${mode == 'create'} ? '/teacher/exams' : '/teacher/exams/' + examId"
+  <!-- FORM -->
+  <form th:with="actionUrl=${mode == 'create' ? '/teacher/exams' : '/teacher/exams/' + examId}"
         th:action="@{${actionUrl}}"
         method="post"
         th:object="${form}"
@@ -45,10 +45,10 @@
       </div>
     </div>
 
-    <!-- HÀNG TRÊN: 2 CỘT (Thông tin chung + Thời gian) -->
+    <!-- 2 CỘT: Thông tin chung + Thời gian -->
     <div class="grid">
 
-      <!-- LEFT -->
+      <!-- LEFT: Thông tin chung -->
       <section class="card">
         <div class="card-title">Thông tin chung</div>
 
@@ -71,7 +71,7 @@
         </label>
       </section>
 
-      <!-- RIGHT: share + time -->
+      <!-- RIGHT: Share + Time -->
       <section class="stack">
 
         <!-- SHARE (chỉ edit mới có) -->
@@ -261,7 +261,6 @@
 
         <!-- icon upload -->
         <button type="button" class="btn-upload-icon" title="Tải file lên">
-          <!-- đổi icon theo project bạn -->
           <img th:src="@{/img/management-image.svg}" alt="upload" style="width:18px;height:18px;">
         </button>
 

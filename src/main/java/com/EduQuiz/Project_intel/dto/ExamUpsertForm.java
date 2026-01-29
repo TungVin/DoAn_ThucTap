@@ -4,7 +4,7 @@ import com.EduQuiz.Project_intel.model.Exam.ResultDisplayMode;
 
 public class ExamUpsertForm {
 
-    // dùng cho update (tạo mới thì để null)
+    // Dùng cho update (tạo mới thì để null)
     private Long id;
 
     // --- Thông tin chung ---
@@ -24,9 +24,7 @@ public class ExamUpsertForm {
     private String endDate;
     private String endTime;
 
-    // --- CÀI ĐẶT NÂNG CAO (giống NineQuiz) ---
-
-    // Khi nào hiển thị kết quả
+    // --- Cài đặt nâng cao (giống NineQuiz) ---
     private ResultDisplayMode resultDisplayMode = ResultDisplayMode.AFTER_TEACHER_REVIEW;
 
     // Hệ thống tự động chia điểm
@@ -47,8 +45,11 @@ public class ExamUpsertForm {
     // Số câu trả lời trên 1 hàng
     private Integer answersPerRow = 1;
 
-    // ===== GETTER / SETTER =====
+    // --- Thêm trường mới ---
+    // Công khai bài kiểm tra
+    private boolean isPublic = false; // Mặc định là không công khai
 
+    // --- GETTER / SETTER ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -105,4 +106,8 @@ public class ExamUpsertForm {
 
     public Integer getAnswersPerRow() { return answersPerRow; }
     public void setAnswersPerRow(Integer answersPerRow) { this.answersPerRow = answersPerRow; }
+
+    // --- Getter/Setter mới cho isPublic ---
+    public boolean isPublic() { return isPublic; }
+    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
 }

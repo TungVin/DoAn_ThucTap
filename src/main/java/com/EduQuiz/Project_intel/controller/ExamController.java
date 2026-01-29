@@ -51,7 +51,7 @@ public class ExamController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editExam(@PathVariable Long id, Model model) {
+    public String editExam(@PathVariable("id") Long id, Model model) {
         model.addAttribute("mode", "edit");
         model.addAttribute("examId", id);
         model.addAttribute("form", examService.getFormById(id));
@@ -67,10 +67,13 @@ public class ExamController {
     public String updateExam(@PathVariable Long id,
                              @ModelAttribute("form") ExamUpsertForm form,
                              RedirectAttributes ra) {
+        if (id == null) {
+            ra.addFlashAttribute("examError", "ID bài kiểm tra không hợp lệ.");
+            return "redirect:/teacher/exams"; // Quay lại danh sách bài kiểm tra
+        }
         examService.updateFromForm(id, form);
         ra.addFlashAttribute("toast", "Lưu thay đổi thành công!");
         return "redirect:/teacher?activeTab=exams";
-        // nếu bạn muốn ở lại edit: return "redirect:/teacher/exams/" + id + "/edit";
     }
 
     /**
