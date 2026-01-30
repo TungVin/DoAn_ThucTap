@@ -159,6 +159,9 @@ public class ExamService {
             f.setAnswersPerRow(exam.getAnswersPerRow());
         }
 
+        // Thêm trường isPublic
+        f.setIsPublic(exam.getIsPublic());
+
         return f;
     }
 
@@ -239,6 +242,11 @@ public class ExamService {
             exam.setAnswersPerRow(f.getAnswersPerRow());
         } else if (exam.getAnswersPerRow() == null) {
             exam.setAnswersPerRow(1);
+        }
+
+        // Cập nhật trạng thái công khai
+        if (f.getIsPublic() != null) {
+            exam.setIsPublic(f.getIsPublic());
         }
     }
 

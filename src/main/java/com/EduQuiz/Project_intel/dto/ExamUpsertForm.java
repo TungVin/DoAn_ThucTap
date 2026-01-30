@@ -45,11 +45,12 @@ public class ExamUpsertForm {
     // Số câu trả lời trên 1 hàng
     private Integer answersPerRow = 1;
 
-    // --- Thêm trường mới ---
+    // --- Thêm trường mới --- 
     // Công khai bài kiểm tra
-    private boolean isPublic = false; // Mặc định là không công khai
+    private Boolean isPublic = false; // Sử dụng Boolean thay vì boolean
 
     // --- GETTER / SETTER ---
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -108,6 +109,6 @@ public class ExamUpsertForm {
     public void setAnswersPerRow(Integer answersPerRow) { this.answersPerRow = answersPerRow; }
 
     // --- Getter/Setter mới cho isPublic ---
-    public boolean isPublic() { return isPublic; }
-    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
+    public Boolean getIsPublic() { return isPublic; }
+    public void setIsPublic(Boolean isPublic) { this.isPublic = isPublic; }
 }

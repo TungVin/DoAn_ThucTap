@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Controller
 @RequestMapping("/teacher")
@@ -45,7 +46,7 @@ public class TeacherController {
             Model model,
             HttpSession session
     ) {
-        // ====== CHỈ THÊM PHẦN KIỂM TRA ĐĂNG NHẬP ======
+        // Kiểm tra đăng nhập
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/auth";
@@ -53,13 +54,13 @@ public class TeacherController {
         if (user.getRole() != Role.TEACHER) {
             return "redirect:/student";
         }
-        // ====== HẾT PHẦN SỬA ======
 
+        // Truyền dữ liệu vào model
         model.addAttribute("activeTab", activeTab);
         model.addAttribute("exams", examService.getAll());
         model.addAttribute("categories", categoryService.getAll());
         model.addAttribute("questions", questionService.findAllOrdered());
-        model.addAttribute("classes", classRoomService.findAll());
+        model.addAttribute("classes", classRoomService.findAll());  // Truyền danh sách lớp học
         model.addAttribute("schedules", scheduleService.findAll());
 
         return "teacher";

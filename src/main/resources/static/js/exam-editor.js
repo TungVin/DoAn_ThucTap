@@ -1,13 +1,10 @@
-// Nếu bạn muốn tắt toggle là xoá luôn dữ liệu -> true
-// Nếu muốn tắt toggle chỉ disable nhưng giữ value (khi bật lại vẫn còn) -> false
+// Constants
 const CLEAR_ON_DISABLE = true;
-
-// Upload config
 const MAX_UPLOAD_MB = 10;
-const DEFAULT_ACCEPT = "image/*,application/pdf"; // bạn đổi nếu muốn
+const DEFAULT_ACCEPT = "image/*,application/pdf"; // Update if needed
 
+// Upload Configuration
 function getUploadUrl() {
-  // ưu tiên lấy từ form data-upload-url (nếu bạn thêm ở HTML)
   const form = document.querySelector("form[data-upload-url]");
   return form?.dataset?.uploadUrl || "/api/uploads";
 }
@@ -33,6 +30,7 @@ async function uploadFileToServer(file) {
   return await res.json(); // {url, originalName ...}
 }
 
+// Toggle functionality to disable/enable input fields
 function bindToggle(cbId, inputIds) {
   const cb = document.getElementById(cbId);
   if (!cb) return;
@@ -55,42 +53,29 @@ function bindToggle(cbId, inputIds) {
   };
 
   cb.addEventListener("change", apply);
-  apply(); // init state khi load
+  apply(); // Initial state
 }
 
-// ================== PHẦN 1: CÂU HỎI ==================
-
+// ================== QUESTION MANAGEMENT ==================
 let questionIndex = 0;
 
+// Function to create HTML for each answer row
 function buildAnswerRowHtml(qIdx) {
-  // Mỗi đáp án sẽ có:
-  // - radio chọn đúng
-  // - input nội dung
-  // - hidden lưu url file
-  // - file input ẩn
-  // - nút upload
-  // - span status
   return `
     <div class="answer-row">
       <label class="answer-radio">
         <input type="radio" name="q${qIdx}-correct">
       </label>
-
       <input class="input answer-content" placeholder="Câu trả lời...">
-
       <input type="hidden" class="answer-attachment-url" value="">
-
       <input type="file" class="answer-file" accept="${DEFAULT_ACCEPT}" hidden>
-
-      <button type="button" class="icon-btn upload-btn" title="Đính kèm tệp">
-        📤
-      </button>
-
+      <button type="button" class="icon-btn upload-btn" title="Đính kèm tệp">📤</button>
       <span class="upload-status muted small"></span>
     </div>
   `;
 }
 
+// Function to create a question block
 function createQuestionBlock(index) {
   const wrapper = document.createElement("div");
   wrapper.className = "question-block";
@@ -104,25 +89,14 @@ function createQuestionBlock(index) {
   wrapper.innerHTML = `
     <div class="question-inner">
       <div class="question-header-row">
-        <div class="question-title">
-          Nhập nội dung câu hỏi ?
-        </div>
+        <div class="question-title">Nhập nội dung câu hỏi ?</div>
         <div class="question-type">
           <span class="badge">Chọn 1 kết quả</span>
         </div>
       </div>
-
-      <textarea class="textarea question-content"
-                placeholder="Nhập nội dung câu hỏi..."></textarea>
-
-      <div class="answers">
-        ${answersHtml}
-      </div>
-
-      <button type="button" class="btn small" data-role="add-answer">
-        Thêm câu trả lời +
-      </button>
-
+      <textarea class="textarea question-content" placeholder="Nhập nội dung câu hỏi..."></textarea>
+      <div class="answers">${answersHtml}</div>
+      <button type="button" class="btn small" data-role="add-answer">Thêm câu trả lời +</button>
       <div class="question-footer">
         <div class="question-score">
           <span>Điểm</span>
@@ -140,6 +114,7 @@ function createQuestionBlock(index) {
   return wrapper;
 }
 
+// Add event listeners to the question block
 function wireQuestionBlock(block) {
   const addAnswerBtn = block.querySelector('[data-role="add-answer"]');
   const answersContainer = block.querySelector(".answers");
@@ -149,8 +124,6 @@ function wireQuestionBlock(block) {
       const idx = block.dataset.index;
       const row = document.createElement("div");
       row.innerHTML = buildAnswerRowHtml(idx);
-      // buildAnswerRowHtml trả về <div class="answer-row">...</div>
-      // nên row.firstElementChild là answer-row
       answersContainer.appendChild(row.firstElementChild);
     });
   }
@@ -185,7 +158,6 @@ function wireQuestionBlock(block) {
         if (dstAnswers[i]) dstAnswers[i].value = a.value;
       });
 
-      // copy cả attachmentUrl nếu có
       const srcUrls = block.querySelectorAll(".answer-attachment-url");
       const dstUrls = clone.querySelectorAll(".answer-attachment-url");
       srcUrls.forEach((u, i) => {
@@ -197,6 +169,7 @@ function wireQuestionBlock(block) {
   }
 }
 
+// Add a new question to the list
 function addQuestion() {
   const list = document.getElementById("questionList");
   if (!list) return;
@@ -204,8 +177,7 @@ function addQuestion() {
   list.appendChild(qb);
 }
 
-// ================== UPLOAD: EVENT DELEGATION ==================
-
+// ================== UPLOAD HANDLING ==================
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".upload-btn");
   if (!btn) return;
@@ -213,7 +185,6 @@ document.addEventListener("click", (e) => {
   const row = btn.closest(".answer-row");
   if (!row) return;
 
-  // mở file picker
   const fileInput = row.querySelector(".answer-file");
   if (!fileInput) return;
   fileInput.click();
@@ -245,7 +216,6 @@ document.addEventListener("change", async (e) => {
     if (btn) btn.disabled = true;
 
     const data = await uploadFileToServer(file);
-    // mong đợi data.url
     if (!data?.url) throw new Error("Server không trả về url");
 
     if (hiddenUrl) hiddenUrl.value = data.url;
@@ -256,27 +226,22 @@ document.addEventListener("change", async (e) => {
     if (hiddenUrl) hiddenUrl.value = "";
   } finally {
     if (btn) btn.disabled = false;
-    // cho phép chọn lại cùng 1 file vẫn trigger change
     fileInput.value = "";
   }
 });
 
 // ================== DOM READY ==================
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Toggle thời gian
   bindToggle("timeLimitEnabled", ["timeLimit"]);
   bindToggle("startEnabled", ["startDate", "startTime"]);
   bindToggle("endEnabled", ["endDate", "endTime"]);
 
-  // Set min date = today
   const today = new Date().toISOString().split("T")[0];
   const sd = document.getElementById("startDate");
   const ed = document.getElementById("endDate");
   if (sd) sd.min = today;
   if (ed) ed.min = today;
 
-  // Copy share link (chỉ mode edit)
   const btn = document.getElementById("copyLinkBtn");
   const inp = document.getElementById("shareLink");
   if (btn && inp) {
@@ -284,8 +249,8 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await navigator.clipboard.writeText(inp.value);
         const old = btn.textContent;
-        btn.textContent = "Đã copy";
-        setTimeout(() => (btn.textContent = old || "Copy"), 1200);
+        btn.textContent = "Đã sao chép";
+        setTimeout(() => (btn.textContent = old || "Sao chép"), 1200);
       } catch {
         inp.focus();
         inp.select();
@@ -294,7 +259,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Hệ thống tự động chia điểm -> enable/disable ô điểm tối đa
   const autoCb = document.getElementById("autoDivideScore");
   const maxScoreInput = document.getElementById("maxScore");
 
@@ -308,11 +272,76 @@ document.addEventListener("DOMContentLoaded", () => {
     applyAuto();
   }
 
-  // Khởi tạo Phần 1
   const qList = document.getElementById("questionList");
   const addQBtn = document.getElementById("addQuestionBtn");
   if (qList && addQBtn) {
     addQBtn.addEventListener("click", () => addQuestion());
-    addQuestion(); // luôn có sẵn 1 câu
+    addQuestion(); // always add one question initially
+  }
+
+  // Thêm Nhóm
+  const addGroupBtn = document.getElementById("addGroupBtn");
+  const addGroupModal = document.getElementById("addGroupModal");
+  const closeGroupModalBtn = document.getElementById("closeGroupModalBtn");
+  const closeGroupModalFooterBtn = document.getElementById("closeGroupModalFooterBtn");
+  const addGroupSubmitBtn = document.getElementById("addGroupSubmitBtn");
+  const classSelect = document.getElementById("classSelect");
+
+  // Mở modal khi nhấn "Thêm Nhóm"
+  addGroupBtn.addEventListener("click", () => {
+    addGroupModal.style.display = "block";
+  });
+
+  // Đóng modal khi nhấn "X"
+  closeGroupModalBtn.addEventListener("click", () => {
+    addGroupModal.style.display = "none";
+  });
+
+  // Đóng modal khi nhấn "Hủy"
+  closeGroupModalFooterBtn.addEventListener("click", () => {
+    addGroupModal.style.display = "none";
+  });
+
+  // Xử lý khi nhấn "Thêm Nhóm"
+  addGroupSubmitBtn.addEventListener("click", () => {
+    const selectedClass = classSelect.value;
+    if (selectedClass) {
+      const groupList = document.getElementById("groupList");
+      const groupItem = document.createElement("p");
+      groupItem.textContent = `Nhóm: ${selectedClass}`;
+      groupList.appendChild(groupItem);
+      addGroupModal.style.display = "none"; // Đóng modal
+    } else {
+      alert("Vui lòng chọn lớp!");
+    }
+  });
+
+  // Hiển thị link công khai khi checkbox "Công khai" được tick
+  const publicCheckbox = document.getElementById("publicCheckbox");
+  const publicLinkSection = document.getElementById("publicLinkSection");
+
+  publicCheckbox.addEventListener("change", function () {
+    if (publicCheckbox.checked) {
+      const randomLink = generateRandomLink();
+      document.getElementById("publicLink").value = randomLink; // Gán link ngẫu nhiên
+      publicLinkSection.style.display = "block"; // Hiển thị link công khai
+    } else {
+      publicLinkSection.style.display = "none"; // Ẩn link công khai
+    }
+  });
+
+  // Đảm bảo trạng thái ban đầu của checkbox
+  if (publicCheckbox.checked) {
+    const randomLink = generateRandomLink();
+    document.getElementById("publicLink").value = randomLink; // Gán link ngẫu nhiên
+    publicLinkSection.style.display = "block";
+  } else {
+    publicLinkSection.style.display = "none";
+  }
+
+  // Hàm tạo link ngẫu nhiên
+  function generateRandomLink() {
+    const randomStr = Math.random().toString(36).substring(2, 15);
+    return `https://example.com/test/${randomStr}`;
   }
 });

@@ -72,6 +72,10 @@ public class Exam {
     @Column(name = "answers_per_row")
     private Integer answersPerRow = 1;
 
+    // ===== Thêm trường isPublic =====
+    @Column(name = "is_public")
+    private Boolean isPublic = Boolean.FALSE;  // Trạng thái mặc định là không công khai
+
     // ===== Getters và Setters =====
 
     public Long getId() {
@@ -200,6 +204,14 @@ public class Exam {
 
     public void setAnswersPerRow(Integer answersPerRow) {
         this.answersPerRow = answersPerRow;
+    }
+
+    public Boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
     }
 
     /**
