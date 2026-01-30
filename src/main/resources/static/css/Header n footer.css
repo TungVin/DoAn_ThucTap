@@ -131,7 +131,7 @@ a {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 3rem;
-    margin-top: 4rem;
+    margin-top: 16rem;
 }
 
 .footer .col {
