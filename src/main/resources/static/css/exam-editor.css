@@ -417,3 +417,53 @@ h1 {
   border: 1px solid #ccc;
   margin-top: 10px;
 }
+
+.toast-overlay{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease;
+  z-index: 9999;
+}
+
+.toast-overlay.show{
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-card{
+  background: #111827;
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  min-width: 260px;
+  max-width: 420px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.toast-text{
+  flex: 1;
+  font-size: 14px;
+}
+
+.toast-close{
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  opacity: .85;
+}
+
+.toast-close:hover{
+  opacity: 1;
+}

@@ -5,7 +5,7 @@ const DEFAULT_ACCEPT = "image/*,application/pdf";
 
 // ================== UPLOAD CONFIG ==================
 function getUploadUrl() {
-  const form = document.querySelector("form[data-upload-url]");
+  const form = document.querySelector('form[data-upload-url]');
   return form?.dataset?.uploadUrl || "/api/uploads";
 }
 
@@ -46,14 +46,141 @@ function bindToggle(cbId, inputIds) {
       i.disabled = !on;
       i.classList.toggle("is-disabled", !on);
 
-      if (!on && CLEAR_ON_DISABLE) {
-        i.value = "";
-      }
+      if (!on && CLEAR_ON_DISABLE) i.value = "";
     });
   };
 
   cb.addEventListener("change", apply);
   apply();
+}
+
+// ================== CENTER TOAST (AUTO DOM + AUTO CSS) ==================
+function ensureToastDom() {
+  if (document.getElementById("toastOverlay")) return;
+
+  // Inject CSS once
+  const style = document.createElement("style");
+  style.id = "toastOverlayStyle";
+  style.textContent = `
+    #toastOverlay{
+      position:fixed; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.35);
+      opacity:0; pointer-events:none;
+      transition:opacity .18s ease;
+      z-index:99999;
+    }
+    #toastOverlay.show{opacity:1; pointer-events:auto;}
+    #toastBox{
+      min-width:280px; max-width:420px;
+      background:#111827; color:#fff;
+      border-radius:14px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      padding:14px 14px;
+      transform:translateY(8px);
+      transition:transform .18s ease;
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    #toastOverlay.show #toastBox{transform:translateY(0);}
+    #toastIcon{
+      width:22px; height:22px;
+      flex:0 0 auto;
+      margin-top:1px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius:999px;
+      background:rgba(34,197,94,.18);
+      color:#22c55e;
+      font-weight:700;
+    }
+    #toastText{line-height:1.4; font-size:14px; margin:0; flex:1;}
+    #toastCloseBtn{
+      border:none; background:transparent; color:#cbd5e1;
+      cursor:pointer; font-size:18px; line-height:1;
+      padding:0 6px;
+    }
+    #toastCloseBtn:hover{color:#fff;}
+  `;
+  document.head.appendChild(style);
+
+  // Build DOM
+  const overlay = document.createElement("div");
+  overlay.id = "toastOverlay";
+  overlay.setAttribute("aria-hidden", "true");
+
+  overlay.innerHTML = `
+    <div id="toastBox" role="status" aria-live="polite">
+      <div id="toastIcon">✓</div>
+      <p id="toastText">Đã sao chép!</p>
+      <button type="button" id="toastCloseBtn" aria-label="Đóng">×</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Close handlers (bind once)
+  const closeBtn = document.getElementById("toastCloseBtn");
+  const hide = () => {
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden", "true");
+  };
+
+  if (closeBtn) closeBtn.addEventListener("click", hide);
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) hide();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && overlay.classList.contains("show")) hide();
+  });
+}
+
+function showCenterToast(message = "Đã sao chép!") {
+  ensureToastDom();
+
+  const overlay = document.getElementById("toastOverlay");
+  const textEl = document.getElementById("toastText");
+  if (!overlay || !textEl) return;
+
+  textEl.textContent = message;
+
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden", "false");
+
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => {
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden", "true");
+  }, 1200);
+}
+
+async function copyText(text) {
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    showCenterToast("Đã copy link!");
+  } catch {
+    // fallback execCommand
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showCenterToast("Đã copy link!");
+  }
+}
+
+function bindCopy(buttonId, inputId) {
+  const btn = document.getElementById(buttonId);
+  const inp = document.getElementById(inputId);
+  if (!btn || !inp) return;
+
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    copyText(inp.value || "");
+  });
 }
 
 // ================== QUESTION MANAGEMENT ==================
@@ -80,9 +207,7 @@ function createQuestionBlock(index) {
   wrapper.dataset.index = index;
 
   let answersHtml = "";
-  for (let i = 0; i < 4; i++) {
-    answersHtml += buildAnswerRowHtml(index);
-  }
+  for (let i = 0; i < 4; i++) answersHtml += buildAnswerRowHtml(index);
 
   wrapper.innerHTML = `
     <div class="question-inner">
@@ -138,10 +263,7 @@ function wireQuestionBlock(block) {
       if (!list) return;
 
       list.removeChild(block);
-
-      if (list.children.length === 0) {
-        addQuestion(); // luôn đảm bảo có ít nhất 1 câu
-      }
+      if (list.children.length === 0) addQuestion();
     });
   }
 
@@ -164,12 +286,12 @@ function wireQuestionBlock(block) {
 
       // copy answers + attachment urls + correct radio
       const srcRows = block.querySelectorAll(".answer-row");
-      const dstRows = clone.querySelectorAll(".answer-row");
+      const dstAnswersContainer = clone.querySelector(".answers");
 
       // nếu câu gốc > 4 đáp án => thêm row cho clone
-      const dstAnswersContainer = clone.querySelector(".answers");
-      if (dstAnswersContainer && srcRows.length > dstRows.length) {
-        for (let i = dstRows.length; i < srcRows.length; i++) {
+      const initialDstRows = clone.querySelectorAll(".answer-row");
+      if (dstAnswersContainer && srcRows.length > initialDstRows.length) {
+        for (let i = initialDstRows.length; i < srcRows.length; i++) {
           const row = document.createElement("div");
           row.innerHTML = buildAnswerRowHtml(clone.dataset.index);
           dstAnswersContainer.appendChild(row.firstElementChild);
@@ -215,10 +337,8 @@ function addQuestion() {
 function parseExistingQuestions() {
   const raw = window.__EXAM_QUESTIONS_JSON__;
 
-  // trường hợp đã là mảng/object
   if (Array.isArray(raw)) return raw;
 
-  // trường hợp là string JSON
   if (typeof raw === "string") {
     const s = raw.trim();
     if (!s) return [];
@@ -240,7 +360,7 @@ function renderQuestionsFromServer(questions) {
   list.innerHTML = "";
   questionIndex = 0;
 
-  questions.forEach((q, qPos) => {
+  questions.forEach((q) => {
     const block = createQuestionBlock(questionIndex++);
     const qContent = block.querySelector(".question-content");
     const scoreInput = block.querySelector(".score-input");
@@ -282,7 +402,6 @@ function renderQuestionsFromServer(questions) {
     list.appendChild(block);
   });
 
-  // nếu trống => add 1 câu trống
   if (list.children.length === 0) addQuestion();
 }
 
@@ -375,23 +494,6 @@ function collectQuestionsToJson() {
   return JSON.stringify(questions);
 }
 
-// ================== UTIL: COPY TEXT ==================
-async function copyText(text) {
-  if (!text) return;
-  try {
-    await navigator.clipboard.writeText(text);
-    alert("Đã sao chép!");
-  } catch {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    document.body.removeChild(ta);
-    alert("Đã sao chép!");
-  }
-}
-
 // ================== DOM READY ==================
 document.addEventListener("DOMContentLoaded", () => {
   // toggles
@@ -406,23 +508,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (sd) sd.min = today;
   if (ed) ed.min = today;
 
-  // copy share link (hỗ trợ cả id cũ và mới)
-  const oldCopyBtn = document.getElementById("copyLinkBtn");
-  const shareBtn = document.getElementById("copyShareLinkBtn");
-  const publicBtn = document.getElementById("copyPublicLinkBtn");
+  // ✅ Copy link
+  // Chỉ cần Share link là đủ (bạn đã bỏ block Link bài kiểm tra bên trái)
+  bindCopy("copyShareLinkBtn", "shareLink");
+  bindCopy("copyLinkBtn", "shareLink"); // id cũ (nếu bạn chưa đổi)
 
-  if (oldCopyBtn) {
-    const inp = document.getElementById("shareLink");
-    oldCopyBtn.addEventListener("click", () => copyText(inp?.value || ""));
-  }
-  if (shareBtn) {
-    const inp = document.getElementById("shareLink");
-    shareBtn.addEventListener("click", () => copyText(inp?.value || ""));
-  }
-  if (publicBtn) {
-    const inp = document.getElementById("publicLink");
-    publicBtn.addEventListener("click", () => copyText(inp?.value || ""));
-  }
+  // (Nếu bạn vẫn còn publicLink/public button đâu đó, bindCopy sẽ tự bỏ qua nếu không tồn tại)
+  bindCopy("copyPublicLinkBtn", "publicLink");
 
   // questions init: EDIT -> render from server, CREATE -> add 1 empty
   const qList = document.getElementById("questionList");
@@ -474,7 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
     addGroupSubmitBtn.addEventListener("click", () => {
       const selectedClass = classSelect?.value;
       if (!selectedClass) {
-        alert("Vui lòng chọn lớp!");
+        showCenterToast("Vui lòng chọn lớp!");
         return;
       }
       const groupList = document.getElementById("groupList");
@@ -488,14 +580,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== Public checkbox show/hide (không tạo random link) =====
+  // ===== Public checkbox show/hide =====
+  // Bạn đã bỏ block publicLinkSection thì chỉ cần toggle addNewContainer là đủ
   const publicCheckbox = document.getElementById("publicCheckbox");
-  const publicLinkSection = document.getElementById("publicLinkSection");
   const addNewContainer = document.getElementById("addNewContainer");
 
   const applyPublicUI = () => {
     const isPublic = !!publicCheckbox?.checked;
-    if (publicLinkSection) publicLinkSection.style.display = isPublic ? "block" : "none";
     if (addNewContainer) addNewContainer.style.display = isPublic ? "none" : "block";
   };
 

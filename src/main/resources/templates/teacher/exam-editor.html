@@ -24,6 +24,9 @@
         th:object="${form}"
         data-upload-url="/api/uploads">
 
+    <!-- CSRF hidden field (form POST cần) -->
+    <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
     <!-- hidden json submit -->
     <input type="hidden" name="questionsJson" id="questionsJson">
 
@@ -82,21 +85,6 @@
             <span class="switch-label">Cho phép mọi người có link đều có thể làm bài kiểm tra này.</span>
           </div>
         </label>
-
-        <!-- Đường link công khai -->
-        <div id="publicLinkSection"
-             th:style="${form.isPublic} ? 'display:block;' : 'display:none;'">
-          <label class="field">
-            <span>Link bài kiểm tra</span>
-            <input type="text"
-                   id="publicLink"
-                   class="input"
-                   readonly
-                   th:value="${mode == 'edit' ? shareLink : ''}"
-                   placeholder="Tạo bài kiểm tra xong sẽ có link">
-            <button type="button" id="copyPublicLinkBtn" class="btn small">Copy Link</button>
-          </label>
-        </div>
 
         <!-- Riêng tư -->
         <div id="addNewContainer"
@@ -264,9 +252,7 @@
           </select>
         </div>
 
-        <div id="questionList" class="question-list">
-          <!-- JS render câu hỏi vào đây -->
-        </div>
+        <div id="questionList" class="question-list"></div>
 
         <button type="button" class="btn ghost full" id="addQuestionBtn">
           + Thêm câu hỏi
@@ -278,6 +264,14 @@
   </form>
 </div>
 
+<!-- ✅ TOAST CENTER (để JS show/hide) -->
+<div id="toastOverlay" class="toast-overlay" aria-hidden="true">
+  <div class="toast-card" role="status" aria-live="polite">
+    <div id="toastText" class="toast-text">Đã copy link!</div>
+    <button type="button" id="toastCloseBtn" class="toast-close" aria-label="Đóng">×</button>
+  </div>
+</div>
+
 <!-- ✅ BƠM JSON TỪ SERVER TRƯỚC KHI LOAD JS -->
 <script th:inline="javascript">
   window.__EXAM_MODE__ = /*[[${mode}]]*/ "create";
@@ -285,80 +279,22 @@
   window.__EXAM_QUESTIONS_JSON__ = /*[[${questionsJson}]]*/ "[]";
 </script>
 
-<!-- exam-editor.js sẽ đọc window.__EXAM_QUESTIONS_JSON__ để render lại câu hỏi khi edit -->
+<!-- exam-editor.js sẽ bắt copy và show toast (KHÔNG dùng alert) -->
 <script th:src="@{/js/exam-editor.js}"></script>
 
+<!-- Inline chỉ giữ modal thêm thành viên (bỏ hoàn toàn code copy dùng alert) -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const addNewContainer = document.getElementById("addNewContainer");
-    const publicLinkSection = document.getElementById("publicLinkSection");
-    const publicCheckbox = document.getElementById("publicCheckbox");
-
-    // ===== Toggle Public/Private UI =====
-    const applyPublicUI = () => {
-      const isPublic = !!publicCheckbox?.checked;
-      if (publicLinkSection) publicLinkSection.style.display = isPublic ? "block" : "none";
-      if (addNewContainer) addNewContainer.style.display = isPublic ? "none" : "block";
-    };
-
-    if (publicCheckbox) {
-      publicCheckbox.addEventListener("change", applyPublicUI);
-      applyPublicUI(); // set initial
-    }
-
-    // ===== Copy link buttons =====
-    const copyText = async (text) => {
-      if (!text) return;
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("Đã copy link!");
-      } catch (e) {
-        // fallback
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        alert("Đã copy link!");
-      }
-    };
-
-    const copyShareBtn = document.getElementById("copyShareLinkBtn");
-    if (copyShareBtn) {
-      copyShareBtn.addEventListener("click", () => {
-        const shareLink = document.getElementById("shareLink")?.value || "";
-        copyText(shareLink);
-      });
-    }
-
-    const copyPublicBtn = document.getElementById("copyPublicLinkBtn");
-    if (copyPublicBtn) {
-      copyPublicBtn.addEventListener("click", () => {
-        const publicLink = document.getElementById("publicLink")?.value || "";
-        copyText(publicLink);
-      });
-    }
-
-    // ===== Modal Thêm thành viên =====
     const addNewBtn = document.getElementById("addNewBtn");
     const modal = document.getElementById("addMemberModal");
     const closeModalBtn = document.getElementById("closeModalBtn");
     const cancelBtn = document.getElementById("cancelBtn");
     const saveBtn = document.getElementById("saveBtn");
 
-    if (addNewBtn && modal) {
-      addNewBtn.addEventListener("click", () => modal.style.display = "block");
-    }
-    if (closeModalBtn && modal) {
-      closeModalBtn.addEventListener("click", () => modal.style.display = "none");
-    }
-    if (cancelBtn && modal) {
-      cancelBtn.addEventListener("click", () => modal.style.display = "none");
-    }
-    if (saveBtn && modal) {
-      saveBtn.addEventListener("click", () => modal.style.display = "none");
-    }
+    if (addNewBtn && modal) addNewBtn.addEventListener("click", () => modal.style.display = "block");
+    if (closeModalBtn && modal) closeModalBtn.addEventListener("click", () => modal.style.display = "none");
+    if (cancelBtn && modal) cancelBtn.addEventListener("click", () => modal.style.display = "none");
+    if (saveBtn && modal) saveBtn.addEventListener("click", () => modal.style.display = "none");
 
     const addMemberBtn = document.getElementById("addMemberBtn");
     if (addMemberBtn) {
@@ -366,50 +302,12 @@
         const emailEl = document.getElementById("memberEmail");
         const memberList = document.getElementById("memberList");
         const email = emailEl?.value?.trim();
-
         if (!email || !memberList) return;
 
         const memberItem = document.createElement("p");
         memberItem.textContent = email;
         memberList.appendChild(memberItem);
         if (emailEl) emailEl.value = "";
-      });
-    }
-
-    // ===== Modal Thêm nhóm =====
-    const addGroupBtn = document.getElementById("addGroupBtn");
-    const addGroupModal = document.getElementById("addGroupModal");
-    const closeGroupModalBtn = document.getElementById("closeGroupModalBtn");
-    const closeGroupModalFooterBtn = document.getElementById("closeGroupModalFooterBtn");
-    const addGroupSubmitBtn = document.getElementById("addGroupSubmitBtn");
-    const classSelect = document.getElementById("classSelect");
-
-    if (addGroupBtn && addGroupModal) {
-      addGroupBtn.addEventListener("click", () => addGroupModal.style.display = "block");
-    }
-    if (closeGroupModalBtn && addGroupModal) {
-      closeGroupModalBtn.addEventListener("click", () => addGroupModal.style.display = "none");
-    }
-    if (closeGroupModalFooterBtn && addGroupModal) {
-      closeGroupModalFooterBtn.addEventListener("click", () => addGroupModal.style.display = "none");
-    }
-
-    if (addGroupSubmitBtn) {
-      addGroupSubmitBtn.addEventListener("click", () => {
-        const selectedClass = classSelect?.value;
-        if (!selectedClass) {
-          alert("Vui lòng chọn lớp!");
-          return;
-        }
-
-        const groupList = document.getElementById("groupList");
-        if (!groupList) return;
-
-        const groupItem = document.createElement("p");
-        groupItem.textContent = `Nhóm: ${selectedClass}`;
-        groupList.appendChild(groupItem);
-
-        if (addGroupModal) addGroupModal.style.display = "none";
       });
     }
   });
