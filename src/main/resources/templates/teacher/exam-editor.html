@@ -10,11 +10,11 @@
 
   <!-- CSS -->
   <link rel="stylesheet" th:href="@{/css/exam-editor.css}">
+  <link rel="stylesheet" th:href="@{/css/styles.css}">
   <title th:text="${mode == 'create' ? 'Tạo bài kiểm tra' : 'Chỉnh sửa bài kiểm tra'}">Exam</title>
-  <link rel="stylesheet" href="/css/styles.css"> <!-- Import CSS file -->
 </head>
-<body>
 
+<body>
 <div class="page">
 
   <!-- FORM -->
@@ -24,7 +24,8 @@
         th:object="${form}"
         data-upload-url="/api/uploads">
 
-<input type="hidden" name="questionsJson" id="questionsJson">
+    <!-- hidden json submit -->
+    <input type="hidden" name="questionsJson" id="questionsJson">
 
     <!-- TOPBAR -->
     <div class="topbar">
@@ -82,89 +83,97 @@
           </div>
         </label>
 
-        <!-- Đường link công khai (ẩn cho đến khi "Công khai" được tick) -->
-        <div id="publicLinkSection" style="display: none;">
-  <label class="field">
-    <span>Link bài kiểm tra</span>
-    <input type="text" id="publicLink" class="input" readonly>
-    <button type="button" id="copyLinkBtn" class="btn small">Copy Link</button>
-  </label>
-</div>
-
-      <!-- Thêm mới (Chỉ hiển thị khi "Công khai" không được tick) -->
-      <div id="addNewContainer" style="display: none;">
-        <div class="card">
-          <div class="card-title">Riêng tư</div>
-          <p>Chỉ thành viên trong nhóm được phép làm bài</p>
-          
-          <!-- Nút Thêm Thành Viên -->
-          <button class="btn small" id="addNewBtn">+ Thêm Thành Viên</button>
-          
-          <!-- Thêm Nhóm -->
-          <div class="add-group mt-3">
-            <button type="button" id="addGroupBtn" class="btn btn-secondary">+ Thêm Nhóm</button>
-          </div>
+        <!-- Đường link công khai -->
+        <div id="publicLinkSection"
+             th:style="${form.isPublic} ? 'display:block;' : 'display:none;'">
+          <label class="field">
+            <span>Link bài kiểm tra</span>
+            <input type="text"
+                   id="publicLink"
+                   class="input"
+                   readonly
+                   th:value="${mode == 'edit' ? shareLink : ''}"
+                   placeholder="Tạo bài kiểm tra xong sẽ có link">
+            <button type="button" id="copyPublicLinkBtn" class="btn small">Copy Link</button>
+          </label>
         </div>
-      </div>
 
-      <!-- Hiển thị danh sách nhóm đã thêm -->
-      <ul id="groupList" class="mt-3">
-        <!-- Các nhóm sẽ được thêm vào đây -->
-      </ul>
+        <!-- Riêng tư -->
+        <div id="addNewContainer"
+             th:style="${form.isPublic} ? 'display:none;' : 'display:block;'">
+          <div class="card">
+            <div class="card-title">Riêng tư</div>
+            <p>Chỉ thành viên trong nhóm được phép làm bài</p>
 
-      <!-- Modal for Thêm thành viên -->
-      <div id="addMemberModal" class="modal" style="display: none;">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Thành viên</h2>
-            <span class="close-btn" id="closeModalBtn">&times;</span>
-          </div>
-          <div class="modal-body">
-            <label for="memberEmail">Nhập email thành viên:</label>
-            <input type="text" id="memberEmail" placeholder="Nhập email thành viên...">
-            <button id="addMemberBtn" class="btn primary">Thêm thành viên</button>
-            <div id="memberList" class="member-list">
-              <p>Chưa có thành viên nào</p>
+            <!-- Nút Thêm Thành Viên -->
+            <button type="button" class="btn small" id="addNewBtn">+ Thêm Thành Viên</button>
+
+            <!-- Thêm Nhóm -->
+            <div class="add-group mt-3">
+              <button type="button" id="addGroupBtn" class="btn btn-secondary">+ Thêm Nhóm</button>
             </div>
           </div>
-          <div class="modal-footer">
-            <button id="saveBtn" class="btn primary">Xong</button>
-            <button id="cancelBtn" class="btn ghost">Hủy</button>
-          </div>
         </div>
-      </div>
 
-      <!-- Modal Thêm Nhóm -->
-      <div id="addGroupModal" class="modal" style="display: none;">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Chọn Lớp</h2>
-            <span class="close-btn" id="closeGroupModalBtn">&times;</span>
-          </div>
-          <div class="modal-body">
-            <label for="classSelect">Chọn lớp:</label>
-            <select id="classSelect" class="input small">
-              <option value="">-- Chọn lớp --</option>
-              <!-- Danh sách lớp sẽ được thêm vào ở đây -->
-              <option value="class1">Lớp 1</option>
-              <option value="class2">Lớp 2</option>
-              <option value="class3">Lớp 3</option>
-            </select>
-            <button id="addGroupSubmitBtn" class="btn primary">Thêm Nhóm</button>
-          </div>
-          <div class="modal-footer">
-            <button id="closeGroupModalFooterBtn" class="btn ghost">Hủy</button>
+        <!-- Hiển thị danh sách nhóm đã thêm -->
+        <ul id="groupList" class="mt-3"></ul>
+
+        <!-- Modal for Thêm thành viên -->
+        <div id="addMemberModal" class="modal" style="display: none;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>Thành viên</h2>
+              <span class="close-btn" id="closeModalBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+              <label for="memberEmail">Nhập email thành viên:</label>
+              <input type="text" id="memberEmail" placeholder="Nhập email thành viên...">
+              <button type="button" id="addMemberBtn" class="btn primary">Thêm thành viên</button>
+              <div id="memberList" class="member-list">
+                <p>Chưa có thành viên nào</p>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="saveBtn" class="btn primary">Xong</button>
+              <button type="button" id="cancelBtn" class="btn ghost">Hủy</button>
+            </div>
           </div>
         </div>
-      </div>
+
+        <!-- Modal Thêm Nhóm -->
+        <div id="addGroupModal" class="modal" style="display: none;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>Chọn Lớp</h2>
+              <span class="close-btn" id="closeGroupModalBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+              <label for="classSelect">Chọn lớp:</label>
+              <select id="classSelect" class="input small">
+                <option value="">-- Chọn lớp --</option>
+                <option value="class1">Lớp 1</option>
+                <option value="class2">Lớp 2</option>
+                <option value="class3">Lớp 3</option>
+              </select>
+              <button type="button" id="addGroupSubmitBtn" class="btn primary">Thêm Nhóm</button>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="closeGroupModalFooterBtn" class="btn ghost">Hủy</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
 
       <!-- RIGHT: Share + Time -->
       <section class="stack">
+
+        <!-- Share (chỉ edit) -->
         <div class="card" th:if="${mode == 'edit'}">
           <div class="card-title">Chia sẻ</div>
           <div class="share-row">
             <input class="input" id="shareLink" th:value="${shareLink}" readonly>
-            <button type="button" class="btn small" id="copyLinkBtn">Copy</button>
+            <button type="button" class="btn small" id="copyShareLinkBtn">Copy</button>
           </div>
           <p class="muted small">Gửi link này cho học sinh để vào làm bài.</p>
         </div>
@@ -172,6 +181,7 @@
         <!-- TIME SETTINGS -->
         <div class="card">
           <div class="card-title">Cài đặt thời gian</div>
+
           <div class="switch-row">
             <label class="toggle-switch">
               <input type="checkbox" th:field="*{timeLimitEnabled}" id="timeLimitEnabled">
@@ -223,11 +233,13 @@
             <input class="input" type="time" th:field="*{endTime}" id="endTime">
           </div>
         </div>
+
       </section>
     </div>
 
     <!-- HÀNG DƯỚI: FULL WIDTH (Cài đặt nâng cao + Phần 1) -->
     <section class="stack stack-wide">
+
       <div class="card">
         <div class="card-title">Cài đặt nâng cao</div>
         <label class="field">
@@ -260,69 +272,111 @@
           + Thêm câu hỏi
         </button>
       </div>
+
     </section>
 
   </form>
 </div>
 
+<!-- ✅ BƠM JSON TỪ SERVER TRƯỚC KHI LOAD JS -->
+<script th:inline="javascript">
+  window.__EXAM_MODE__ = /*[[${mode}]]*/ "create";
+  window.__EXAM_ID__ = /*[[${examId}]]*/ null;
+  window.__EXAM_QUESTIONS_JSON__ = /*[[${questionsJson}]]*/ "[]";
+</script>
+
+<!-- exam-editor.js sẽ đọc window.__EXAM_QUESTIONS_JSON__ để render lại câu hỏi khi edit -->
 <script th:src="@{/js/exam-editor.js}"></script>
+
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const addNewContainer = document.getElementById("addNewContainer");
-    const addMemberContainer = document.getElementById("addMemberContainer");
+    const publicLinkSection = document.getElementById("publicLinkSection");
     const publicCheckbox = document.getElementById("publicCheckbox");
 
-    publicCheckbox.addEventListener("change", function() {
-      if (!publicCheckbox.checked) {
-        addNewContainer.style.display = "block"; // Hiển thị "Thêm mới"
-        addMemberContainer.style.display = "block"; // Hiển thị "Thêm thành viên"
-      } else {
-        addNewContainer.style.display = "none"; // Ẩn "Thêm mới"
-        addMemberContainer.style.display = "none"; // Ẩn "Thêm thành viên"
-      }
-    });
+    // ===== Toggle Public/Private UI =====
+    const applyPublicUI = () => {
+      const isPublic = !!publicCheckbox?.checked;
+      if (publicLinkSection) publicLinkSection.style.display = isPublic ? "block" : "none";
+      if (addNewContainer) addNewContainer.style.display = isPublic ? "none" : "block";
+    };
 
-    // Khi nhấn vào "Thêm mới", hiển thị modal
+    if (publicCheckbox) {
+      publicCheckbox.addEventListener("change", applyPublicUI);
+      applyPublicUI(); // set initial
+    }
+
+    // ===== Copy link buttons =====
+    const copyText = async (text) => {
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Đã copy link!");
+      } catch (e) {
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        alert("Đã copy link!");
+      }
+    };
+
+    const copyShareBtn = document.getElementById("copyShareLinkBtn");
+    if (copyShareBtn) {
+      copyShareBtn.addEventListener("click", () => {
+        const shareLink = document.getElementById("shareLink")?.value || "";
+        copyText(shareLink);
+      });
+    }
+
+    const copyPublicBtn = document.getElementById("copyPublicLinkBtn");
+    if (copyPublicBtn) {
+      copyPublicBtn.addEventListener("click", () => {
+        const publicLink = document.getElementById("publicLink")?.value || "";
+        copyText(publicLink);
+      });
+    }
+
+    // ===== Modal Thêm thành viên =====
     const addNewBtn = document.getElementById("addNewBtn");
     const modal = document.getElementById("addMemberModal");
     const closeModalBtn = document.getElementById("closeModalBtn");
-
-    addNewBtn.addEventListener("click", () => {
-      modal.style.display = "block";
-    });
-
-    // Khi nhấn vào nút đóng (x)
-    closeModalBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
-
-    // Khi nhấn vào nút "Hủy", đóng modal
     const cancelBtn = document.getElementById("cancelBtn");
-    cancelBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
+    const saveBtn = document.getElementById("saveBtn");
 
-    // Khi nhấn vào nút "Thêm thành viên"
+    if (addNewBtn && modal) {
+      addNewBtn.addEventListener("click", () => modal.style.display = "block");
+    }
+    if (closeModalBtn && modal) {
+      closeModalBtn.addEventListener("click", () => modal.style.display = "none");
+    }
+    if (cancelBtn && modal) {
+      cancelBtn.addEventListener("click", () => modal.style.display = "none");
+    }
+    if (saveBtn && modal) {
+      saveBtn.addEventListener("click", () => modal.style.display = "none");
+    }
+
     const addMemberBtn = document.getElementById("addMemberBtn");
-    addMemberBtn.addEventListener("click", () => {
-      const email = document.getElementById("memberEmail").value;
-      const memberList = document.getElementById("memberList");
+    if (addMemberBtn) {
+      addMemberBtn.addEventListener("click", () => {
+        const emailEl = document.getElementById("memberEmail");
+        const memberList = document.getElementById("memberList");
+        const email = emailEl?.value?.trim();
 
-      if (email) {
+        if (!email || !memberList) return;
+
         const memberItem = document.createElement("p");
         memberItem.textContent = email;
         memberList.appendChild(memberItem);
-        document.getElementById("memberEmail").value = ""; // Reset input
-      }
-    });
+        if (emailEl) emailEl.value = "";
+      });
+    }
 
-    // Khi nhấn vào "Xong", đóng modal
-    const saveBtn = document.getElementById("saveBtn");
-    saveBtn.addEventListener("click", () => {
-      modal.style.display = "none";
-    });
-
-    // Thêm Nhóm
+    // ===== Modal Thêm nhóm =====
     const addGroupBtn = document.getElementById("addGroupBtn");
     const addGroupModal = document.getElementById("addGroupModal");
     const closeGroupModalBtn = document.getElementById("closeGroupModalBtn");
@@ -330,34 +384,34 @@
     const addGroupSubmitBtn = document.getElementById("addGroupSubmitBtn");
     const classSelect = document.getElementById("classSelect");
 
-    // Mở modal khi nhấn "Thêm Nhóm"
-    addGroupBtn.addEventListener("click", () => {
-      addGroupModal.style.display = "block";
-    });
+    if (addGroupBtn && addGroupModal) {
+      addGroupBtn.addEventListener("click", () => addGroupModal.style.display = "block");
+    }
+    if (closeGroupModalBtn && addGroupModal) {
+      closeGroupModalBtn.addEventListener("click", () => addGroupModal.style.display = "none");
+    }
+    if (closeGroupModalFooterBtn && addGroupModal) {
+      closeGroupModalFooterBtn.addEventListener("click", () => addGroupModal.style.display = "none");
+    }
 
-    // Đóng modal khi nhấn "X"
-    closeGroupModalBtn.addEventListener("click", () => {
-      addGroupModal.style.display = "none";
-    });
+    if (addGroupSubmitBtn) {
+      addGroupSubmitBtn.addEventListener("click", () => {
+        const selectedClass = classSelect?.value;
+        if (!selectedClass) {
+          alert("Vui lòng chọn lớp!");
+          return;
+        }
 
-    // Đóng modal khi nhấn "Hủy"
-    closeGroupModalFooterBtn.addEventListener("click", () => {
-      addGroupModal.style.display = "none";
-    });
-
-    // Xử lý khi nhấn "Thêm Nhóm"
-    addGroupSubmitBtn.addEventListener("click", () => {
-      const selectedClass = classSelect.value;
-      if (selectedClass) {
         const groupList = document.getElementById("groupList");
+        if (!groupList) return;
+
         const groupItem = document.createElement("p");
         groupItem.textContent = `Nhóm: ${selectedClass}`;
         groupList.appendChild(groupItem);
-        addGroupModal.style.display = "none"; // Đóng modal
-      } else {
-        alert("Vui lòng chọn lớp!");
-      }
-    });
+
+        if (addGroupModal) addGroupModal.style.display = "none";
+      });
+    }
   });
 </script>
 

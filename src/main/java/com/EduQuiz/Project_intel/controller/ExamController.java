@@ -80,6 +80,9 @@ public String editExam(@PathVariable("id") Long id, Model model) {
 
     model.addAttribute("shareLink", baseUrl + "/quiz/" + id);
 
+    model.addAttribute("questionsJson", examQuestionItemService.getQuestionsJsonByExamId(id));
+
+
     return "teacher/exam-editor";
 }
 
