@@ -11,19 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/student")
 public class StudentController {
 
-    @GetMapping("/dashboard") // ✅ đổi URL để không trùng
+    @GetMapping
     public String studentPage(HttpSession session) {
-
         User user = (User) session.getAttribute("user");
-
-        if (user == null) {
-            return "redirect:/auth";
-        }
-
-        if (user.getRole() != Role.STUDENT) {
-            return "redirect:/teacher";
-        }
-
+        if (user == null) return "redirect:/auth";
+        if (user.getRole() != Role.STUDENT) return "redirect:/teacher";
         return "student";
     }
 }

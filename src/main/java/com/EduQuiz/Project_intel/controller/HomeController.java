@@ -11,10 +11,6 @@ public class HomeController {
         return "index";
     }
 
-    @GetMapping("/student")
-    public String student() {
-        return "student";
-    }
 
     @GetMapping("/HTT")
     public String chonHinhThuc() {

@@ -1,0 +1,60 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title th:text="${exam.title}">Quiz</title>
+  <link rel="stylesheet" th:href="@{/css/quiz.css}">
+</head>
+
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div>
+      <div class="badge">📘 Bài kiểm tra</div>
+      <h1 th:text="${exam.title}">Tên bài</h1>
+      <p th:text="${exam.description}">Mô tả ngắn</p>
+    </div>
+
+    <div class="badge" th:if="${exam.timeLimit != null}">
+      ⏱ Thời gian: <b th:text="${exam.timeLimit}">15</b> phút
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="stat">
+      <div class="label">Số câu</div>
+      <div class="value" th:text="${questionCount}">0</div>
+    </div>
+    <div class="stat">
+      <div class="label">Hình thức</div>
+      <div class="value">Trắc nghiệm</div>
+    </div>
+    <div class="stat">
+      <div class="label">Lưu ý</div>
+      <div class="value">Chỉ nộp 1 lần</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Hướng dẫn làm bài</h2>
+    <ul class="list">
+      <li>Chọn đáp án cho mỗi câu hỏi rồi nhấn <b>Nộp bài</b>.</li>
+      <li>Nếu có giới hạn thời gian, hệ thống sẽ tự nộp khi hết giờ.</li>
+      <li>Không tải lại trang khi đang làm bài để tránh mất lựa chọn.</li>
+    </ul>
+
+    <div class="actions">
+      <a class="btn primary" th:href="@{/quiz/{id}/take(id=${exam.id})}">🚀 Bắt đầu làm bài</a>
+      <a class="btn ghost" th:href="@{/student}">⬅ Về trang sinh viên</a>
+    </div>
+
+    <p class="small" th:if="${questionCount == 0}">
+      ⚠ Đề này hiện chưa có câu hỏi. Giáo viên cần vào editor và lưu câu hỏi trước.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Kết quả</title>
+  <link rel="stylesheet" th:href="@{/css/quiz.css}">
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div>
+      <div class="badge">✅ Hoàn thành</div>
+      <h1>Kết quả bài làm</h1>
+      <p>Bài: <b th:text="${exam.title}"></b></p>
+    </div>
+
+    <div class="badge">
+      🎯 Điểm: <b th:text="${score}">0</b> / <b th:text="${total}">0</b>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Tiếp theo</h2>
+    <ul class="list">
+      <li>Nếu giáo viên cần duyệt/chấm lại, điểm có thể thay đổi theo cài đặt.</li>
+      <li>Bạn có thể quay lại trang sinh viên để xem các bài khác.</li>
+    </ul>
+
+    <div class="actions">
+      <a class="btn primary" th:href="@{/student}">🏠 Về trang sinh viên</a>
+      <a class="btn ghost" th:href="@{/quiz/{id}(id=${exam.id})}">🔁 Xem lại thông tin đề</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -345,3 +345,49 @@ document.addEventListener("DOMContentLoaded", () => {
     return `https://example.com/test/${randomStr}`;
   }
 });
+
+
+function collectQuestionsToJson() {
+  const list = document.getElementById("questionList");
+  if (!list) return "[]";
+
+  const blocks = Array.from(list.querySelectorAll(".question-block"));
+  const questions = blocks.map((b, idx) => {
+    const content = b.querySelector(".question-content")?.value?.trim() || "";
+    const score = parseFloat(b.querySelector(".score-input")?.value || "1") || 1;
+
+    const answerRows = Array.from(b.querySelectorAll(".answer-row"));
+    const answers = answerRows.map((row) => ({
+      content: row.querySelector(".answer-content")?.value?.trim() || "",
+      attachmentUrl: row.querySelector(".answer-attachment-url")?.value || ""
+    }));
+
+    // tìm đáp án đúng (radio checked)
+    let correctIndex = -1;
+    answerRows.forEach((row, i) => {
+      const radio = row.querySelector('input[type="radio"]');
+      if (radio && radio.checked) correctIndex = i;
+    });
+
+    return {
+      orderIndex: idx,
+      type: "single_choice",
+      content,
+      score,
+      correctIndex,
+      answers
+    };
+  });
+
+  return JSON.stringify(questions);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("form");
+  if (!form) return;
+
+  form.addEventListener("submit", () => {
+    const hidden = document.getElementById("questionsJson");
+    if (hidden) hidden.value = collectQuestionsToJson();
+  });
+});

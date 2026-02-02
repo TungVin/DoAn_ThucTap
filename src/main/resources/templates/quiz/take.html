@@ -1,0 +1,149 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title th:text="${exam.title}">Take Quiz</title>
+  <link rel="stylesheet" th:href="@{/css/quiz.css}">
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <div style="font-weight:800" th:text="${exam.title}">Quiz</div>
+      <div class="small">
+        Đã trả lời: <b id="answeredCount">0</b>/<b id="totalCount" th:text="${#lists.size(questions)}">0</b>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; align-items:center">
+      <div class="progress" aria-label="progress">
+        <div id="progressBar"></div>
+      </div>
+
+      <!-- Timer (chỉ hiện khi có timeLimit) -->
+      <div th:if="${exam.timeLimit != null}" class="timer" id="timer"
+           th:attr="data-minutes=${exam.timeLimit}">
+        ⏱ --:--
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <form th:action="@{/quiz/{id}/submit(id=${exam.id})}" method="post" id="quizForm">
+
+    <div th:if="${#lists.isEmpty(questions)}" class="card">
+      <h2>Chưa có câu hỏi</h2>
+      <p class="small">Đề này hiện chưa có câu hỏi. Vui lòng liên hệ giáo viên.</p>
+      <div class="actions">
+        <a class="btn ghost" th:href="@{/quiz/{id}(id=${exam.id})}">⬅ Quay lại</a>
+      </div>
+    </div>
+
+    <div th:each="q, st : ${questions}" class="q-card">
+      <div class="q-head">
+        <p class="q-title">
+          Câu <span th:text="${st.index + 1}">1</span>
+        </p>
+        <div class="q-meta">
+          Điểm: <b th:text="${q.score}">1</b>
+        </div>
+      </div>
+
+      <div th:text="${q.content}">Nội dung câu hỏi</div>
+
+      <div class="options">
+        <label class="option" th:each="opt : ${q.options}">
+          <input type="radio"
+                 th:name="${'q_' + q.id}"
+                 th:value="${opt.id}">
+          <div class="text">
+            <div th:text="${opt.content}">Đáp án</div>
+            <div class="small" th:if="${opt.attachmentUrl != null and !#strings.isEmpty(opt.attachmentUrl)}">
+              📎 <a th:href="${opt.attachmentUrl}" target="_blank">Xem tệp đính kèm</a>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Sticky submit bar -->
+    <div class="footer-actions" th:if="${!#lists.isEmpty(questions)}">
+      <div class="inner">
+        <div class="small">
+          Lưu ý: kiểm tra đáp án trước khi nộp.
+        </div>
+        <div style="display:flex; gap:12px">
+          <a class="btn ghost" th:href="@{/quiz/{id}(id=${exam.id})}">⬅ Quay lại</a>
+          <button type="submit" class="btn primary" onclick="return confirm('Bạn chắc chắn muốn nộp bài?');">
+            ✅ Nộp bài
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // Progress: đếm số câu đã chọn
+  const form = document.getElementById('quizForm');
+  const answeredEl = document.getElementById('answeredCount');
+  const totalEl = document.getElementById('totalCount');
+  const bar = document.getElementById('progressBar');
+
+  function updateProgress(){
+    const total = parseInt(totalEl?.textContent || '0', 10);
+    if (!total) return;
+    const names = new Set(Array.from(form.querySelectorAll('input[type="radio"]')).map(i => i.name));
+    let answered = 0;
+    names.forEach(n => {
+      if (form.querySelector(`input[name="${n}"]:checked`)) answered++;
+    });
+    answeredEl.textContent = answered;
+    bar.style.width = Math.round((answered / total) * 100) + '%';
+  }
+
+  if (form) {
+    form.addEventListener('change', (e) => {
+      if (e.target && e.target.matches('input[type="radio"]')) updateProgress();
+    });
+    updateProgress();
+  }
+
+  // Timer (nếu có)
+  const timer = document.getElementById('timer');
+  if (timer) {
+    const minutes = parseInt(timer.getAttribute('data-minutes') || '0', 10);
+    if (minutes > 0) {
+      let remaining = minutes * 60;
+
+      function render(){
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        timer.textContent = `⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+        // đỏ khi còn <= 1 phút
+        if (remaining <= 60) timer.classList.add('danger');
+
+        if (remaining <= 0) {
+          timer.textContent = '⏱ 00:00';
+          alert('Hết giờ! Hệ thống sẽ tự nộp bài.');
+          document.getElementById('quizForm')?.submit();
+          return;
+        }
+        remaining--;
+        setTimeout(render, 1000);
+      }
+      render();
+    }
+  }
+</script>
+
+</body>
+</html>

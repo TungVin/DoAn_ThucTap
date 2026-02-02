@@ -3,10 +3,13 @@ package com.EduQuiz.Project_intel.controller;
 import com.EduQuiz.Project_intel.dto.ExamUpsertForm;
 import com.EduQuiz.Project_intel.service.CategoryService;
 import com.EduQuiz.Project_intel.service.ExamService;
+import com.EduQuiz.Project_intel.service.ExamQuestionItemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 @Controller
 @RequestMapping("/teacher/exams")
@@ -14,20 +17,20 @@ public class ExamController {
 
     private final ExamService examService;
     private final CategoryService categoryService;
+    private final ExamQuestionItemService examQuestionItemService;
 
-    public ExamController(ExamService examService, CategoryService categoryService) {
+    public ExamController(ExamService examService,
+                          CategoryService categoryService,
+                          ExamQuestionItemService examQuestionItemService) {
         this.examService = examService;
         this.categoryService = categoryService;
+        this.examQuestionItemService = examQuestionItemService;
     }
 
-    /**
-     * (Tuỳ chọn) Nếu bạn có trang list riêng /teacher/exams
-     * Còn nếu list nằm trong /teacher?activeTab=exams thì bạn không cần gọi route này.
-     */
     @GetMapping
     public String list(Model model) {
         model.addAttribute("exams", examService.getAll());
-        return "teacher/exams"; // nếu bạn có templates/teacher/exams.html
+        return "teacher/exams";
     }
 
     @GetMapping("/new")
@@ -39,51 +42,87 @@ public class ExamController {
     }
 
     /**
-     * TẠO XONG -> QUAY VỀ DANH SÁCH (giống Ninequiz)
+     * CREATE:
+     * - Nhận questionsJson từ hidden input
+     * - Sau khi tạo exam xong, dùng examId để lưu câu hỏi
      */
     @PostMapping
     public String createExam(@ModelAttribute("form") ExamUpsertForm form,
+                             @RequestParam(value = "questionsJson", required = false) String questionsJson,
                              RedirectAttributes ra) {
-        examService.createFromForm(form);
-        ra.addFlashAttribute("toast", "Tạo bài kiểm tra thành công!");
-        return "redirect:/teacher?activeTab=exams";
-        // nếu bạn dùng list riêng: return "redirect:/teacher/exams";
+        try {
+            // ✅ Khuyến nghị: sửa ExamService.createFromForm(form) => trả về Long examId
+            Long examId = examService.createFromForm(form);
+
+            // lưu câu hỏi của đề (nếu có)
+            if (examId != null) {
+                examQuestionItemService.replaceFromJson(examId, questionsJson);
+            }
+
+            ra.addFlashAttribute("toast", "Tạo bài kiểm tra thành công!");
+            return "redirect:/teacher?activeTab=exams";
+        } catch (Exception e) {
+            ra.addFlashAttribute("examError", "Tạo bài kiểm tra thất bại: " + e.getMessage());
+            return "redirect:/teacher/exams/new";
+        }
     }
 
     @GetMapping("/{id}/edit")
-    public String editExam(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("mode", "edit");
-        model.addAttribute("examId", id);
-        model.addAttribute("form", examService.getFormById(id));
-        model.addAttribute("categories", categoryService.getAll());
-        model.addAttribute("shareLink", "/quiz/" + id);
-        return "teacher/exam-editor";
-    }
+public String editExam(@PathVariable("id") Long id, Model model) {
+    model.addAttribute("mode", "edit");
+    model.addAttribute("examId", id);
+    model.addAttribute("form", examService.getFormById(id));
+    model.addAttribute("categories", categoryService.getAll());
+
+    String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+            .build()
+            .toUriString();
+
+    model.addAttribute("shareLink", baseUrl + "/quiz/" + id);
+
+    return "teacher/exam-editor";
+}
 
     /**
-     * LƯU SỬA XONG -> QUAY VỀ DANH SÁCH
+     * UPDATE:
+     * - Nhận questionsJson và replace toàn bộ câu hỏi trong đề
      */
     @PostMapping("/{id}")
     public String updateExam(@PathVariable Long id,
                              @ModelAttribute("form") ExamUpsertForm form,
+                             @RequestParam(value = "questionsJson", required = false) String questionsJson,
                              RedirectAttributes ra) {
         if (id == null) {
             ra.addFlashAttribute("examError", "ID bài kiểm tra không hợp lệ.");
-            return "redirect:/teacher/exams"; // Quay lại danh sách bài kiểm tra
+            return "redirect:/teacher?activeTab=exams";
         }
-        examService.updateFromForm(id, form);
-        ra.addFlashAttribute("toast", "Lưu thay đổi thành công!");
-        return "redirect:/teacher?activeTab=exams";
+
+        try {
+            examService.updateFromForm(id, form);
+
+            // ✅ lưu câu hỏi/đáp án của đề
+            examQuestionItemService.replaceFromJson(id, questionsJson);
+
+            ra.addFlashAttribute("toast", "Lưu thay đổi thành công!");
+            return "redirect:/teacher?activeTab=exams";
+        } catch (Exception e) {
+            ra.addFlashAttribute("examError", "Lưu thất bại: " + e.getMessage());
+            return "redirect:/teacher/exams/" + id + "/edit";
+        }
     }
 
     /**
-     * XÓA (modal đang submit POST /teacher/exams/delete)
+     * DELETE:
+     * - Xoá câu hỏi thuộc đề trước để tránh lỗi FK
      */
     @PostMapping("/delete")
     public String deleteExam(@RequestParam("id") Long id,
                              RedirectAttributes ra) {
         try {
-            examService.deleteById(id); // bạn cần thêm method này trong ExamService
+            // ✅ nếu có FK, nên xoá questions trước
+            examQuestionItemService.deleteByExamId(id);
+
+            examService.deleteById(id);
             ra.addFlashAttribute("toast", "Đã xóa bài kiểm tra!");
         } catch (Exception e) {
             ra.addFlashAttribute("examError", "Xóa thất bại: " + e.getMessage());
