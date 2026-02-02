@@ -110,7 +110,8 @@ public String editExam(@PathVariable("id") Long id, Model model) {
             return "redirect:/teacher?activeTab=exams";
         } catch (Exception e) {
             ra.addFlashAttribute("examError", "Lưu thất bại: " + e.getMessage());
-            return "redirect:/teacher/exams/" + id + "/edit";
+            return "redirect:/teacher?activeTab=exams";
+
         }
     }
 
@@ -119,17 +120,14 @@ public String editExam(@PathVariable("id") Long id, Model model) {
      * - Xoá câu hỏi thuộc đề trước để tránh lỗi FK
      */
     @PostMapping("/delete")
-    public String deleteExam(@RequestParam("id") Long id,
-                             RedirectAttributes ra) {
-        try {
-            // ✅ nếu có FK, nên xoá questions trước
-            examQuestionItemService.deleteByExamId(id);
-
-            examService.deleteById(id);
-            ra.addFlashAttribute("toast", "Đã xóa bài kiểm tra!");
-        } catch (Exception e) {
-            ra.addFlashAttribute("examError", "Xóa thất bại: " + e.getMessage());
-        }
-        return "redirect:/teacher?activeTab=exams";
+public String deleteExam(@RequestParam("id") Long id, RedirectAttributes ra) {
+    try {
+        examService.deleteById(id);
+        ra.addFlashAttribute("toast", "Đã xóa bài kiểm tra!");
+    } catch (Exception e) {
+        ra.addFlashAttribute("examError", "Xóa thất bại: " + e.getMessage());
     }
+    return "redirect:/teacher?activeTab=exams";
+}
+
 }

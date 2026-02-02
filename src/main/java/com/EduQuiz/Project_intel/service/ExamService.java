@@ -5,6 +5,8 @@ import com.EduQuiz.Project_intel.dto.ExamUpsertForm;
 import com.EduQuiz.Project_intel.model.Category;
 import com.EduQuiz.Project_intel.model.Exam;
 import com.EduQuiz.Project_intel.repository.CategoryRepository;
+import com.EduQuiz.Project_intel.repository.ExamAnswerOptionRepository;
+import com.EduQuiz.Project_intel.repository.ExamQuestionItemRepository;
 import com.EduQuiz.Project_intel.repository.ExamRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +22,21 @@ public class ExamService {
     private final ExamRepository examRepository;
     private final CategoryRepository categoryRepository;
 
+    // ✅ thêm để xóa con trước
+    private final ExamQuestionItemRepository examQuestionItemRepository;
+    private final ExamAnswerOptionRepository examAnswerOptionRepository;
+
     private static final DateTimeFormatter DATE_TIME_FMT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final DateTimeFormatter CARD_DATE_FMT = DateTimeFormatter.ofPattern("'Thg' MM dd");
 
-    public ExamService(ExamRepository examRepository, CategoryRepository categoryRepository) {
+    public ExamService(ExamRepository examRepository,
+                       CategoryRepository categoryRepository,
+                       ExamQuestionItemRepository examQuestionItemRepository,
+                       ExamAnswerOptionRepository examAnswerOptionRepository) {
         this.examRepository = examRepository;
         this.categoryRepository = categoryRepository;
+        this.examQuestionItemRepository = examQuestionItemRepository;
+        this.examAnswerOptionRepository = examAnswerOptionRepository;
     }
 
     // ================== LIST CARD (CHO TRANG DTO) ==================
@@ -40,10 +51,8 @@ public class ExamService {
 
     private ExamCardDTO toCard(Exam e) {
         String title = (e.getTitle() == null || e.getTitle().isBlank()) ? "(Chưa đặt tên)" : e.getTitle();
-
         String timeLabel = (e.getTimeLimit() == null) ? "Không giới hạn" : (e.getTimeLimit() + " phút");
 
-        // ưu tiên createdAt nếu có, không có thì dùng hôm nay
         String dateLabel;
         if (getCreatedAtLocalDate(e) != null) {
             dateLabel = getCreatedAtLocalDate(e).format(CARD_DATE_FMT);
@@ -51,7 +60,6 @@ public class ExamService {
             dateLabel = LocalDate.now().format(CARD_DATE_FMT);
         }
 
-        // statusLabel: nếu bạn chưa có status trong entity -> để mặc định
         String statusLabel = "Bản nháp";
 
         int questionCount = 0;
@@ -68,23 +76,17 @@ public class ExamService {
         );
     }
 
-    /**
-     * Helper: tránh lỗi nếu Exam của bạn chưa có createdAt hoặc kiểu khác.
-     * Nếu entity Exam có getCreatedAt() trả về LocalDateTime thì sẽ dùng được.
-     */
     private LocalDate getCreatedAtLocalDate(Exam e) {
         try {
-            // nếu Exam có getCreatedAt(): LocalDateTime
             var createdAt = e.getCreatedAt();
             if (createdAt == null) return null;
             return createdAt.toLocalDate();
         } catch (Exception ex) {
-            // Exam chưa có field createdAt hoặc kiểu khác
             return null;
         }
     }
 
-    // ================== LIST ENTITY (CHO FRAGMENT NINEQUIZ ĐANG DÙNG Exam) ==================
+    // ================== LIST ENTITY ==================
 
     @Transactional(readOnly = true)
     public List<Exam> getAll() {
@@ -159,7 +161,6 @@ public class ExamService {
             f.setAnswersPerRow(exam.getAnswersPerRow());
         }
 
-        // Thêm trường isPublic
         f.setIsPublic(exam.getIsPublic());
 
         return f;
@@ -173,9 +174,24 @@ public class ExamService {
     }
 
     // ================== DELETE ==================
-
+    /**
+     * ✅ Xóa bài kiểm tra đúng cách:
+     * - Xóa đáp án (exam_answer_options) theo examId
+     * - Xóa câu hỏi (exam_question_items) theo examId
+     * - Xóa exam
+     */
     @Transactional
     public void deleteById(Long id) {
+        if (!examRepository.existsById(id)) return;
+
+        // 1) Xóa options trước (nếu repo có method)
+        // Nếu bạn chưa có deleteByExamId ở ExamAnswerOptionRepository thì tạo (mình hướng dẫn ngay dưới)
+        examAnswerOptionRepository.deleteByExamId(id);
+
+        // 2) Xóa question items
+        examQuestionItemRepository.deleteByExamId(id);
+
+        // 3) Xóa exam
         examRepository.deleteById(id);
     }
 
@@ -244,7 +260,6 @@ public class ExamService {
             exam.setAnswersPerRow(1);
         }
 
-        // Cập nhật trạng thái công khai
         if (f.getIsPublic() != null) {
             exam.setIsPublic(f.getIsPublic());
         }
