@@ -1,39 +1,25 @@
 package com.EduQuiz.Project_intel.controller;
 
 import com.EduQuiz.Project_intel.model.Schedule;
-import com.EduQuiz.Project_intel.model.ClassRoom;
-import com.EduQuiz.Project_intel.model.Question;
 import com.EduQuiz.Project_intel.service.ScheduleService;
 import com.EduQuiz.Project_intel.service.ClassRoomService;
 import com.EduQuiz.Project_intel.service.QuestionService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Controller
 public class TeacherScheduleController {
 
     private final ScheduleService scheduleService;
-    private final ClassRoomService classRoomService;
-    private final com.EduQuiz.Project_intel.service.FileStorageService fileStorageService;
-    private final QuestionService questionService;
-
     public TeacherScheduleController(ScheduleService scheduleService,
                                      ClassRoomService classRoomService,
                                      com.EduQuiz.Project_intel.service.FileStorageService fileStorageService,
                                      QuestionService questionService) {
         this.scheduleService = scheduleService;
-        this.classRoomService = classRoomService;
-        this.fileStorageService = fileStorageService;
-        this.questionService = questionService;
     }
 
 
