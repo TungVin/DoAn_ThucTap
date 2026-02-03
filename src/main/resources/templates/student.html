@@ -12,19 +12,22 @@
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 />
-
+    <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 </head>
 
 <body>
 
 <header class="header">
-    <div class="logo">EduQuiz</div>
+    <a href="/student">
+        <div class="logo">EduQuiz</div>
+    </a>
 
     <nav class="nav-right">
         <a class="icon-btn bell">🔔 Thông báo</a>
         <a class="icon-btn">❓ Hỗ trợ</a>
-        <img src="/images/avatar.jpg" class="avatar">
+        <img src="/images/avatar.jpg" class="avatar" alt="Avatar giáo viên">
     </nav>
 </header>
 
