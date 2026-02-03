@@ -7,17 +7,17 @@ import java.time.LocalDateTime;
 @Table(name = "exams")
 public class Exam {
 
-   
     public enum ResultDisplayMode {
-        AFTER_TEACHER_REVIEW,   
-        AFTER_EXAM_TIME_END,   
-        AFTER_SUBMIT            
+        AFTER_TEACHER_REVIEW,
+        AFTER_EXAM_TIME_END,
+        AFTER_SUBMIT
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ===== Basic info =====
     @Column(nullable = false)
     private String title;
 
@@ -28,214 +28,137 @@ public class Exam {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    
-    private Integer timeLimit; 
+    // ✅ NEW: giáo viên tạo bài kiểm tra (để thống kê "my exams")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
+    // ===== Time config =====
+    private Integer timeLimit;
 
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
 
+    // ===== Status =====
     @Column(nullable = false)
-    private String status = "draft"; 
+    private String status = "draft";
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
-    
-
-    
+    // ===== Settings =====
     @Enumerated(EnumType.STRING)
     @Column(name = "result_display_mode")
     private ResultDisplayMode resultDisplayMode = ResultDisplayMode.AFTER_TEACHER_REVIEW;
 
-    
     @Column(name = "auto_divide_score")
     private Boolean autoDivideScore = Boolean.TRUE;
 
-    
     @Column(name = "max_score")
     private Integer maxScore = 10;
 
-    
     @Column(name = "max_attempts")
     private Integer maxAttempts = 1;
 
-    
     @Column(name = "question_number_style")
     private String questionNumberStyle = "LETTER";
 
-   
     @Column(name = "questions_per_page")
     private Integer questionsPerPage = 50;
 
-    
     @Column(name = "answers_per_row")
     private Integer answersPerRow = 1;
 
-    
     @Column(name = "is_public")
-    private Boolean isPublic = Boolean.FALSE;  
+    private Boolean isPublic = Boolean.FALSE;
 
-   
-
-    public Long getId() {
-        return id;
+    // ===== JPA lifecycle =====
+    @PrePersist
+    public void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.status == null || this.status.isBlank()) {
+            this.status = "draft";
+        }
+        if (this.isPublic == null) {
+            this.isPublic = Boolean.FALSE;
+        }
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // ===== getter & setter =====
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public String getDescription() {
-        return description;
-    }
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public User getCreatedBy() { return createdBy; }
+    public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
 
-    public Category getCategory() {
-        return category;
-    }
+    public Integer getTimeLimit() { return timeLimit; }
+    public void setTimeLimit(Integer timeLimit) { this.timeLimit = timeLimit; }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
 
-    public Integer getTimeLimit() {
-        return timeLimit;
-    }
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
 
-    public void setTimeLimit(Integer timeLimit) {
-        this.timeLimit = timeLimit;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
+    public ResultDisplayMode getResultDisplayMode() { return resultDisplayMode; }
+    public void setResultDisplayMode(ResultDisplayMode resultDisplayMode) { this.resultDisplayMode = resultDisplayMode; }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
+    public Boolean getAutoDivideScore() { return autoDivideScore; }
+    public void setAutoDivideScore(Boolean autoDivideScore) { this.autoDivideScore = autoDivideScore; }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
+    public Integer getMaxScore() { return maxScore; }
+    public void setMaxScore(Integer maxScore) { this.maxScore = maxScore; }
 
-    public String getStatus() {
-        return status;
-    }
+    public Integer getMaxAttempts() { return maxAttempts; }
+    public void setMaxAttempts(Integer maxAttempts) { this.maxAttempts = maxAttempts; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getQuestionNumberStyle() { return questionNumberStyle; }
+    public void setQuestionNumberStyle(String questionNumberStyle) { this.questionNumberStyle = questionNumberStyle; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public Integer getQuestionsPerPage() { return questionsPerPage; }
+    public void setQuestionsPerPage(Integer questionsPerPage) { this.questionsPerPage = questionsPerPage; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public Integer getAnswersPerRow() { return answersPerRow; }
+    public void setAnswersPerRow(Integer answersPerRow) { this.answersPerRow = answersPerRow; }
 
-    public ResultDisplayMode getResultDisplayMode() {
-        return resultDisplayMode;
-    }
+    public Boolean getIsPublic() { return isPublic; }
+    public void setIsPublic(Boolean isPublic) { this.isPublic = isPublic; }
 
-    public void setResultDisplayMode(ResultDisplayMode resultDisplayMode) {
-        this.resultDisplayMode = resultDisplayMode;
-    }
-
-    public Boolean getAutoDivideScore() {
-        return autoDivideScore;
-    }
-
-    public void setAutoDivideScore(Boolean autoDivideScore) {
-        this.autoDivideScore = autoDivideScore;
-    }
-
-    public Integer getMaxScore() {
-        return maxScore;
-    }
-
-    public void setMaxScore(Integer maxScore) {
-        this.maxScore = maxScore;
-    }
-
-    public Integer getMaxAttempts() {
-        return maxAttempts;
-    }
-
-    public void setMaxAttempts(Integer maxAttempts) {
-        this.maxAttempts = maxAttempts;
-    }
-
-    public String getQuestionNumberStyle() {
-        return questionNumberStyle;
-    }
-
-    public void setQuestionNumberStyle(String questionNumberStyle) {
-        this.questionNumberStyle = questionNumberStyle;
-    }
-
-    public Integer getQuestionsPerPage() {
-        return questionsPerPage;
-    }
-
-    public void setQuestionsPerPage(Integer questionsPerPage) {
-        this.questionsPerPage = questionsPerPage;
-    }
-
-    public Integer getAnswersPerRow() {
-        return answersPerRow;
-    }
-
-    public void setAnswersPerRow(Integer answersPerRow) {
-        this.answersPerRow = answersPerRow;
-    }
-
-    public Boolean getIsPublic() {
-        return isPublic;
-    }
-
-    public void setIsPublic(Boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-
-
+    // ===== status helpers =====
     public void updateStatus() {
         if (startTime == null || endTime == null) {
-            
             return;
         }
 
         LocalDateTime now = LocalDateTime.now();
 
         if (now.isBefore(startTime)) {
-           
             this.status = "draft";
         } else if (now.isAfter(endTime)) {
-           
             this.status = "ended";
         } else {
-            
             this.status = "ongoing";
         }
     }
 
-   
     public String getCurrentStatus() {
         updateStatus();
         return this.status;

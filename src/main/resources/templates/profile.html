@@ -5,19 +5,411 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hồ sơ</title>
   <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e5e7eb;
+      --brand:#ef4444;
+      --brand2:#f97316;
+      --shadow:0 10px 30px rgba(0,0,0,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text)}
+    a{color:inherit}
+
+    .wrap{max-width:1100px;margin:22px auto;padding:0 16px}
+
+    .hero{
+      border-radius:22px;
+      padding:18px;
+      background: linear-gradient(90deg, var(--brand), var(--brand2));
+      box-shadow: var(--shadow);
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::after{
+      content:"";
+      position:absolute; right:-80px; top:-80px;
+      width:220px;height:220px;border-radius:50%;
+      background:rgba(255,255,255,.18);
+    }
+    .hero-top{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+    .hero-title{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .hero-actions{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      border:0; cursor:pointer; text-decoration:none;
+      padding:10px 12px; border-radius:12px; font-weight:700;
+      display:inline-flex; align-items:center; gap:8px;
+      white-space:nowrap;
+    }
+    .btn.light{background:rgba(255,255,255,.18); color:#fff}
+    .btn.white{background:#fff; color:#111827}
+    .btn:active{transform:translateY(1px)}
+
+    .hero-body{display:flex; align-items:center; gap:16px; margin-top:14px; flex-wrap:wrap;}
+    .avatar-lg{
+      width:78px;height:78px;border-radius:50%;
+      border:3px solid rgba(255,255,255,.7);
+      object-fit:cover; background:rgba(255,255,255,.2);
+    }
+    .fallback-lg{
+      width:78px;height:78px;border-radius:50%;
+      display:none;
+      align-items:center; justify-content:center;
+      font-weight:900; font-size:26px;
+      border:3px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.22);
+    }
+    .name{font-size:22px; font-weight:900; margin:0}
+    .sub{margin:4px 0 0; opacity:.95; display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      background:rgba(255,255,255,.2);
+      font-weight:800; font-size:12px;
+    }
+    .pill{
+      padding:6px 10px;border-radius:999px;
+      background:rgba(255,255,255,.16);
+      font-weight:700; font-size:12px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      background:var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h3{
+      margin:0 0 12px;
+      font-size:16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .muted{color:var(--muted); font-size:13px; margin:0}
+    .hr{height:1px;background:var(--line);margin:12px 0}
+
+    .info{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
+    @media (max-width: 620px){ .info{grid-template-columns:1fr} }
+    .field{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#fafafa;
+    }
+    .label{font-size:12px;color:var(--muted); margin-bottom:6px}
+    .value{font-weight:800; display:flex; align-items:center; gap:10px}
+    .value small{font-weight:700;color:var(--muted)}
+    .copy{
+      margin-left:auto;
+      border:0; cursor:pointer;
+      background:#fff; border:1px solid var(--line);
+      padding:6px 10px; border-radius:10px;
+      font-weight:800; font-size:12px;
+    }
+
+    .quick{display:flex; flex-direction:column; gap:10px;}
+    .qbtn{
+      display:flex; align-items:center; gap:10px;
+      padding:12px; border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff; text-decoration:none;
+      font-weight:800;
+    }
+    .qbtn:hover{background:#f9fafb}
+    .qbtn i{width:20px;text-align:center;color:#111827}
+    .qbtn .hint{margin-left:auto;color:var(--muted);font-weight:700;font-size:12px}
+    .danger{border-color:#fecaca}
+    .danger i{color:#ef4444}
+
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 620px){ .stats{grid-template-columns:1fr} }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+    }
+    .stat .n{font-size:18px;font-weight:900}
+    .stat .t{font-size:12px;color:var(--muted);margin-top:4px}
+
+    /* ===== form edit ===== */
+    .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+    @media (max-width: 620px){ .form-grid{grid-template-columns:1fr} }
+    .input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      outline:none;
+      font-weight:700;
+    }
+    .input:focus{border-color:#cbd5e1}
+    .err{margin-top:6px; font-size:12px; color:#ef4444; font-weight:700}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .btn2{
+      border:1px solid var(--line);
+      background:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:8px;
+      text-decoration:none;
+    }
+    .btn2.primary{
+      background:var(--brand);
+      color:#fff;
+      border-color:transparent;
+    }
+  </style>
 </head>
-<body style="font-family:system-ui; background:#f6f7fb; margin:0;">
-<div style="max-width:900px; margin:24px auto; padding:0 16px;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2>Hồ sơ</h2>
-    <a th:href="${backUrl}" style="background:#ef4444;color:#fff;padding:10px 12px;border-radius:10px;text-decoration:none;">Quay lại</a>
+
+<body>
+<div class="wrap">
+
+  <!-- Flash msg hidden (để JS đọc) -->
+  <div id="flashSuccess" th:if="${success}" th:attr="data-msg=${success}" style="display:none"></div>
+  <div id="flashError" th:if="${error}" th:attr="data-msg=${error}" style="display:none"></div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-title">
+        <i class="fa-regular fa-id-card"></i>
+        <span>Hồ sơ</span>
+      </div>
+
+      <div class="hero-actions">
+        <a class="btn light" th:href="${backUrl}">
+          <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </a>
+        <a class="btn white" href="/settings">
+          <i class="fa-solid fa-gear"></i> Cài đặt
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-body">
+      <img class="avatar-lg"
+           th:src="${session.user != null && session.user.avatarUrl != null ? session.user.avatarUrl : '/images/avatar.jpg'}"
+           src="/images/avatar.jpg"
+           alt="Avatar"
+           onerror="this.style.display='none'; document.getElementById('fallbackLg').style.display='inline-flex';"/>
+      <div class="fallback-lg" id="fallbackLg"
+           th:text="${user != null && user.name != null && user.name.length() > 0
+              ? #strings.toUpperCase(#strings.substring(user.name,0,1))
+              : 'U'}">U</div>
+
+      <div>
+        <p class="name" th:text="${user.name}">Họ tên</p>
+        <div class="sub">
+          <span class="badge">
+            <i class="fa-solid fa-user-shield"></i>
+            <span th:text="${user.role}">ROLE</span>
+          </span>
+          <span class="pill">ID: <span th:text="${user.id}">0</span></span>
+          <span class="pill"><i class="fa-regular fa-envelope"></i> <span th:text="${user.email}">email</span></span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.06);">
-    <p><b>Họ tên:</b> <span th:text="${user.name}"></span></p>
-    <p><b>Email:</b> <span th:text="${user.email}"></span></p>
-    <p><b>Vai trò:</b> <span th:text="${user.role}"></span></p>
+  <!-- CONTENT -->
+  <div class="grid">
+
+    <!-- Left -->
+    <div class="card">
+      <h3><i class="fa-solid fa-circle-info"></i> Thông tin chi tiết</h3>
+      <p class="muted">Thông tin tài khoản hiển thị theo dữ liệu đang lưu trong hệ thống.</p>
+
+      <div class="hr"></div>
+
+      <div class="info">
+        <div class="field">
+          <div class="label">Họ và tên</div>
+          <div class="value"><span th:text="${user.name}">Họ tên</span></div>
+        </div>
+
+        <div class="field">
+          <div class="label">Email</div>
+          <div class="value">
+            <span id="emailText" th:text="${user.email}">email</span>
+            <button class="copy" type="button" onclick="copyEmail()">
+              <i class="fa-regular fa-copy"></i> Copy
+            </button>
+          </div>
+          <div class="muted" style="margin-top:6px;">Dùng email để đăng nhập / nhận thông báo.</div>
+        </div>
+
+        <div class="field">
+          <div class="label">Vai trò</div>
+          <div class="value">
+            <span th:text="${user.role}">ROLE</span>
+            <small th:text="${user.role.name() == 'TEACHER' ? 'Quản lý nội dung, bài kiểm tra' : 'Làm bài, tham gia lớp'}">
+              mô tả vai trò
+            </small>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Trạng thái</div>
+          <div class="value">
+            <span style="display:inline-flex;align-items:center;gap:8px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block"></span>
+              Đang hoạt động
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <!-- ✅ FORM EDIT PROFILE -->
+      <h3 style="margin-top:0;"><i class="fa-solid fa-pen-to-square"></i> Chỉnh sửa hồ sơ</h3>
+      <p class="muted" style="margin-bottom:10px;">Cập nhật họ tên và email (sẽ lưu DB và đồng bộ session).</p>
+
+      <form action="/profile/update" method="post">
+        <div class="form-grid">
+          <div>
+            <div class="label">Họ và tên</div>
+            <input class="input" name="name" placeholder="Nhập họ và tên"
+                   th:value="${profileName != null ? profileName : user.name}">
+            <div class="err" th:if="${nameError}" th:text="${nameError}"></div>
+          </div>
+
+          <div>
+            <div class="label">Email</div>
+            <input class="input" name="email" type="email" placeholder="Nhập email"
+                   th:value="${profileEmail != null ? profileEmail : user.email}">
+            <div class="err" th:if="${emailError}" th:text="${emailError}"></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn2 primary" type="submit">
+            <i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi
+          </button>
+          <a class="btn2" href="/settings">
+            <i class="fa-solid fa-gear"></i> Cài đặt
+          </a>
+        </div>
+      </form>
+
+      <div class="hr"></div>
+
+      <!-- ✅ STATS THẬT -->
+      <h3 style="margin-top:0;"><i class="fa-solid fa-chart-simple"></i> Tổng quan (dữ liệu thật)</h3>
+      <div class="stats">
+        <div class="stat">
+          <div class="n" th:text="${stats != null ? stats.totalUsers : 0}">0</div>
+          <div class="t">Tổng người dùng</div>
+        </div>
+        <div class="stat">
+          <div class="n" th:text="${stats != null ? stats.totalExams : 0}">0</div>
+          <div class="t">Tổng bài kiểm tra</div>
+        </div>
+        <div class="stat">
+          <div class="n" th:text="${stats != null ? stats.publicExams : 0}">0</div>
+          <div class="t">Bài kiểm tra công khai</div>
+        </div>
+      </div>
+
+      <p class="muted" style="margin-top:10px;">
+    
+      </p>
+    </div>
+
+    <!-- Right -->
+    <div class="card">
+      <h3><i class="fa-solid fa-bolt"></i> Thao tác nhanh</h3>
+      <div class="quick">
+        <a class="qbtn" href="/settings">
+          <i class="fa-solid fa-image"></i>
+          <span>Đổi avatar</span>
+          <span class="hint">Upload ảnh</span>
+        </a>
+
+        <a class="qbtn" href="/settings">
+          <i class="fa-solid fa-key"></i>
+          <span>Đổi mật khẩu</span>
+          <span class="hint">Bảo mật</span>
+        </a>
+
+        <a class="qbtn" th:href="${backUrl}">
+          <i class="fa-solid fa-house"></i>
+          <span>Về trang chính</span>
+          <span class="hint">Teacher/Student</span>
+        </a>
+
+        <!-- ✅ logout đúng route -->
+        <a class="qbtn danger" href="/auth/logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Đăng xuất</span>
+          <span class="hint">Thoát</span>
+        </a>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3><i class="fa-solid fa-shield-halved"></i> Gợi ý bảo mật</h3>
+      <ul class="muted" style="margin:0; padding-left:18px; line-height:1.65;">
+        <li>Đổi mật khẩu định kỳ và không dùng lại mật khẩu cũ.</li>
+        <li>Không chia sẻ tài khoản cho người khác.</li>
+        <li>Ưu tiên mật khẩu có chữ hoa + chữ thường + số.</li>
+      </ul>
+    </div>
+
   </div>
 </div>
+
+<script>
+  // SweetAlert flash
+  const s = document.getElementById("flashSuccess");
+  const e = document.getElementById("flashError");
+  if (s) Swal.fire({icon:"success", title:"Thành công", text:s.getAttribute("data-msg"), timer:1600, showConfirmButton:false});
+  if (e) Swal.fire({icon:"error", title:"Lỗi", text:e.getAttribute("data-msg")});
+
+  function copyEmail(){
+    const el = document.getElementById('emailText');
+    const text = (el && el.textContent) ? el.textContent.trim() : '';
+    if(!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      Swal.fire({
+        icon: "success",
+        title: "Đã copy",
+        text: "Email đã được copy vào clipboard",
+        timer: 1400,
+        showConfirmButton: false
+      });
+    }).catch(() => {
+      Swal.fire({ icon: "error", title: "Không copy được", text: "Trình duyệt chặn clipboard." });
+    });
+  }
+</script>
 </body>
 </html>
