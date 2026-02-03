@@ -1,22 +1,145 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cài đặt</title>
-  <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
-</head>
-<body style="font-family:system-ui; background:#f6f7fb; margin:0;">
-<div style="max-width:900px; margin:24px auto; padding:0 16px;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2>Cài đặt</h2>
-    <a th:href="${backUrl}" style="background:#ef4444;color:#fff;padding:10px 12px;border-radius:10px;text-decoration:none;">Quay lại</a>
-  </div>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Cài đặt</title>
 
-  <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.06);">
-    <p>Trang cài đặt (bạn có thể thêm đổi mật khẩu, đổi avatar, bật/tắt thông báo...).</p>
-    <p>Tài khoản: <b th:text="${user.name}"></b></p>
-  </div>
+    <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body{
+            font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+            background:#f6f7fb;
+            margin:0;
+        }
+        .wrap{max-width:900px; margin:24px auto; padding:0 16px;}
+        .top{
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:12px;
+        }
+        .btn-back{
+            background:#ef4444; color:#fff; padding:10px 12px;
+            border-radius:10px; text-decoration:none;
+        }
+
+        .card{
+            background:#fff;
+            border-radius:14px;
+            padding:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,.06);
+            margin-bottom:14px;
+        }
+
+        .title{font-weight:800; margin:0 0 10px;}
+        .muted{color:#666; margin:0; line-height:1.5}
+
+        .grid{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap:12px;
+        }
+        @media (max-width:720px){
+            .grid{grid-template-columns:1fr;}
+        }
+
+        label{font-size:13px;color:#444;display:block;margin-bottom:6px;}
+        input{
+            width:100%;
+            padding:10px 12px;
+            border:1px solid #e5e7eb;
+            border-radius:10px;
+            outline:none;
+        }
+        input:focus{border-color:#ef4444;}
+        .hint{font-size:12px;color:#666;margin-top:6px;}
+        .err{font-size:12px;color:#dc2626;margin-top:6px;}
+
+        .actions{
+            display:flex;
+            gap:10px;
+            justify-content:flex-end;
+            margin-top:12px;
+        }
+        .btn{
+            border:0;
+            border-radius:10px;
+            padding:10px 14px;
+            cursor:pointer;
+            font-weight:600;
+        }
+        .btn-primary{background:#111827;color:#fff;}
+        .btn-secondary{background:#f3f4f6;color:#111827;}
+    </style>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="top">
+        <h2 style="margin:0;">Cài đặt</h2>
+        <a class="btn-back" th:href="${backUrl}">Quay lại</a>
+    </div>
+
+    <!-- Thông tin tài khoản -->
+    <div class="card">
+        <p class="title">Thông tin tài khoản</p>
+        <p class="muted">
+            <b th:text="${user.name}">User</b>
+            <span th:if="${user.email != null}"> — <span th:text="${user.email}">email</span></span>
+        </p>
+    </div>
+
+    <!-- Đổi mật khẩu -->
+    <div class="card">
+        <p class="title">Đổi mật khẩu</p>
+        <p class="muted" style="margin-bottom:12px;">
+            Nhập mật khẩu hiện tại và mật khẩu mới để cập nhật. Mật khẩu mới nên từ 6 ký tự trở lên.
+        </p>
+
+        <form th:action="@{/settings/password}" method="post" th:object="${form}">
+            <div class="grid">
+                <div>
+                    <label>Mật khẩu hiện tại</label>
+                    <input type="password" th:field="*{currentPassword}" placeholder="Nhập mật khẩu hiện tại">
+                    <div class="err" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
+                </div>
+
+                <div>
+                    <label>Mật khẩu mới</label>
+                    <input type="password" th:field="*{newPassword}" placeholder="Nhập mật khẩu mới (>= 6 ký tự)">
+                    <div class="err" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+                    <div class="hint">Gợi ý: dùng chữ hoa + chữ thường + số để tăng độ mạnh.</div>
+                </div>
+
+                <div>
+                    <label>Xác nhận mật khẩu mới</label>
+                    <input type="password" th:field="*{confirmPassword}" placeholder="Nhập lại mật khẩu mới">
+                    <div class="err" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="reset" class="btn btn-secondary">Nhập lại</button>
+                <button type="submit" class="btn btn-primary">Cập nhật mật khẩu</button>
+            </div>
+        </form>
+    </div>
 </div>
+
+<!-- SweetAlert thông báo thành công/thất bại -->
+<script th:inline="javascript">
+/*<![CDATA[*/
+    const success = /*[[${success}]]*/ null;
+    const error = /*[[${error}]]*/ null;
+
+    if (success) {
+        Swal.fire({ icon: "success", title: "Thành công", text: success, confirmButtonText: "OK" });
+    }
+    if (error) {
+        Swal.fire({ icon: "error", title: "Lỗi", text: error, confirmButtonText: "OK" });
+    }
+/*]]>*/
+</script>
 </body>
 </html>
