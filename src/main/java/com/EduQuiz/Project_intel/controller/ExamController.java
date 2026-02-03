@@ -41,20 +41,14 @@ public class ExamController {
         return "teacher/exam-editor";
     }
 
-    /**
-     * CREATE:
-     * - Nhận questionsJson từ hidden input
-     * - Sau khi tạo exam xong, dùng examId để lưu câu hỏi
-     */
+    
     @PostMapping
     public String createExam(@ModelAttribute("form") ExamUpsertForm form,
                              @RequestParam(value = "questionsJson", required = false) String questionsJson,
                              RedirectAttributes ra) {
         try {
-            // ✅ Khuyến nghị: sửa ExamService.createFromForm(form) => trả về Long examId
             Long examId = examService.createFromForm(form);
 
-            // lưu câu hỏi của đề (nếu có)
             if (examId != null) {
                 examQuestionItemService.replaceFromJson(examId, questionsJson);
             }
@@ -86,10 +80,7 @@ public String editExam(@PathVariable("id") Long id, Model model) {
     return "teacher/exam-editor";
 }
 
-    /**
-     * UPDATE:
-     * - Nhận questionsJson và replace toàn bộ câu hỏi trong đề
-     */
+ 
     @PostMapping("/{id}")
     public String updateExam(@PathVariable Long id,
                              @ModelAttribute("form") ExamUpsertForm form,
@@ -103,7 +94,6 @@ public String editExam(@PathVariable("id") Long id, Model model) {
         try {
             examService.updateFromForm(id, form);
 
-            // ✅ lưu câu hỏi/đáp án của đề
             examQuestionItemService.replaceFromJson(id, questionsJson);
 
             ra.addFlashAttribute("toast", "Lưu thay đổi thành công!");
@@ -115,10 +105,7 @@ public String editExam(@PathVariable("id") Long id, Model model) {
         }
     }
 
-    /**
-     * DELETE:
-     * - Xoá câu hỏi thuộc đề trước để tránh lỗi FK
-     */
+  
     @PostMapping("/delete")
 public String deleteExam(@RequestParam("id") Long id, RedirectAttributes ra) {
     try {

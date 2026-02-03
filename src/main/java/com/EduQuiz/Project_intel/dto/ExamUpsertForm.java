@@ -4,52 +4,51 @@ import com.EduQuiz.Project_intel.model.Exam.ResultDisplayMode;
 
 public class ExamUpsertForm {
 
-    // Dùng cho update (tạo mới thì để null)
+    
     private Long id;
 
-    // --- Thông tin chung ---
+    
     private String title;
     private String description;
     private Long categoryId;
 
-    // --- Cài đặt thời gian ---
+   
     private boolean timeLimitEnabled;
-    private Integer timeLimit; // phút
+    private Integer timeLimit; 
 
     private boolean startEnabled;
-    private String startDate;  // yyyy-MM-dd
-    private String startTime;  // HH:mm
+    private String startDate;  
+    private String startTime;  
 
     private boolean endEnabled;
     private String endDate;
     private String endTime;
 
-    // --- Cài đặt nâng cao (giống NineQuiz) ---
+    
     private ResultDisplayMode resultDisplayMode = ResultDisplayMode.AFTER_TEACHER_REVIEW;
 
-    // Hệ thống tự động chia điểm
+   
     private boolean autoDivideScore = true;
 
-    // Điểm tối đa cho bài kiểm tra
+
     private Integer maxScore = 10;
 
-    // Số lần nộp bài
+    
     private Integer maxAttempts = 1;
 
-    // Kiểu số thứ tự câu hỏi: NUMBER / LETTER / NONE
+   
     private String questionNumberStyle = "LETTER";
 
-    // Số câu hỏi trên 1 trang (0 = tất cả)
+    
     private Integer questionsPerPage = 50;
 
-    // Số câu trả lời trên 1 hàng
+    
     private Integer answersPerRow = 1;
 
-    // --- Thêm trường mới --- 
-    // Công khai bài kiểm tra
-    private Boolean isPublic = false; // Sử dụng Boolean thay vì boolean
+    
+    private Boolean isPublic = false; 
 
-    // --- GETTER / SETTER ---
+ 
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

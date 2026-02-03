@@ -20,7 +20,7 @@ public class ExamQuestionItem {
     private String content;
 
     @Column(nullable = false)
-    private String type = "single_choice"; // tạm hỗ trợ single_choice trước
+    private String type = "single_choice"; 
 
     @Column(nullable = false)
     private Integer orderIndex = 0;
@@ -32,7 +32,7 @@ public class ExamQuestionItem {
     @OrderBy("orderIndex ASC")
     private List<ExamAnswerOption> options = new ArrayList<>();
 
-    // getters/setters
+    
     public Long getId() { return id; }
     public Exam getExam() { return exam; }
     public void setExam(Exam exam) { this.exam = exam; }

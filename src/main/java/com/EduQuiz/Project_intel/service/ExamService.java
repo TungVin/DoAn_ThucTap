@@ -39,7 +39,7 @@ public class ExamService {
         this.examAnswerOptionRepository = examAnswerOptionRepository;
     }
 
-    // ================== LIST CARD (CHO TRANG DTO) ==================
+    
 
     @Transactional(readOnly = true)
     public List<ExamCardDTO> getCards() {
@@ -86,14 +86,14 @@ public class ExamService {
         }
     }
 
-    // ================== LIST ENTITY ==================
+    
 
     @Transactional(readOnly = true)
     public List<Exam> getAll() {
         return examRepository.findAll();
     }
 
-    // ================== CREATE / UPDATE ==================
+   
 
     @Transactional
     public Long createFromForm(ExamUpsertForm form) {
@@ -173,29 +173,22 @@ public class ExamService {
         examRepository.save(exam);
     }
 
-    // ================== DELETE ==================
-    /**
-     * ✅ Xóa bài kiểm tra đúng cách:
-     * - Xóa đáp án (exam_answer_options) theo examId
-     * - Xóa câu hỏi (exam_question_items) theo examId
-     * - Xóa exam
-     */
+    
     @Transactional
     public void deleteById(Long id) {
         if (!examRepository.existsById(id)) return;
 
-        // 1) Xóa options trước (nếu repo có method)
-        // Nếu bạn chưa có deleteByExamId ở ExamAnswerOptionRepository thì tạo (mình hướng dẫn ngay dưới)
+       
         examAnswerOptionRepository.deleteByExamId(id);
 
-        // 2) Xóa question items
+        
         examQuestionItemRepository.deleteByExamId(id);
 
-        // 3) Xóa exam
+        
         examRepository.deleteById(id);
     }
 
-    // ================== APPLY FORM ==================
+    
 
     private void applyForm(Exam exam, ExamUpsertForm f) {
         exam.setTitle(f.getTitle());

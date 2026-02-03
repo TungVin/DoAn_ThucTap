@@ -38,14 +38,12 @@ public class TeacherController {
         this.fileStorageService = fileStorageService;
     }
 
-    // ==================== MAIN PAGE ====================
     @GetMapping
     public String teacherPage(
             @RequestParam(defaultValue = "exams") String activeTab,
             Model model,
             HttpSession session
     ) {
-        // Kiểm tra đăng nhập
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/auth";
@@ -54,7 +52,6 @@ public class TeacherController {
             return "redirect:/student";
         }
 
-        // Truyền dữ liệu vào model
         model.addAttribute("activeTab", activeTab);
         model.addAttribute("exams", examService.getAll());
         model.addAttribute("categories", categoryService.getAll());
@@ -65,7 +62,6 @@ public class TeacherController {
         return "teacher";
     }
 
-    // ==================== CATEGORIES ====================
     @PostMapping("/categories/create")
     public String createCategory(@RequestParam String name,
                                  @RequestParam(required = false) String description,
@@ -113,7 +109,6 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=categories";
     }
 
-    // ==================== QUESTIONS ====================
     @PostMapping("/questions/create")
     public String createQuestion(@RequestParam String title,
                                  @RequestParam String content,
@@ -169,7 +164,6 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=questions";
     }
 
-    // ==================== CLASSES ====================
     @PostMapping("/classes/create")
     public String createClass(@RequestParam String name,
                               @RequestParam(required = false) String description,
@@ -233,7 +227,6 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=classes";
     }
 
-    // ==================== ONLINE SCHEDULES ====================
     @PostMapping("/online/create")
     public String createSchedule(@RequestParam String title,
                                  @RequestParam String platform,
@@ -273,7 +266,6 @@ public class TeacherController {
         return "redirect:/teacher?activeTab=online";
     }
 
-    // ==================== HELPERS ====================
     private Category parseCategory(String categoryId) {
         if (categoryId == null || categoryId.isBlank()) return null;
         try {

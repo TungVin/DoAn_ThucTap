@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cài đặt</title>
+  <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
+</head>
+<body style="font-family:system-ui; background:#f6f7fb; margin:0;">
+<div style="max-width:900px; margin:24px auto; padding:0 16px;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>Cài đặt</h2>
+    <a th:href="${backUrl}" style="background:#ef4444;color:#fff;padding:10px 12px;border-radius:10px;text-decoration:none;">Quay lại</a>
+  </div>
+
+  <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.06);">
+    <p>Trang cài đặt (bạn có thể thêm đổi mật khẩu, đổi avatar, bật/tắt thông báo...).</p>
+    <p>Tài khoản: <b th:text="${user.name}"></b></p>
+  </div>
+</div>
+</body>
+</html>

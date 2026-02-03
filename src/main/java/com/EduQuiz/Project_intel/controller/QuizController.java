@@ -36,7 +36,6 @@ public class QuizController {
                 .mapToDouble(q -> q.getScore() == null ? 0.0 : q.getScore())
                 .sum();
 
-        // check thời gian
         BlockInfo block = checkTimeWindow(exam);
         model.addAttribute("blocked", block.blocked);
         model.addAttribute("blockMessage", block.message);
@@ -45,7 +44,6 @@ public class QuizController {
         model.addAttribute("questionCount", questions.size());
         model.addAttribute("totalScore", totalScore);
 
-        // Timer: chỉ hiển thị nếu bật giới hạn thời gian
         boolean showTimer = isTimeLimitEnabled(exam);
         model.addAttribute("showTimer", showTimer);
 
@@ -57,7 +55,6 @@ public class QuizController {
         Exam exam = examRepository.findById(examId).orElse(null);
         if (exam == null) return "redirect:/";
 
-        // chặn theo thời gian
         BlockInfo block = checkTimeWindow(exam);
         if (block.blocked) {
             model.addAttribute("exam", exam);
@@ -76,11 +73,9 @@ public class QuizController {
         model.addAttribute("questionCount", questions.size());
         model.addAttribute("totalScore", totalScore);
 
-        // Timer: chỉ hiển thị nếu bật giới hạn thời gian
         boolean showTimer = isTimeLimitEnabled(exam);
         model.addAttribute("showTimer", showTimer);
 
-        // phút: nếu null thì 0
         Integer timeLimit = getTimeLimitMinutes(exam);
         model.addAttribute("timeLimitMinutes", timeLimit == null ? 0 : timeLimit);
 
@@ -132,21 +127,16 @@ public class QuizController {
         model.addAttribute("score", score);
         model.addAttribute("total", total);
 
-        // thêm chi tiết
         model.addAttribute("answeredCount", answered);
         model.addAttribute("correctCount", correctCount);
         model.addAttribute("questionCount", questions.size());
 
-        // phần trăm
         double percent = total > 0 ? (score / total) * 100.0 : 0.0;
         model.addAttribute("percent", Math.round(percent * 10.0) / 10.0);
 
         return "quiz/result";
     }
 
-    // =========================
-    // Helpers
-    // =========================
 
     private boolean isTimeLimitEnabled(Exam exam) {
         // nếu bạn có field timeLimitEnabled trong Exam thì dùng nó.
@@ -170,7 +160,6 @@ public class QuizController {
     }
 
     private BlockInfo checkTimeWindow(Exam exam) {
-        // nếu bạn không lưu start/end trong Exam thì coi như không block
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime start = parseExamDateTime(exam, true);
@@ -189,13 +178,11 @@ public class QuizController {
     }
 
     private LocalDateTime parseExamDateTime(Exam exam, boolean isStart) {
-        // Lấy startDate/startTime hoặc endDate/endTime dạng String "yyyy-MM-dd" + "HH:mm"
         String date = getString(exam, isStart ? "getStartDate" : "getEndDate");
         String time = getString(exam, isStart ? "getStartTime" : "getEndTime");
 
         if (date == null || date.isBlank()) return null;
 
-        // nếu time trống thì mặc định 00:00 hoặc 23:59
         String t = (time == null || time.isBlank())
                 ? (isStart ? "00:00" : "23:59")
                 : time;

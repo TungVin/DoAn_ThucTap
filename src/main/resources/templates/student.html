@@ -1,20 +1,91 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduQuiz - Trang Chủ</title>
+
     <link rel="stylesheet" href="/css/student.css">
+
     <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-/>
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+    />
     <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
+    <!-- Avatar dropdown (inline để bạn không cần tạo file css mới) -->
+    <style>
+        .avatar-wrap { position: relative; display: inline-flex; align-items: center; }
+
+        .avatar-btn {
+            background: transparent;
+            border: 0;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            line-height: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Nếu bạn đã có .avatar trong student.css thì giữ nguyên, style này chỉ hỗ trợ fallback */
+        .avatar-fallback {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #fff;
+            background: rgba(255,255,255,0.22);
+            border: 2px solid rgba(255,255,255,0.6);
+            user-select: none;
+        }
+
+        .avatar-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            min-width: 220px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .avatar-menu.hidden { display: none; }
+
+        .avatar-menu-header {
+            padding: 10px 12px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .avatar-name { font-weight: 700; font-size: 14px; color: #222; }
+        .avatar-email { font-size: 12px; color: #666; margin-top: 2px; }
+
+        .avatar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            font-size: 14px;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .avatar-menu-item:hover { background: #f5f5f5; }
+        .avatar-menu-divider { height: 1px; background: #eee; margin: 4px 0; }
+        .avatar-menu-item.danger { color: #d32f2f; }
+    </style>
 </head>
 
 <body>
@@ -27,7 +98,44 @@
     <nav class="nav-right">
         <a class="icon-btn bell">🔔 Thông báo</a>
         <a class="icon-btn">❓ Hỗ trợ</a>
-        <img src="/images/avatar.jpg" class="avatar" alt="Avatar giáo viên">
+
+        <!-- Avatar dropdown -->
+        <div class="avatar-wrap" id="avatarWrap">
+            <button type="button" class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
+                <!-- Nếu có ảnh thì hiện ảnh -->
+                <img src="/images/avatar.jpg" class="avatar" alt="Avatar"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+
+                <!-- Nếu ảnh lỗi thì hiện chữ cái đầu -->
+                <span class="avatar-fallback" style="display:none"
+                      th:text="${session.user != null && session.user.name != null && session.user.name.length() > 0
+                                ? #strings.toUpperCase(#strings.substring(session.user.name,0,1))
+                                : 'U'}">U</span>
+            </button>
+
+            <div class="avatar-menu hidden" id="avatarMenu">
+                <div class="avatar-menu-header">
+                    <div class="avatar-name" th:text="${session.user != null ? session.user.name : 'Người dùng'}">Người dùng</div>
+                    <div class="avatar-email" th:text="${session.user != null ? session.user.email : ''}"></div>
+                </div>
+
+                <a href="/profile" class="avatar-menu-item">
+                    <i class="fa-regular fa-user"></i>
+                    <span>Hồ sơ</span>
+                </a>
+                <a href="/settings" class="avatar-menu-item">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Cài đặt</span>
+                </a>
+
+                <div class="avatar-menu-divider"></div>
+
+                <a href="/logout" class="avatar-menu-item danger">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </div>
     </nav>
 </header>
 
@@ -63,47 +171,43 @@
     <div class="content">
 
         <div class="history-top">
-    <div class="search-wrapper">
-        <input
-            type="text"
-            class="search-input"
-            id="searchInput"
-            placeholder="Nhập từ khóa"
-        >
+            <div class="search-wrapper">
+                <input
+                        type="text"
+                        class="search-input"
+                        id="searchInput"
+                        placeholder="Nhập từ khóa"
+                >
 
-        <button type="button" class="clear-search-btn" id="clearSearchBtn">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+                <button type="button" class="clear-search-btn" id="clearSearchBtn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
 
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-    </div>
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            </div>
 
-    <button class="filter-btn" type="button">
-  <i class="fa-solid fa-filter"></i>
-  <span>Lọc</span>
-  <i class="fa-solid fa-chevron-down"></i>
-</button>
+            <button class="filter-btn" type="button">
+                <i class="fa-solid fa-filter"></i>
+                <span>Lọc</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
 
+            <div class="filter-box hide" id="filterBox">
+                <div class="filter-field">
+                    <label>Loại bài</label>
+                    <select id="filterType">
+                        <option value="">-- Chọn loại --</option>
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
 
-
-    <div class="filter-box hide" id="filterBox">
-        <div class="filter-field">
-            <label>Loại bài</label>
-            <select id="filterType">
-                <option value="">-- Chọn loại --</option>
-                <option value="public">Public</option>
-                <option value="private">Private</option>
-            </select>
+                <div class="filter-actions">
+                    <button id="cancelFilter" class="btn-cancel">Hủy</button>
+                    <button id="applyFilter" class="btn-apply">Filter</button>
+                </div>
+            </div>
         </div>
-
-        <div class="filter-actions">
-            <button id="cancelFilter" class="btn-cancel">Hủy</button>
-            <button id="applyFilter" class="btn-apply">Filter</button>
-        </div>
-    </div>
-</div>
-
-
 
         <div class="empty-box">
             <img src="/img/empty-quiz.png" class="empty-img" alt="Không có bài trắc nghiệm">
@@ -175,5 +279,40 @@
 </footer>
 
 <script src="/js/app.js"></script>
+
+<!-- JS dropdown avatar (inline để không cần tạo file js mới) -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const btn = document.getElementById("avatarBtn");
+        const menu = document.getElementById("avatarMenu");
+        const wrap = document.getElementById("avatarWrap");
+        if (!btn || !menu || !wrap) return;
+
+        const setExpanded = (open) => btn.setAttribute("aria-expanded", open ? "true" : "false");
+
+        const closeMenu = () => {
+            if (!menu.classList.contains("hidden")) {
+                menu.classList.add("hidden");
+                setExpanded(false);
+            }
+        };
+
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const willOpen = menu.classList.contains("hidden");
+            menu.classList.toggle("hidden");
+            setExpanded(willOpen);
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!wrap.contains(e.target)) closeMenu();
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeMenu();
+        });
+    });
+</script>
+
 </body>
 </html>

@@ -8,6 +8,6 @@ public class TinhNangController {
 
     @GetMapping("/TinhNang")
     public String TinhNang() {
-        return "./ChucNang/TinhNang";  // Trả về tên file TinhNang.html
+        return "./ChucNang/TinhNang";  
     }
 }

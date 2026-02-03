@@ -30,21 +30,14 @@ public class ExamQuestionItemService {
         this.examRepository = examRepository;
     }
 
-    // ================== GET LIST ==================
+    
 
     @Transactional(readOnly = true)
     public List<ExamQuestionItem> getByExam(Long examId) {
         return repo.findByExamIdOrderByOrderIndexAsc(examId);
     }
 
-    // ================== GET JSON (PHỤC VỤ TRANG EDIT) ==================
-    /**
-     * Dùng cho màn chỉnh sửa: đổ câu hỏi từ DB ra JSON để JS render lại.
-     * Format JSON phải khớp với collectQuestionsToJson() bên exam-editor.js:
-     * [
-     *   {orderIndex,type,content,score,correctIndex,answers:[{content,attachmentUrl}]}
-     * ]
-     */
+    
     @Transactional(readOnly = true)
     public String getQuestionsJsonByExamId(Long examId) {
         List<ExamQuestionItem> items = repo.findByExamIdOrderByOrderIndexAsc(examId);
@@ -59,7 +52,7 @@ public class ExamQuestionItemService {
             p.content = q.getContent();
             p.score = (q.getScore() == null ? 1.0 : q.getScore());
 
-            // options -> answers
+            
             List<ExamAnswerOption> opts = q.getOptions();
             if (opts != null && !opts.isEmpty()) {
                 p.answers = new ArrayList<>();
@@ -93,30 +86,20 @@ public class ExamQuestionItemService {
         }
     }
 
-    // ================== REPLACE FROM JSON (LƯU TỪ UI) ==================
-    /**
-     * Replace toàn bộ câu hỏi của 1 exam bằng JSON
-     * - XÓA options trước (con)
-     * - XÓA question items sau (cha)
-     * - rồi INSERT lại theo JSON
-     *
-     * Quy ước an toàn:
-     * - questionsJson null/blank => KHÔNG ĐỤNG GÌ (tránh mất dữ liệu khi JS lỗi)
-     * - questionsJson == "[]"    => xóa hết câu hỏi
-     */
+    
     @Transactional
     public void replaceFromJson(Long examId, String questionsJson) {
 
-        // Nếu JS không gửi questionsJson => đừng xóa gì cả (tránh mất dữ liệu)
+        
         if (questionsJson == null || questionsJson.isBlank()) return;
 
         String s = questionsJson.trim();
 
-        // Clear cũ đúng thứ tự (con -> cha)
+        
         optionRepo.deleteByExamId(examId);
         repo.deleteByExamId(examId);
 
-        // Nếu người dùng gửi [] tức là muốn xóa hết câu hỏi
+        
         if ("[]".equals(s)) return;
 
         Exam examRef = examRepository.getReferenceById(examId);
@@ -136,7 +119,7 @@ public class ExamQuestionItemService {
                 q.setContent(p.content);
                 q.setScore(p.score == null ? 1.0 : p.score);
 
-                // đảm bảo options list không null
+                
                 if (q.getOptions() == null) {
                     q.setOptions(new ArrayList<>());
                 }
@@ -166,14 +149,14 @@ public class ExamQuestionItemService {
         }
     }
 
-    // ================== DELETE ALL BY EXAM ==================
+    
     @Transactional
     public void deleteByExamId(Long examId) {
         optionRepo.deleteByExamId(examId);
         repo.deleteByExamId(examId);
     }
 
-    // ================== DTO nội bộ ==================
+    
     public static class QuestionPayload {
         public Integer orderIndex;
         public String type;

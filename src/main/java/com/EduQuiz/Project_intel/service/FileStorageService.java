@@ -31,7 +31,7 @@ public class FileStorageService {
         Files.createDirectories(this.uploadAttachmentsDir);
     }
 
-    // ==== CŨ: lưu ảnh lớp (giữ lại) ====
+   
     public String storeClassImage(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) return null;
 
@@ -47,7 +47,7 @@ public class FileStorageService {
         return "/uploads/classes/" + fileName;
     }
 
-    // ==== MỚI: dùng cho upload đính kèm đáp án/câu hỏi ====
+    
     public String store(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new IOException("File rỗng");

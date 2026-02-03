@@ -25,7 +25,6 @@ public class AuthController {
         return "auth";
     }
 
-    // ===================== REGISTER =====================
     @PostMapping("/register")
     public String register(
             @RequestParam String name,
@@ -45,7 +44,6 @@ public class AuthController {
         return "auth";
     }
 
-    // ===================== LOGIN =====================
     @PostMapping("/login")
     public String login(
             @RequestParam String email,
@@ -70,7 +68,6 @@ public class AuthController {
         return "redirect:/student";
     }
 
-    // ===================== LOGOUT =====================
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();

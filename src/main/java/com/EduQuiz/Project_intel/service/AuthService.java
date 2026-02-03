@@ -16,9 +16,7 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // =========================
-    // REGISTER
-    // =========================
+    
     public User register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -38,9 +36,7 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    // =========================
-    // LOGIN
-    // =========================
+    
     public User login(String email, String password) {
 
         User user = userRepository.findByEmail(email)

@@ -3,11 +3,11 @@ package com.EduQuiz.Project_intel.dto;
 public class ExamCardDTO {
     private Long id;
     private String title;
-    private String timeLabel;     // "15 phút" / "Không giới hạn"
-    private String dateLabel;     // "Thg 01 15"
-    private String statusLabel;   // tạm: "Bản nháp"
-    private int questionCount;    // tạm: 0
-    private String thumbUrl;      // tạm: null (template dùng ảnh default)
+    private String timeLabel;     
+    private String dateLabel;     
+    private String statusLabel;  
+    private int questionCount;   
+    private String thumbUrl;      
 
     public ExamCardDTO() {}
 

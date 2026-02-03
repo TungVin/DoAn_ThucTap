@@ -20,7 +20,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ===================== REGISTER =====================
+    
     public String register(String name, String email, String password, String roleStr) {
 
         if (userRepository.existsByEmail(email)) {
@@ -48,7 +48,7 @@ public class UserService {
         return "SUCCESS";
     }
 
-    // ===================== LOGIN =====================
+    
     public Optional<User> login(String email, String rawPassword) {
 
         Optional<User> userOpt = userRepository.findByEmail(email);
