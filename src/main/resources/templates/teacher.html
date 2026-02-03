@@ -79,24 +79,13 @@
         .avatar-menu-item:hover { background: #f5f5f5; }
         .avatar-menu-divider { height: 1px; background: #eee; margin: 4px 0; }
 
-        /* =========================
-           FIX LỖI: link bị CSS global đổi màu
-           ép màu chữ trong dropdown luôn hiển thị
-           ========================= */
+        /* FIX LỖI: link bị CSS global đổi màu */
         #avatarMenu a,
-        #avatarMenu a:visited {
-            color: #222 !important;
-        }
-        #avatarMenu .avatar-menu-item span {
-            color: inherit !important;
-        }
-        #avatarMenu .avatar-menu-item i {
-            color: inherit !important;
-        }
+        #avatarMenu a:visited { color: #222 !important; }
+        #avatarMenu .avatar-menu-item span { color: inherit !important; }
+        #avatarMenu .avatar-menu-item i { color: inherit !important; }
         #avatarMenu a.danger,
-        #avatarMenu a.danger:visited {
-            color: #d32f2f !important;
-        }
+        #avatarMenu a.danger:visited { color: #d32f2f !important; }
     </style>
 </head>
 
@@ -113,8 +102,15 @@
 
         <div class="avatar-wrap" id="avatarWrap">
             <button type="button" class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
-                <img src="/images/avatar.jpg" class="avatar" alt="Avatar"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+
+                <!-- Avatar thật: lấy từ session.user.avatarUrl nếu có -->
+                <img
+                        th:src="${session.user != null && session.user.avatarUrl != null ? session.user.avatarUrl : '/images/avatar.jpg'}"
+                        src="/images/avatar.jpg"
+                        class="avatar"
+                        alt="Avatar"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+                >
 
                 <span class="avatar-fallback" style="display:none"
                       th:text="${session.user != null && session.user.name != null && session.user.name.length() > 0

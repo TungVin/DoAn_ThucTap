@@ -12,13 +12,22 @@ public class User {
 
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
+
+    /**
+     * Đường dẫn avatar để hiển thị (ví dụ: /uploads/avatars/u1_xxx.jpg)
+     * Có thể null => dùng avatar mặc định.
+     */
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     // ===== getter & setter =====
     public Long getId() {
@@ -59,5 +68,13 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

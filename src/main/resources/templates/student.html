@@ -33,7 +33,7 @@
             justify-content: center;
         }
 
-        /* Nếu bạn đã có .avatar trong student.css thì giữ nguyên, style này chỉ hỗ trợ fallback */
+        /* Fallback khi ảnh avatar lỗi / chưa có */
         .avatar-fallback {
             width: 36px;
             height: 36px;
@@ -102,9 +102,15 @@
         <!-- Avatar dropdown -->
         <div class="avatar-wrap" id="avatarWrap">
             <button type="button" class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
-                <!-- Nếu có ảnh thì hiện ảnh -->
-                <img src="/images/avatar.jpg" class="avatar" alt="Avatar"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+
+                <!-- Avatar thật: lấy từ session.user.avatarUrl nếu có -->
+                <img
+                        th:src="${session.user != null && session.user.avatarUrl != null ? session.user.avatarUrl : '/images/avatar.jpg'}"
+                        src="/images/avatar.jpg"
+                        class="avatar"
+                        alt="Avatar"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+                >
 
                 <!-- Nếu ảnh lỗi thì hiện chữ cái đầu -->
                 <span class="avatar-fallback" style="display:none"
@@ -123,6 +129,7 @@
                     <i class="fa-regular fa-user"></i>
                     <span>Hồ sơ</span>
                 </a>
+
                 <a href="/settings" class="avatar-menu-item">
                     <i class="fa-solid fa-gear"></i>
                     <span>Cài đặt</span>
@@ -280,7 +287,6 @@
 
 <script src="/js/app.js"></script>
 
-<!-- JS dropdown avatar (inline để không cần tạo file js mới) -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById("avatarBtn");

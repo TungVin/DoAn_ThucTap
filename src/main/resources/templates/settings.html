@@ -90,6 +90,27 @@
         </p>
     </div>
 
+<div class="card">
+  <p class="title">Ảnh đại diện</p>
+  <p class="muted" style="margin-bottom:12px;">Tải lên ảnh PNG/JPG/WEBP (tối đa 2MB).</p>
+
+  <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+    <img
+      th:src="${session.user != null && session.user.avatarUrl != null ? session.user.avatarUrl : '/images/avatar.jpg'}"
+      src="/images/avatar.jpg"
+      alt="Avatar"
+      style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #eee;"
+      onerror="this.src='/images/avatar.jpg';"
+    >
+
+    <form th:action="@{/settings/avatar}" method="post" enctype="multipart/form-data" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <input type="file" name="avatar" accept="image/png,image/jpeg,image/webp" />
+      <button type="submit" class="btn btn-primary">Cập nhật avatar</button>
+    </form>
+  </div>
+</div>
+
+
     <!-- Đổi mật khẩu -->
     <div class="card">
         <p class="title">Đổi mật khẩu</p>

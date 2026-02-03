@@ -4,6 +4,7 @@ import com.EduQuiz.Project_intel.dto.ChangePasswordForm;
 import com.EduQuiz.Project_intel.model.Role;
 import com.EduQuiz.Project_intel.model.User;
 import com.EduQuiz.Project_intel.service.AccountService;
+import com.EduQuiz.Project_intel.service.AvatarService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -12,15 +13,19 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AccountController {
 
     private final AccountService accountService;
+    private final AvatarService avatarService;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, AvatarService avatarService) {
         this.accountService = accountService;
+        this.avatarService = avatarService;
     }
 
     @GetMapping("/profile")
@@ -43,7 +48,6 @@ public class AccountController {
         model.addAttribute("user", user);
         model.addAttribute("backUrl", user.getRole() == Role.TEACHER ? "/teacher" : "/student");
 
-        // Nếu lần đầu vào settings (chưa có form từ flash), tạo form mới
         if (!model.containsAttribute("form")) {
             model.addAttribute("form", new ChangePasswordForm());
         }
@@ -51,6 +55,30 @@ public class AccountController {
         return "settings";
     }
 
+    // =========================
+    // Upload avatar
+    // =========================
+    @PostMapping("/settings/avatar")
+    public String uploadAvatar(@RequestParam("avatar") MultipartFile avatar,
+                               HttpSession session,
+                               RedirectAttributes ra) {
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser == null) return "redirect:/auth";
+
+        try {
+            User updated = avatarService.updateAvatar(sessionUser.getEmail(), avatar);
+            session.setAttribute("user", updated);
+            ra.addFlashAttribute("success", "Cập nhật avatar thành công");
+        } catch (IllegalArgumentException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+        }
+
+        return "redirect:/settings";
+    }
+
+    // =========================
+    // Change password
+    // =========================
     @PostMapping("/settings/password")
     public String changePassword(@Valid @ModelAttribute("form") ChangePasswordForm form,
                                  BindingResult bindingResult,
@@ -60,7 +88,6 @@ public class AccountController {
         User sessionUser = (User) session.getAttribute("user");
         if (sessionUser == null) return "redirect:/auth";
 
-        // Validate logic: confirm password + new != current
         if (!bindingResult.hasErrors()) {
             if (!form.getNewPassword().equals(form.getConfirmPassword())) {
                 bindingResult.rejectValue("confirmPassword", "confirmPassword",
@@ -72,7 +99,6 @@ public class AccountController {
             }
         }
 
-        // Nếu có lỗi validate: redirect về /settings và giữ lỗi + dữ liệu
         if (bindingResult.hasErrors()) {
             ra.addFlashAttribute("org.springframework.validation.BindingResult.form", bindingResult);
             ra.addFlashAttribute("form", form);
@@ -87,7 +113,6 @@ public class AccountController {
                     form.getNewPassword()
             );
 
-            // cập nhật lại user trong session để đồng bộ
             session.setAttribute("user", updated);
 
             ra.addFlashAttribute("success", "Đổi mật khẩu thành công");
