@@ -482,3 +482,205 @@ body {
     border-radius: 999px !important;
     padding: 8px 22px !important;
 }
+
+/* ===== History Pro UI ===== */
+.history-list{
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.history-card{
+  position: relative;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 14px;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.history-card:hover{
+  transform: translateY(-1px);
+  border-color: rgba(15, 23, 42, 0.14);
+  box-shadow: 0 14px 38px rgba(2, 6, 23, 0.10);
+}
+
+/* thanh nhấn bên trái */
+.history-card::before{
+  content:"";
+  position:absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 999px;
+  background: #111; /* bạn có thể đổi sang màu brand */
+  opacity: .9;
+}
+
+.history-left{
+  padding-left: 10px; /* chừa chỗ cho thanh nhấn */
+  min-width: 0;
+}
+
+.history-title{
+  font-weight: 800;
+  font-size: 16px;
+  color: #0f172a;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-sub{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: rgba(15, 23, 42, 0.65);
+  margin-bottom: 10px;
+}
+
+.history-sub .dot{
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.history-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(15, 23, 42, 0.82);
+  background: rgba(2, 6, 23, 0.035);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.chip i{
+  font-size: 12px;
+  opacity: .75;
+}
+
+.history-right{
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+/* progress % */
+.scorebar{
+  width: 160px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.06);
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.scorebar__fill{
+  height: 100%;
+  width: 0%;
+  background: #111;
+  border-radius: 999px;
+}
+
+.action-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: #111;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  text-decoration: none;
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: opacity .15s ease, transform .15s ease;
+}
+.action-btn:hover{
+  opacity: .92;
+  transform: translateY(-1px);
+}
+
+/* responsive */
+@media (max-width: 680px){
+  .history-card{
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+  .history-right{
+    justify-items: start;
+  }
+  .scorebar{ width: 100%; }
+}
+
+/* ===== Color by percent ===== */
+.chip--good{
+  background: rgba(34,197,94,0.10);
+  border: 1px solid rgba(34,197,94,0.25);
+  color: rgba(22,101,52,0.95);
+}
+.chip--good i{ color: rgba(22,101,52,0.9); }
+
+.chip--mid{
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.28);
+  color: rgba(120,53,15,0.95);
+}
+.chip--mid i{ color: rgba(120,53,15,0.9); }
+
+.chip--bad{
+  background: rgba(239,68,68,0.10);
+  border: 1px solid rgba(239,68,68,0.25);
+  color: rgba(153,27,27,0.95);
+}
+.chip--bad i{ color: rgba(153,27,27,0.9); }
+
+/* Progress bar đổi màu theo % */
+.scorebar__fill.good{ background: rgb(34,197,94); }
+.scorebar__fill.mid{ background: rgb(245,158,11); }
+.scorebar__fill.bad{ background: rgb(239,68,68); }
+
+/* ===== Pass / Fail pill ===== */
+.pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 800;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.pill--pass{
+  background: rgba(34,197,94,0.10);
+  border-color: rgba(34,197,94,0.25);
+  color: rgba(22,101,52,0.95);
+}
+
+.pill--fail{
+  background: rgba(239,68,68,0.10);
+  border-color: rgba(239,68,68,0.25);
+  color: rgba(153,27,27,0.95);
+}
+
+.pill i{ font-size: 12px; opacity: .9; }

@@ -1,13 +1,21 @@
 package com.EduQuiz.Project_intel.controller;
 
 import com.EduQuiz.Project_intel.model.Exam;
+import com.EduQuiz.Project_intel.model.ExamAttempt;
 import com.EduQuiz.Project_intel.model.ExamQuestionItem;
+import com.EduQuiz.Project_intel.model.Role;
+import com.EduQuiz.Project_intel.model.User;
+import com.EduQuiz.Project_intel.repository.ExamAttemptRepository;
 import com.EduQuiz.Project_intel.repository.ExamRepository;
 import com.EduQuiz.Project_intel.service.ExamQuestionItemService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,14 +27,60 @@ public class QuizController {
 
     private final ExamRepository examRepository;
     private final ExamQuestionItemService questionItemService;
+    private final ExamAttemptRepository attemptRepository;
 
-    public QuizController(ExamRepository examRepository, ExamQuestionItemService questionItemService) {
+    public QuizController(ExamRepository examRepository,
+                          ExamQuestionItemService questionItemService,
+                          ExamAttemptRepository attemptRepository) {
         this.examRepository = examRepository;
         this.questionItemService = questionItemService;
+        this.attemptRepository = attemptRepository;
+    }
+
+    /**
+     * Bắt buộc đăng nhập và phải là STUDENT.
+     * - Chưa login => /auth?redirect=<current_url>
+     * - Login TEACHER => /teacher
+     */
+    private String requireStudent(HttpSession session, HttpServletRequest request) {
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return redirectToAuthWithCurrentUrl(request);
+        }
+
+        // chống null role (tránh redirect loop nếu DB có user role null)
+        if (user.getRole() == null) {
+            session.invalidate();
+            return "redirect:/auth";
+        }
+
+        if (user.getRole() != Role.STUDENT) {
+            return "redirect:/teacher";
+        }
+
+        return null; // ok
+    }
+
+    private String redirectToAuthWithCurrentUrl(HttpServletRequest request) {
+        String full = request.getRequestURI();
+        String qs = request.getQueryString();
+        if (qs != null && !qs.isBlank()) {
+            full += "?" + qs;
+        }
+        String encoded = URLEncoder.encode(full, StandardCharsets.UTF_8);
+        return "redirect:/auth?redirect=" + encoded;
     }
 
     @GetMapping("/{examId}")
-    public String intro(@PathVariable Long examId, Model model) {
+    public String intro(@PathVariable Long examId,
+                        Model model,
+                        HttpSession session,
+                        HttpServletRequest request) {
+
+        String guard = requireStudent(session, request);
+        if (guard != null) return guard;
+
         Exam exam = examRepository.findById(examId).orElse(null);
         if (exam == null) return "redirect:/";
 
@@ -51,7 +105,14 @@ public class QuizController {
     }
 
     @GetMapping("/{examId}/take")
-    public String take(@PathVariable Long examId, Model model) {
+    public String take(@PathVariable Long examId,
+                       Model model,
+                       HttpSession session,
+                       HttpServletRequest request) {
+
+        String guard = requireStudent(session, request);
+        if (guard != null) return guard;
+
         Exam exam = examRepository.findById(examId).orElse(null);
         if (exam == null) return "redirect:/";
 
@@ -85,7 +146,12 @@ public class QuizController {
     @PostMapping("/{examId}/submit")
     public String submit(@PathVariable Long examId,
                          @RequestParam Map<String, String> params,
-                         Model model) {
+                         Model model,
+                         HttpSession session,
+                         HttpServletRequest request) {
+
+        String guard = requireStudent(session, request);
+        if (guard != null) return guard;
 
         Exam exam = examRepository.findById(examId).orElse(null);
         if (exam == null) return "redirect:/";
@@ -123,6 +189,24 @@ public class QuizController {
             }
         }
 
+        double percent = total > 0 ? (score / total) * 100.0 : 0.0;
+        double percentRounded = Math.round(percent * 10.0) / 10.0;
+
+        // ===== LƯU LỊCH SỬ BÀI LÀM =====
+        User student = (User) session.getAttribute("user"); // chắc chắn != null do requireStudent
+        ExamAttempt attempt = new ExamAttempt();
+        attempt.setStudent(student);
+        attempt.setExam(exam);
+        attempt.setSubmittedAt(LocalDateTime.now());
+        attempt.setScore(score);
+        attempt.setTotal(total);
+        attempt.setPercent(percentRounded);
+        attempt.setAnsweredCount(answered);
+        attempt.setCorrectCount(correctCount);
+        attempt.setQuestionCount(questions.size());
+        attemptRepository.save(attempt);
+
+        // ===== TRẢ VIEW RESULT =====
         model.addAttribute("exam", exam);
         model.addAttribute("score", score);
         model.addAttribute("total", total);
@@ -131,23 +215,21 @@ public class QuizController {
         model.addAttribute("correctCount", correctCount);
         model.addAttribute("questionCount", questions.size());
 
-        double percent = total > 0 ? (score / total) * 100.0 : 0.0;
-        model.addAttribute("percent", Math.round(percent * 10.0) / 10.0);
+        model.addAttribute("percent", percentRounded);
 
         return "quiz/result";
     }
 
+    // ====== Các hàm hiện có của bạn giữ nguyên ======
 
     private boolean isTimeLimitEnabled(Exam exam) {
-        // nếu bạn có field timeLimitEnabled trong Exam thì dùng nó.
-        // nếu không có, chỉ cần timeLimit != null là coi như enabled.
         try {
-            // reflection tránh compile lỗi nếu field không tồn tại
             var m = exam.getClass().getMethod("isTimeLimitEnabled");
             Object val = m.invoke(exam);
             if (val instanceof Boolean) return (Boolean) val;
         } catch (Exception ignored) { }
-        return getTimeLimitMinutes(exam) != null && getTimeLimitMinutes(exam) > 0;
+        Integer tl = getTimeLimitMinutes(exam);
+        return tl != null && tl > 0;
     }
 
     private Integer getTimeLimitMinutes(Exam exam) {
@@ -224,6 +306,7 @@ public class QuizController {
     private static class BlockInfo {
         boolean blocked;
         String message;
+
         BlockInfo(boolean blocked, String message) {
             this.blocked = blocked;
             this.message = message;

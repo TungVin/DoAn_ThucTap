@@ -1,323 +1,655 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduQuiz - Trang Chủ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduQuiz - Trang Chủ</title>
 
-    <link rel="stylesheet" href="/css/student.css">
+  <link rel="stylesheet" th:href="@{/css/student.css}">
 
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-            integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-    />
-    <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+  />
+  <link rel="icon" type="image/png" th:href="@{/img/Eduq.png}">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Avatar dropdown (inline để bạn không cần tạo file css mới) -->
-    <style>
-        .avatar-wrap { position: relative; display: inline-flex; align-items: center; }
+  <style>
+    /* ===== Avatar dropdown ===== */
+    .avatar-wrap { position: relative; display: inline-flex; align-items: center; }
 
-        .avatar-btn {
-            background: transparent;
-            border: 0;
-            padding: 0;
-            margin: 0;
-            cursor: pointer;
-            line-height: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .avatar-btn {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      line-height: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        /* Fallback khi ảnh avatar lỗi / chưa có */
-        .avatar-fallback {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 14px;
-            color: #fff;
-            background: rgba(255,255,255,0.22);
-            border: 2px solid rgba(255,255,255,0.6);
-            user-select: none;
-        }
+    .avatar-fallback {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+      background: rgba(255,255,255,0.22);
+      border: 2px solid rgba(255,255,255,0.6);
+      user-select: none;
+    }
 
-        .avatar-menu {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 10px);
-            min-width: 220px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            overflow: hidden;
-            z-index: 1000;
-        }
+    .avatar-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      min-width: 220px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      overflow: hidden;
+      z-index: 1000;
+    }
 
-        .avatar-menu.hidden { display: none; }
+    .avatar-menu.hidden { display: none; }
 
-        .avatar-menu-header {
-            padding: 10px 12px;
-            background: #fafafa;
-            border-bottom: 1px solid #eee;
-        }
+    .avatar-menu-header {
+      padding: 10px 12px;
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
+    }
 
-        .avatar-name { font-weight: 700; font-size: 14px; color: #222; }
-        .avatar-email { font-size: 12px; color: #666; margin-top: 2px; }
+    .avatar-name { font-weight: 700; font-size: 14px; color: #222; }
+    .avatar-email { font-size: 12px; color: #666; margin-top: 2px; }
 
-        .avatar-menu-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            font-size: 14px;
-            color: #222;
-            text-decoration: none;
-        }
+    .avatar-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #222;
+      text-decoration: none;
+    }
 
-        .avatar-menu-item:hover { background: #f5f5f5; }
-        .avatar-menu-divider { height: 1px; background: #eee; margin: 4px 0; }
-        .avatar-menu-item.danger { color: #d32f2f; }
-    </style>
+    .avatar-menu-item:hover { background: #f5f5f5; }
+    .avatar-menu-divider { height: 1px; background: #eee; margin: 4px 0; }
+    .avatar-menu-item.danger { color: #d32f2f; }
+
+    /* ===== History Pro UI ===== */
+    .history-list{
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .history-card{
+      position: relative;
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 14px;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+
+    .history-card:hover{
+      transform: translateY(-1px);
+      border-color: rgba(15, 23, 42, 0.14);
+      box-shadow: 0 14px 38px rgba(2, 6, 23, 0.10);
+    }
+
+    .history-card::before{
+      content:"";
+      position:absolute;
+      left: 0;
+      top: 12px;
+      bottom: 12px;
+      width: 4px;
+      border-radius: 999px;
+      background: #111;
+      opacity: .9;
+    }
+
+    .history-left{
+      padding-left: 10px;
+      min-width: 0;
+    }
+
+    .history-title{
+      font-weight: 800;
+      font-size: 16px;
+      color: #0f172a;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-sub{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px;
+      color: rgba(15, 23, 42, 0.65);
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .history-sub .dot{
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.35);
+    }
+
+    .history-chips{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip{
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: rgba(15, 23, 42, 0.82);
+      background: rgba(2, 6, 23, 0.035);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .chip i{
+      font-size: 12px;
+      opacity: .75;
+    }
+
+    .history-right{
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+    }
+
+    .scorebar{
+      width: 170px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(2, 6, 23, 0.06);
+      overflow: hidden;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .scorebar__fill{
+      height: 100%;
+      width: 0%;
+      background: #111;
+      border-radius: 999px;
+    }
+
+    .action-btn{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: #111;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      text-decoration: none;
+      border: 1px solid rgba(0,0,0,0.06);
+      transition: opacity .15s ease, transform .15s ease;
+    }
+
+    .action-btn:hover{
+      opacity: .92;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 680px){
+      .history-card{
+        grid-template-columns: 1fr;
+        justify-items: start;
+      }
+      .history-right{
+        justify-items: start;
+        width: 100%;
+      }
+      .scorebar{ width: 100%; }
+    }
+
+    /* ===== Color by percent ===== */
+    .chip--good{
+      background: rgba(34,197,94,0.10);
+      border: 1px solid rgba(34,197,94,0.25);
+      color: rgba(22,101,52,0.95);
+    }
+    .chip--good i{ color: rgba(22,101,52,0.9); }
+
+    .chip--mid{
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.28);
+      color: rgba(120,53,15,0.95);
+    }
+    .chip--mid i{ color: rgba(120,53,15,0.9); }
+
+    .chip--bad{
+      background: rgba(239,68,68,0.10);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: rgba(153,27,27,0.95);
+    }
+    .chip--bad i{ color: rgba(153,27,27,0.9); }
+
+    .scorebar__fill.good{ background: rgb(34,197,94); }
+    .scorebar__fill.mid{ background: rgb(245,158,11); }
+    .scorebar__fill.bad{ background: rgb(239,68,68); }
+
+    /* ===== Pass / Fail pill ===== */
+    .pill{
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 800;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: rgba(2, 6, 23, 0.03);
+      color: rgba(15, 23, 42, 0.85);
+    }
+
+    .pill--pass{
+      background: rgba(34,197,94,0.10);
+      border-color: rgba(34,197,94,0.25);
+      color: rgba(22,101,52,0.95);
+    }
+
+    .pill--fail{
+      background: rgba(239,68,68,0.10);
+      border-color: rgba(239,68,68,0.25);
+      color: rgba(153,27,27,0.95);
+    }
+
+    .pill i{ font-size: 12px; opacity: .95; }
+  </style>
 </head>
 
 <body>
 
 <header class="header">
-    <a href="/student">
-        <div class="logo">EduQuiz</div>
-    </a>
+  <a href="/student">
+    <div class="logo">EduQuiz</div>
+  </a>
 
-    <nav class="nav-right">
-        <a class="icon-btn bell">🔔 Thông báo</a>
-        <a class="icon-btn">❓ Hỗ trợ</a>
+  <nav class="nav-right">
+    <a class="icon-btn bell">🔔 Thông báo</a>
+    <a class="icon-btn">❓ Hỗ trợ</a>
 
-        <!-- Avatar dropdown -->
-        <div class="avatar-wrap" id="avatarWrap">
-            <button type="button" class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
+    <div class="avatar-wrap" id="avatarWrap">
+      <button type="button" class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
+        <img
+                th:src="${session.user != null && session.user.avatarUrl != null ? session.user.avatarUrl : '/img/Eduq.png'}"
+                src="/img/Eduq.png"
+                class="avatar"
+                alt="Avatar"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+        >
 
-                <!-- Avatar thật: lấy từ session.user.avatarUrl nếu có -->
-                <img
-                        th:src="${session.user != null && session.user.avatarUrl != null ? session.user.avatarUrl : '/images/avatar.jpg'}"
-                        src="/images/avatar.jpg"
-                        class="avatar"
-                        alt="Avatar"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
-                >
+        <span class="avatar-fallback" style="display:none"
+              th:text="${session.user != null && session.user.name != null && session.user.name.length() > 0
+                        ? #strings.toUpperCase(#strings.substring(session.user.name,0,1))
+                        : 'U'}">U</span>
+      </button>
 
-                <!-- Nếu ảnh lỗi thì hiện chữ cái đầu -->
-                <span class="avatar-fallback" style="display:none"
-                      th:text="${session.user != null && session.user.name != null && session.user.name.length() > 0
-                                ? #strings.toUpperCase(#strings.substring(session.user.name,0,1))
-                                : 'U'}">U</span>
-            </button>
-
-            <div class="avatar-menu hidden" id="avatarMenu">
-                <div class="avatar-menu-header">
-                    <div class="avatar-name" th:text="${session.user != null ? session.user.name : 'Người dùng'}">Người dùng</div>
-                    <div class="avatar-email" th:text="${session.user != null ? session.user.email : ''}"></div>
-                </div>
-
-                <a href="/profile" class="avatar-menu-item">
-                    <i class="fa-regular fa-user"></i>
-                    <span>Hồ sơ</span>
-                </a>
-
-                <a href="/settings" class="avatar-menu-item">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Cài đặt</span>
-                </a>
-
-                <div class="avatar-menu-divider"></div>
-
-                <a href="/logout" class="avatar-menu-item danger">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Đăng xuất</span>
-                </a>
-            </div>
+      <div class="avatar-menu hidden" id="avatarMenu">
+        <div class="avatar-menu-header">
+          <div class="avatar-name" th:text="${session.user != null ? session.user.name : 'Người dùng'}">Người dùng</div>
+          <div class="avatar-email" th:text="${session.user != null ? session.user.email : ''}"></div>
         </div>
-    </nav>
+
+        <a href="/profile" class="avatar-menu-item">
+          <i class="fa-regular fa-user"></i>
+          <span>Hồ sơ</span>
+        </a>
+
+        <a href="/settings" class="avatar-menu-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Cài đặt</span>
+        </a>
+
+        <div class="avatar-menu-divider"></div>
+
+        <a href="/logout" class="avatar-menu-item danger">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Đăng xuất</span>
+        </a>
+      </div>
+    </div>
+  </nav>
 </header>
 
 <div class="tabs">
-    <a class="tab active">Bản tin</a>
-    <a class="tab">Lịch sử làm bài</a>
-    <a class="tab">Lớp</a>
+  <a class="tab active">Bản tin</a>
+  <a class="tab">Lịch sử làm bài</a>
+  <a class="tab">Lớp</a>
 </div>
 
+<!-- TAB 1: Bản tin -->
 <div class="tab-content active">
-    <div class="content">
+  <div class="content">
 
-        <div class="section">
-            <h3>Lịch học</h3>
-            <div class="empty-box">
-                <img src="/img/hientaikhongcolophoc.svg" class="empty-img" alt="Không có lớp học">
-                <p>Hiện tại không có lớp học</p>
-            </div>
-        </div>
+    <div class="section">
+      <h3>Lịch học</h3>
+      <div class="empty-box">
+        <img src="/img/hientaikhongcolophoc.svg" class="empty-img" alt="Không có lớp học">
+        <p>Hiện tại không có lớp học</p>
+      </div>
+    </div>
 
-        <div class="section">
-            <h3>Bài kiểm tra</h3>
-            <div class="empty-box">
-                <img src="/img/empty-quiz.png" class="empty-img" alt="Không có bài trắc nghiệm">
-                <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
+    <div class="section">
+      <h3>Bài kiểm tra (gần đây)</h3>
+
+      <div class="empty-box" th:if="${attempts == null or #lists.isEmpty(attempts)}">
+        <img src="/img/empty-quiz.png" class="empty-img" alt="Không có bài trắc nghiệm">
+        <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
+      </div>
+
+      <div class="history-list" th:if="${attempts != null and !#lists.isEmpty(attempts)}">
+        <div class="history-card"
+             th:each="a, st : ${attempts}"
+             th:if="${st.index < 3}"
+             th:with="pct=${a.percent != null ? a.percent : 0}"
+             th:attr="data-url=@{/student/attempts/{id}(id=${a.id})}">
+
+          <div class="history-left">
+            <div class="history-title" th:text="${a.exam != null ? a.exam.title : 'Bài kiểm tra'}">Tên bài</div>
+
+            <div class="history-sub">
+              <span><i class="fa-regular fa-clock"></i></span>
+              <span th:text="${a.submittedAt}">2026-02-04T18:00</span>
+              <span class="dot"></span>
+              <span th:text="${a.answeredCount} + ' câu đã trả lời'">4 câu đã trả lời</span>
             </div>
+
+            <div class="history-chips">
+              <span class="chip">
+                <i class="fa-solid fa-star"></i>
+                <span th:text="${a.score} + ' / ' + ${a.total}">8 / 10</span>
+              </span>
+
+              <span class="chip"
+                    th:classappend="${pct >= 80} ? ' chip--good' : (${pct >= 50} ? ' chip--mid' : ' chip--bad')">
+                <i class="fa-solid fa-percent"></i>
+                <span th:text="${pct} + '%'">80%</span>
+              </span>
+
+              <span class="pill"
+                    th:classappend="${pct >= 50} ? ' pill--pass' : ' pill--fail'">
+                <i class="fa-solid"
+                   th:classappend="${pct >= 50} ? ' fa-circle-check' : ' fa-circle-xmark'"></i>
+                <span th:text="${pct >= 50} ? 'Đạt' : 'Chưa đạt'">Đạt</span>
+              </span>
+
+              <span class="chip">
+                <i class="fa-solid fa-check"></i>
+                <span th:text="${a.correctCount} + '/' + ${a.questionCount}">8/10</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="history-right">
+            <div class="scorebar" aria-label="Tiến độ điểm">
+              <div class="scorebar__fill"
+                   th:classappend="${pct >= 80} ? ' good' : (${pct >= 50} ? ' mid' : ' bad')"
+                   th:style="'width:' + ${pct} + '%'"></div>
+            </div>
+
+            <a class="action-btn" th:href="${a.exam != null ? '/quiz/' + a.exam.id : '/student'}">
+              <i class="fa-solid fa-rotate-right"></i>
+              <span>Làm lại</span>
+            </a>
+          </div>
+
         </div>
+      </div>
 
     </div>
+
+  </div>
 </div>
 
+<!-- TAB 2: Lịch sử làm bài -->
 <div class="tab-content">
-    <div class="content">
+  <div class="content">
 
-        <div class="history-top">
-            <div class="search-wrapper">
-                <input
-                        type="text"
-                        class="search-input"
-                        id="searchInput"
-                        placeholder="Nhập từ khóa"
-                >
+    <div class="history-top">
+      <div class="search-wrapper">
+        <input type="text" class="search-input" id="searchInput" placeholder="Nhập từ khóa">
+        <button type="button" class="clear-search-btn" id="clearSearchBtn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      </div>
 
-                <button type="button" class="clear-search-btn" id="clearSearchBtn">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+      <button class="filter-btn" type="button">
+        <i class="fa-solid fa-filter"></i>
+        <span>Lọc</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
 
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            </div>
-
-            <button class="filter-btn" type="button">
-                <i class="fa-solid fa-filter"></i>
-                <span>Lọc</span>
-                <i class="fa-solid fa-chevron-down"></i>
-            </button>
-
-            <div class="filter-box hide" id="filterBox">
-                <div class="filter-field">
-                    <label>Loại bài</label>
-                    <select id="filterType">
-                        <option value="">-- Chọn loại --</option>
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                    </select>
-                </div>
-
-                <div class="filter-actions">
-                    <button id="cancelFilter" class="btn-cancel">Hủy</button>
-                    <button id="applyFilter" class="btn-apply">Filter</button>
-                </div>
-            </div>
+      <div class="filter-box hide" id="filterBox">
+        <div class="filter-field">
+          <label>Loại bài</label>
+          <select id="filterType">
+            <option value="">-- Chọn loại --</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
         </div>
 
-        <div class="empty-box">
-            <img src="/img/empty-quiz.png" class="empty-img" alt="Không có bài trắc nghiệm">
-            <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
+        <div class="filter-actions">
+          <button id="cancelFilter" class="btn-cancel">Hủy</button>
+          <button id="applyFilter" class="btn-apply">Filter</button>
         </div>
-
+      </div>
     </div>
+
+    <div class="empty-box" th:if="${attempts == null or #lists.isEmpty(attempts)}">
+      <img src="/img/empty-quiz.png" class="empty-img" alt="Không có bài trắc nghiệm">
+      <p>Hiện tại không có bài trắc nghiệm nào trong lịch sử gần đây</p>
+    </div>
+
+    <div class="history-list" th:if="${attempts != null and !#lists.isEmpty(attempts)}">
+      <div class="history-card"
+           th:each="a : ${attempts}"
+           th:attr="data-title=${a.exam != null && a.exam.title != null ? a.exam.title : ''},
+                    data-url=@{/student/attempts/{id}(id=${a.id})}"
+           th:with="pct=${a.percent != null ? a.percent : 0}">
+
+        <div class="history-left">
+          <div class="history-title" th:text="${a.exam != null ? a.exam.title : 'Bài kiểm tra'}">Tên bài</div>
+
+          <div class="history-sub">
+            <span><i class="fa-regular fa-clock"></i></span>
+            <span th:text="${a.submittedAt}">2026-02-04T18:00</span>
+            <span class="dot"></span>
+            <span th:text="${a.answeredCount} + ' câu đã trả lời'">10 câu đã trả lời</span>
+          </div>
+
+          <div class="history-chips">
+            <span class="chip">
+              <i class="fa-solid fa-star"></i>
+              <span th:text="${a.score} + ' / ' + ${a.total}">8 / 10</span>
+            </span>
+
+            <span class="chip"
+                  th:classappend="${pct >= 80} ? ' chip--good' : (${pct >= 50} ? ' chip--mid' : ' chip--bad')">
+              <i class="fa-solid fa-percent"></i>
+              <span th:text="${pct} + '%'">80%</span>
+            </span>
+
+            <span class="pill"
+                  th:classappend="${pct >= 50} ? ' pill--pass' : ' pill--fail'">
+              <i class="fa-solid"
+                 th:classappend="${pct >= 50} ? ' fa-circle-check' : ' fa-circle-xmark'"></i>
+              <span th:text="${pct >= 50} ? 'Đạt' : 'Chưa đạt'">Đạt</span>
+            </span>
+
+            <span class="chip">
+              <i class="fa-solid fa-check"></i>
+              <span th:text="${a.correctCount} + '/' + ${a.questionCount}">8/10</span>
+            </span>
+
+            <span class="chip">
+              <i class="fa-regular fa-pen-to-square"></i>
+              <span th:text="${a.answeredCount} + ' câu đã trả lời'">10 câu đã trả lời</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="history-right">
+          <div class="scorebar" aria-label="Tiến độ điểm">
+            <div class="scorebar__fill"
+                 th:classappend="${pct >= 80} ? ' good' : (${pct >= 50} ? ' mid' : ' bad')"
+                 th:style="'width:' + ${pct} + '%'"></div>
+          </div>
+
+          <a class="action-btn" th:href="${a.exam != null ? '/quiz/' + a.exam.id : '/student'}">
+            <i class="fa-solid fa-rotate-right"></i>
+            <span>Làm lại</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
 </div>
 
+<!-- TAB 3: Lớp -->
 <div class="tab-content">
-    <div class="content">
+  <div class="content">
 
-        <div class="join-class-btn">
-            <button class="primary-btn" id="openJoin">Tham gia lớp</button>
-        </div>
-
-        <div class="empty-box">
-            <img src="/img/no-class.svg" class="empty-img" alt="Không có lớp">
-            <p>Hiện tại không có lớp. Liên hệ người quản lý để được thêm vào</p>
-        </div>
-
+    <div class="join-class-btn">
+      <button class="primary-btn" id="openJoin">Tham gia lớp</button>
     </div>
+
+    <div class="empty-box">
+      <img src="/img/no-class.svg" class="empty-img" alt="Không có lớp">
+      <p>Hiện tại không có lớp. Liên hệ người quản lý để được thêm vào</p>
+    </div>
+
+  </div>
 </div>
 
 <div id="overlay" class="overlay hide"></div>
 
 <div id="joinPopup" class="join-popup hide">
-    <h2>Tham gia lớp</h2>
+  <h2>Tham gia lớp</h2>
 
-    <div class="popup-field">
-        <label>Mã lớp</label>
-        <input type="text" id="classCode" placeholder="Nhập mã lớp">
-    </div>
+  <div class="popup-field">
+    <label>Mã lớp</label>
+    <input type="text" id="classCode" placeholder="Nhập mã lớp">
+  </div>
 
-    <div class="popup-actions">
-        <button id="cancelJoin" class="btn-cancel">Hủy</button>
-        <button id="confirmJoin" class="btn-apply">Tham gia lớp</button>
-    </div>
+  <div class="popup-actions">
+    <button id="cancelJoin" class="btn-cancel">Hủy</button>
+    <button id="confirmJoin" class="btn-apply">Tham gia lớp</button>
+  </div>
 </div>
 
 <footer class="footer">
-    <div class="footer-container">
+  <div class="footer-container">
 
-        <div class="footer-col">
-            <h3>EduQuiz</h3>
-            <p>Nơi mang đến trải nghiệm học tập và kiểm tra hiệu quả.</p>
-        </div>
-
-        <div class="footer-col">
-            <h3>Liên hệ</h3>
-            <p>📍 123 Lê Lợi, Quận 1</p>
-            <p>📞 0123 456 789</p>
-            <p>📧 support@eduquiz.com</p>
-            <p>⏰ 8:00 – 22:00</p>
-        </div>
-
-        <div class="footer-col">
-            <h3>Hỗ trợ & Chính sách</h3>
-            <a href="#">Chính sách bảo mật</a><br>
-            <a href="#">Điều khoản sử dụng</a><br>
-            <a href="#">Hướng dẫn học & làm bài</a>
-        </div>
-
+    <div class="footer-col">
+      <h3>EduQuiz</h3>
+      <p>Nơi mang đến trải nghiệm học tập và kiểm tra hiệu quả.</p>
     </div>
 
-    <div class="footer-bottom">
-        © 2025 Quiz Hub. Thiết kế bởi Quiz Hub Team.
+    <div class="footer-col">
+      <h3>Liên hệ</h3>
+      <p>📍 123 Lê Lợi, Quận 1</p>
+      <p>📞 0123 456 789</p>
+      <p>📧 support@eduquiz.com</p>
+      <p>⏰ 8:00 – 22:00</p>
     </div>
+
+    <div class="footer-col">
+      <h3>Hỗ trợ & Chính sách</h3>
+      <a href="#">Chính sách bảo mật</a><br>
+      <a href="#">Điều khoản sử dụng</a><br>
+      <a href="#">Hướng dẫn học & làm bài</a>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    © 2025 Quiz Hub. Thiết kế bởi Quiz Hub Team.
+  </div>
 </footer>
 
 <script src="/js/app.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const btn = document.getElementById("avatarBtn");
-        const menu = document.getElementById("avatarMenu");
-        const wrap = document.getElementById("avatarWrap");
-        if (!btn || !menu || !wrap) return;
+  // Avatar dropdown
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("avatarBtn");
+    const menu = document.getElementById("avatarMenu");
+    const wrap = document.getElementById("avatarWrap");
+    if (!btn || !menu || !wrap) return;
 
-        const setExpanded = (open) => btn.setAttribute("aria-expanded", open ? "true" : "false");
+    const setExpanded = (open) => btn.setAttribute("aria-expanded", open ? "true" : "false");
 
-        const closeMenu = () => {
-            if (!menu.classList.contains("hidden")) {
-                menu.classList.add("hidden");
-                setExpanded(false);
-            }
-        };
+    const closeMenu = () => {
+      if (!menu.classList.contains("hidden")) {
+        menu.classList.add("hidden");
+        setExpanded(false);
+      }
+    };
 
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const willOpen = menu.classList.contains("hidden");
-            menu.classList.toggle("hidden");
-            setExpanded(willOpen);
-        });
-
-        document.addEventListener("click", (e) => {
-            if (!wrap.contains(e.target)) closeMenu();
-        });
-
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closeMenu();
-        });
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const willOpen = menu.classList.contains("hidden");
+      menu.classList.toggle("hidden");
+      setExpanded(willOpen);
     });
+
+    document.addEventListener("click", (e) => {
+      if (!wrap.contains(e.target)) closeMenu();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMenu();
+    });
+  });
+
+  // ✅ Click vào card -> mở trang chi tiết attempt (trừ khi click vào nút link)
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".history-card[data-url]").forEach(card => {
+      card.style.cursor = "pointer";
+      card.addEventListener("click", (e) => {
+        if (e.target.closest("a")) return; // click nút "Làm lại" thì không redirect
+        const url = card.dataset.url;
+        if (url) window.location.href = url;
+      });
+    });
+  });
 </script>
 
 </body>

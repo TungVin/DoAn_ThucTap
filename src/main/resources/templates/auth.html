@@ -18,8 +18,12 @@
         <div class="content">
             <h1>Đăng nhập</h1>
             <form th:action="@{/auth/login}" method="post">
+                <!-- Giữ redirect để login xong quay lại trang đang mở (vd: /quiz/5) -->
+                <input type="hidden" name="redirect" th:value="${redirect}">
+
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Mật khẩu" required>
+
                 <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0;">
                     <label style="display: flex; align-items: center; margin: 0;">
                         <input type="checkbox" name="rememberMe" value="true" style="width: auto; margin: 0 8px 0 0;">
@@ -27,8 +31,10 @@
                     </label>
                     <span class="forget"><a href="#">Quên mật khẩu?</a></span>
                 </div>
+
                 <button type="submit">Đăng nhập</button>
             </form>
+
             <span class="loginwith">Hoặc đăng nhập với</span>
             <a href="#">Facebook</a>
             <a href="#">Google</a>
@@ -57,18 +63,24 @@
         <div class="content">
             <h1>Đăng ký</h1>
             <form th:action="@{/auth/register}" method="post">
+                <!-- Giữ redirect để đăng ký xong vẫn ở auth và login quay lại đúng trang -->
+                <input type="hidden" name="redirect" th:value="${redirect}">
+
                 <input type="text" name="name" placeholder="Họ và tên" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="password" name="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" required>
+
                 <select name="role" class="role-select" required>
                     <option value="">Chọn vai trò</option>
                     <option value="STUDENT">👨‍🎓 Học sinh</option>
                     <option value="TEACHER">👨‍🏫 Giáo viên</option>
                 </select>
+
                 <label style="display: flex; align-items: center; margin: 15px 0;">
                     <input type="checkbox" name="acceptTerms" value="true" required style="width: auto; margin: 0 8px 0 0;">
                     <span style="margin: 0;">Tôi chấp nhận điều khoản</span>
                 </label>
+
                 <button type="submit">Đăng ký</button>
             </form>
         </div>
@@ -83,7 +95,6 @@
     window.addEventListener('DOMContentLoaded', function() {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
-            // Tự động đóng sau 5 giây
             setTimeout(function() {
                 alert.style.animation = 'slideOut 0.3s ease-out';
                 setTimeout(function() {
@@ -91,7 +102,6 @@
                 }, 300);
             }, 5000);
 
-            // Cho phép click để đóng ngay lập tức
             alert.style.cursor = 'pointer';
             alert.addEventListener('click', function() {
                 alert.style.animation = 'slideOut 0.3s ease-out';
