@@ -345,13 +345,13 @@
 </header>
 
 <div class="tabs">
-  <a class="tab active">Bản tin</a>
-  <a class="tab">Lịch sử làm bài</a>
-  <a class="tab">Lớp</a>
+  <a class="tab" th:classappend="${studentActiveTab == null || studentActiveTab == 'news'} ? ' active' : ''">Bản tin</a>
+  <a class="tab" th:classappend="${studentActiveTab == 'history'} ? ' active' : ''">Lịch sử làm bài</a>
+  <a class="tab" th:classappend="${studentActiveTab == 'classes'} ? ' active' : ''">Lớp</a>
 </div>
 
 <!-- TAB 1: Bản tin -->
-<div class="tab-content active">
+<div class="tab-content" th:classappend="${studentActiveTab == null || studentActiveTab == 'news'} ? ' active' : ''">
   <div class="content">
 
     <div class="section">
@@ -435,7 +435,7 @@
 </div>
 
 <!-- TAB 2: Lịch sử làm bài -->
-<div class="tab-content">
+<div class="tab-content" th:classappend="${studentActiveTab == 'history'} ? ' active' : ''">
   <div class="content">
 
     <div class="history-top">
@@ -543,17 +543,63 @@
 </div>
 
 <!-- TAB 3: Lớp -->
-<div class="tab-content">
+<div class="tab-content" th:classappend="${studentActiveTab == 'classes'} ? ' active' : ''">
   <div class="content">
 
-    <div class="join-class-btn">
-      <button class="primary-btn" id="openJoin">Tham gia lớp</button>
-    </div>
+    <section class="section classes-section">
+      <div class="classes-top">
+        <div class="classes-left">
+          <div class="classes-title">Lớp của tôi</div>
+          <div class="classes-subtitle">Tham gia lớp bằng mã lớp giáo viên cung cấp.</div>
+        </div>
+        <div class="classes-right">
+          <button class="primary-btn" id="openJoin" type="button">
+            <i class="fa-solid fa-plus" style="margin-right:8px;"></i>
+            Tham gia lớp
+          </button>
+        </div>
+      </div>
 
-    <div class="empty-box">
-      <img src="/img/no-class.svg" class="empty-img" alt="Không có lớp">
-      <p>Hiện tại không có lớp. Liên hệ người quản lý để được thêm vào</p>
-    </div>
+      <div th:if="${joinSuccess}" class="alert alert--success" th:text="${joinSuccess}"></div>
+      <div th:if="${joinError}" class="alert alert--error" th:text="${joinError}"></div>
+
+      <div class="empty-box" th:if="${joinedClasses == null or #lists.isEmpty(joinedClasses)}">
+        <img src="/img/no-class.svg" class="empty-img" alt="Không có lớp">
+        <p>Hiện tại bạn chưa tham gia lớp nào. Nhấn “Tham gia lớp” và nhập mã lớp.</p>
+      </div>
+
+      <div class="myclass-grid" th:if="${joinedClasses != null and !#lists.isEmpty(joinedClasses)}">
+        <div class="myclass-card" th:each="c : ${joinedClasses}">
+          <div class="myclass-cover">
+            <img th:if="${c.imagePath != null}" th:src="${c.imagePath}" alt="Ảnh lớp">
+            <div th:if="${c.imagePath == null}" class="myclass-cover-fallback"
+                 th:text="${c.name != null and #strings.length(c.name) > 0 ? #strings.substring(c.name,0,1) : 'L'}">L</div>
+          </div>
+
+          <div class="myclass-body">
+            <div class="myclass-title" th:text="${c.name}">Tên lớp</div>
+            <div class="myclass-desc" th:text="${c.description ?: 'Chưa có mô tả'}">Mô tả</div>
+
+            <div class="myclass-chips">
+              <button type="button" class="mychip mychip--copy"
+                      th:attr="data-code=${c.classCode}"
+                      title="Copy mã lớp">
+                <i class="fa-solid fa-hashtag"></i>
+                <span th:text="${c.classCode ?: '---'}">ABC12345</span>
+                <i class="fa-regular fa-copy" style="opacity:.75;"></i>
+              </button>
+
+              <span class="mychip">
+                <i class="fa-solid fa-users"></i>
+                <strong th:text="${joinedClassMemberCounts != null && joinedClassMemberCounts[c.id] != null ? joinedClassMemberCounts[c.id] : 0}">0</strong>
+                học viên
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
 
   </div>
 </div>
@@ -562,16 +608,19 @@
 
 <div id="joinPopup" class="join-popup hide">
   <h2>Tham gia lớp</h2>
+  <p class="join-hint">Nhập mã lớp (ví dụ: <strong>AB12CD34</strong>) để tham gia.</p>
 
-  <div class="popup-field">
-    <label>Mã lớp</label>
-    <input type="text" id="classCode" placeholder="Nhập mã lớp">
-  </div>
+  <form id="joinClassForm" method="post" action="/student/classes/join">
+    <div class="popup-field">
+      <label>Mã lớp</label>
+      <input type="text" id="classCode" name="code" placeholder="Nhập mã lớp">
+    </div>
 
-  <div class="popup-actions">
-    <button id="cancelJoin" class="btn-cancel">Hủy</button>
-    <button id="confirmJoin" class="btn-apply">Tham gia lớp</button>
-  </div>
+    <div class="popup-actions">
+      <button type="button" id="cancelJoin" class="btn-cancel">Hủy</button>
+      <button type="submit" id="confirmJoin" class="btn-apply">Tham gia lớp</button>
+    </div>
+  </form>
 </div>
 
 <footer class="footer">

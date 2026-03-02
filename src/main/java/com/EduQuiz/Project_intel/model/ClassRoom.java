@@ -13,6 +13,9 @@ public class ClassRoom {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "class_code", unique = true, length = 12)
+    private String classCode;
+
     @Column(length = 2000)
     private String description;
 
@@ -32,6 +35,14 @@ public class ClassRoom {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getClassCode() {
+        return classCode;
+    }
+
+    public void setClassCode(String classCode) {
+        this.classCode = classCode;
     }
 
     public String getDescription() {

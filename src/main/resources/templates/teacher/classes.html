@@ -20,7 +20,7 @@
         </div>
 
         <div th:if="${!#lists.isEmpty(classes)}" class="class-grid">
-            <div class="class-card" th:each="c : ${classes}">
+            <div class="class-card" th:each="c : ${classes}" th:attr="data-class-id=${c.id}">
                 <div class="class-card-image">
                     <img th:if="${c.imagePath != null}" th:src="${c.imagePath}" alt="Ảnh lớp">
                     <div th:if="${c.imagePath == null}" class="class-card-placeholder">
@@ -36,20 +36,26 @@
                     <h3 class="class-card-title" th:text="${c.name}">Tên lớp</h3>
                     <p class="class-card-description" th:text="${c.description ?: 'Chưa có mô tả'}">Mô tả lớp học</p>
                     <div class="class-card-footer">
-                        <span class="class-card-info">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                            0 học viên
-                        </span>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            <span class="class-card-info">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span th:text="${classMemberCounts != null && classMemberCounts[c.id] != null ? classMemberCounts[c.id] : 0}">0</span> học viên
+                            </span>
+                            <span style="font-size: 13px; color:#444;">
+                                Mã lớp: <strong class="class-code-text" th:text="${c.classCode ?: '---'}">ABC12345</strong>
+                            </span>
+                        </div>
                         <div class="class-card-actions">
                             <button class="btn-icon btn-edit"
                                     th:data-class-id="${c.id}"
                                     th:data-class-name="${c.name}"
                                     th:data-class-description="${c.description}"
+                                    th:data-class-code="${c.classCode}"
                                     th:data-class-image="${c.imagePath}"
                                     title="Chỉnh sửa">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -129,6 +135,16 @@
                     <div class="form-group">
                         <label for="editClassDescription">Mô tả</label>
                         <textarea id="editClassDescription" name="description" class="input" rows="3" placeholder="Nhập mô tả lớp học"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editClassCode">Mã lớp (học sinh dùng để tham gia)</label>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="text" id="editClassCode" class="input" readonly style="flex:1;" placeholder="Chưa có mã">
+                            <button type="button" class="btn-secondary" id="copyClassCodeBtn" style="padding:10px 14px;">Copy</button>
+                            <button type="button" class="btn-secondary" id="regenClassCodeBtn" style="padding:10px 14px;">Tạo mã mới</button>
+                        </div>
+                        <small style="color: #666; font-size: 13px;">Chia sẻ mã này cho học sinh để tham gia lớp.</small>
                     </div>
 
                     <div class="form-group">
@@ -273,7 +289,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const classId = editBtn.dataset.classId;
         const className = editBtn.dataset.className;
         const classDescription = editBtn.dataset.classDescription;
+        const classCode = editBtn.dataset.classCode;
         const classImage = editBtn.dataset.classImage;
+
+        window.__lastEditBtn = editBtn;
 
         console.log('Opening edit modal with data:', {
             classId, className, classDescription, classImage
@@ -282,6 +301,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('editClassId').value = classId;
         document.getElementById('editClassName').value = className || '';
         document.getElementById('editClassDescription').value = classDescription || '';
+        const codeInput = document.getElementById('editClassCode');
+        if (codeInput) codeInput.value = (classCode && classCode !== 'null') ? classCode : '';
 
         if (classImage && classImage !== 'null' && classImage !== '') {
             document.getElementById('currentImage').src = classImage;
@@ -291,6 +312,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         editClassModal.classList.add('show');
+    }
+
+    // Copy class code
+    const copyBtn = document.getElementById('copyClassCodeBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            const code = document.getElementById('editClassCode')?.value?.trim();
+            if (!code) return;
+            try {
+                await navigator.clipboard.writeText(code);
+            } catch (e) {
+                // fallback
+                const el = document.getElementById('editClassCode');
+                el?.select();
+                document.execCommand?.('copy');
+            }
+        });
+    }
+
+    // Regenerate class code
+    const regenBtn = document.getElementById('regenClassCodeBtn');
+    if (regenBtn) {
+        regenBtn.addEventListener('click', async () => {
+            const classId = document.getElementById('editClassId')?.value;
+            if (!classId) return;
+
+            const ok = confirm('Tạo mã lớp mới? Mã cũ sẽ không dùng được để tham gia nữa.');
+            if (!ok) return;
+
+            regenBtn.disabled = true;
+            try {
+                const body = new URLSearchParams();
+                body.set('id', classId);
+
+                const resp = await fetch('/teacher/classes/regenerate-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                    body
+                });
+
+                const data = await resp.json().catch(() => null);
+                if (!resp.ok || !data || data.ok !== true) {
+                    alert((data && data.message) ? data.message : 'Không thể tạo mã mới');
+                    return;
+                }
+
+                const newCode = data.code;
+                const codeInput = document.getElementById('editClassCode');
+                if (codeInput) codeInput.value = newCode;
+
+                // Update dataset + card display without reload
+                const lastBtn = window.__lastEditBtn;
+                if (lastBtn) lastBtn.dataset.classCode = newCode;
+                const card = document.querySelector('.class-card[data-class-id="' + String(classId) + '"]');
+                const codeText = card?.querySelector('.class-code-text');
+                if (codeText) codeText.textContent = newCode;
+            } catch (e) {
+                alert('Có lỗi khi tạo mã mới');
+            } finally {
+                regenBtn.disabled = false;
+            }
+        });
     }
 
     // Confirm delete class

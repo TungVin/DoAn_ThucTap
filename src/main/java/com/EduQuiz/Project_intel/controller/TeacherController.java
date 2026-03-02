@@ -3,6 +3,8 @@ package com.EduQuiz.Project_intel.controller;
 import com.EduQuiz.Project_intel.model.*;
 import com.EduQuiz.Project_intel.service.*;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/teacher")
@@ -21,6 +24,7 @@ public class TeacherController {
     private final CategoryService categoryService;
     private final QuestionService questionService;
     private final ClassRoomService classRoomService;
+    private final ClassEnrollmentService classEnrollmentService;
     private final ScheduleService scheduleService;
     private final FileStorageService fileStorageService;
 
@@ -28,12 +32,14 @@ public class TeacherController {
                              CategoryService categoryService,
                              QuestionService questionService,
                              ClassRoomService classRoomService,
+                             ClassEnrollmentService classEnrollmentService,
                              ScheduleService scheduleService,
                              FileStorageService fileStorageService) {
         this.examService = examService;
         this.categoryService = categoryService;
         this.questionService = questionService;
         this.classRoomService = classRoomService;
+        this.classEnrollmentService = classEnrollmentService;
         this.scheduleService = scheduleService;
         this.fileStorageService = fileStorageService;
     }
@@ -56,7 +62,13 @@ public class TeacherController {
         model.addAttribute("exams", examService.getAll());
         model.addAttribute("categories", categoryService.getAll());
         model.addAttribute("questions", questionService.findAllOrdered());
-        model.addAttribute("classes", classRoomService.findAll());  // Truyền danh sách lớp học
+        classRoomService.ensureClassCodes();
+        var classes = classRoomService.findAll();
+        model.addAttribute("classes", classes);  // Truyền danh sách lớp học
+        model.addAttribute(
+            "classMemberCounts",
+            classEnrollmentService.countMembersByClassIds(classes.stream().map(ClassRoom::getId).toList())
+        );
         model.addAttribute("schedules", scheduleService.findAll());
 
         return "teacher";
@@ -179,8 +191,11 @@ public class TeacherController {
                 classRoom.setImagePath(imagePath);
             }
 
-            classRoomService.save(classRoom);
-            redirectAttributes.addFlashAttribute("classSuccess", "Thêm lớp học thành công!");
+            ClassRoom saved = classRoomService.save(classRoom);
+            redirectAttributes.addFlashAttribute(
+                    "classSuccess",
+                    "Thêm lớp học thành công! Mã lớp: " + (saved.getClassCode() != null ? saved.getClassCode() : "")
+            );
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("classError", "Lỗi: " + e.getMessage());
         }
@@ -225,6 +240,28 @@ public class TeacherController {
             redirectAttributes.addFlashAttribute("classError", "Lỗi: " + e.getMessage());
         }
         return "redirect:/teacher?activeTab=classes";
+    }
+
+    @PostMapping("/classes/regenerate-code")
+    @ResponseBody
+    public ResponseEntity<?> regenerateClassCode(@RequestParam Long id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("ok", false, "message", "Chưa đăng nhập"));
+        }
+        if (user.getRole() != Role.TEACHER) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("ok", false, "message", "Không có quyền"));
+        }
+
+        try {
+            String newCode = classRoomService.regenerateClassCode(id);
+            return ResponseEntity.ok(Map.of("ok", true, "code", newCode));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("ok", false, "message", e.getMessage()));
+        }
     }
 
     @PostMapping("/online/create")

@@ -3,6 +3,7 @@ package com.EduQuiz.Project_intel.repository;
 import com.EduQuiz.Project_intel.model.ClassRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import java.util.Optional;
 
 public interface ClassRoomRepository extends JpaRepository<ClassRoom, Long> {
 
@@ -13,6 +14,10 @@ public interface ClassRoomRepository extends JpaRepository<ClassRoom, Long> {
      * @return Danh sách các lớp học có tên chứa chuỗi tìm kiếm.
      */
     List<ClassRoom> findByNameContainingIgnoreCase(String name);
+
+    Optional<ClassRoom> findByClassCodeIgnoreCase(String classCode);
+
+    boolean existsByClassCode(String classCode);
 
     /**
      * Kiểm tra xem lớp học có tồn tại hay không dựa trên ID.

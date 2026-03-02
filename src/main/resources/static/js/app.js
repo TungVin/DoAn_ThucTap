@@ -23,6 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Auto select tab by query param: ?tab=classes | history | news
+    try {
+        const url = new URL(window.location.href);
+        const tab = (url.searchParams.get("tab") || "").toLowerCase();
+        const idx = tab === "history" ? 1 : (tab === "classes" ? 2 : 0);
+        if (tabs[idx]) tabs[idx].click();
+    } catch (e) {
+        // ignore
+    }
+
     const filterBtn = document.querySelector(".filter-btn");
     const filterBox = document.getElementById("filterBox");
     const cancelFilter = document.getElementById("cancelFilter");
@@ -67,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cancelJoin = document.getElementById("cancelJoin");
     const confirmJoin = document.getElementById("confirmJoin");
     const classCodeInput = document.getElementById("classCode");
+    const joinClassForm = document.getElementById("joinClassForm");
 
     function openJoinPopup() {
         overlay.classList.remove("hide");
@@ -85,29 +96,62 @@ document.addEventListener("DOMContentLoaded", () => {
         overlay.addEventListener("click", closePopup);
         cancelJoin.addEventListener("click", closePopup);
 
-        confirmJoin.addEventListener("click", () => {
-            const code = classCodeInput.value.trim();
+        // format code as user types
+        classCodeInput.addEventListener("input", () => {
+            const v = classCodeInput.value || "";
+            classCodeInput.value = v.toUpperCase().replace(/\s+/g, "");
+        });
 
-            if (code === "") {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Thiếu mã lớp",
-                    text: "Vui lòng nhập mã lớp trước khi tham gia.",
-                    confirmButtonText: "Đã hiểu"
-                });
-                return;
+        // ESC closes popup
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && !overlay.classList.contains("hide")) {
+                closePopup();
             }
+        });
 
+        if (joinClassForm) {
+            joinClassForm.addEventListener("submit", (e) => {
+                const code = classCodeInput.value.trim();
+                if (code === "") {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Thiếu mã lớp",
+                        text: "Vui lòng nhập mã lớp trước khi tham gia.",
+                        confirmButtonText: "Đã hiểu"
+                    });
+                    return;
+                }
+                // submit bình thường để backend xử lý + flash message
+                confirmJoin.disabled = true;
+            });
+        }
+    }
+
+    // Copy class code chip
+    document.addEventListener("click", async (e) => {
+        const btn = e.target?.closest?.(".mychip--copy");
+        if (!btn) return;
+        const code = (btn.getAttribute("data-code") || "").trim();
+        if (!code) return;
+        try {
+            await navigator.clipboard.writeText(code);
             Swal.fire({
                 icon: "success",
-                title: "Tham gia lớp thành công",
-                text: "Bạn đã gửi yêu cầu tham gia lớp với mã: " + code,
-                confirmButtonText: "OK"
-            }).then(() => {
-                closePopup();
+                title: "Đã copy mã lớp",
+                text: code,
+                timer: 1200,
+                showConfirmButton: false
             });
-        });
-    }
+        } catch (err) {
+            Swal.fire({
+                icon: "info",
+                title: "Không thể copy tự động",
+                text: "Bạn hãy bôi đen và copy: " + code,
+                confirmButtonText: "OK"
+            });
+        }
+    });
 
 });
 

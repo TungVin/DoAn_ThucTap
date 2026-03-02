@@ -5,6 +5,7 @@ import com.EduQuiz.Project_intel.repository.ClassRoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,9 @@ import java.util.Optional;
 public class ClassRoomService {
 
     private final ClassRoomRepository classRoomRepository;
+    private final SecureRandom secureRandom = new SecureRandom();
+    private static final String CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    private static final int DEFAULT_CODE_LEN = 8;
 
     public ClassRoomService(ClassRoomRepository classRoomRepository) {
         this.classRoomRepository = classRoomRepository;
@@ -47,7 +51,62 @@ public class ClassRoomService {
      * @return Lớp học đã được lưu
      */
     public ClassRoom save(ClassRoom classRoom) {
+        if (classRoom.getClassCode() == null || classRoom.getClassCode().trim().isEmpty()) {
+            classRoom.setClassCode(generateUniqueCode(DEFAULT_CODE_LEN));
+        }
         return classRoomRepository.save(classRoom); // Lưu lớp học và trả về đối tượng lớp học đã được lưu
+    }
+
+    @Transactional
+    public void ensureClassCodes() {
+        List<ClassRoom> classes = classRoomRepository.findAll();
+        for (ClassRoom c : classes) {
+            if (c.getClassCode() == null || c.getClassCode().trim().isEmpty()) {
+                c.setClassCode(generateUniqueCode(DEFAULT_CODE_LEN));
+                classRoomRepository.save(c);
+            }
+        }
+    }
+
+    public ClassRoom findByClassCode(String classCode) {
+        if (classCode == null) return null;
+        return classRoomRepository.findByClassCodeIgnoreCase(classCode.trim()).orElse(null);
+    }
+
+    @Transactional
+    public String regenerateClassCode(Long classId) {
+        if (classId == null) {
+            throw new IllegalArgumentException("Thiếu id lớp học");
+        }
+        ClassRoom classRoom = findById(classId);
+        if (classRoom == null) {
+            throw new IllegalArgumentException("Không tìm thấy lớp học");
+        }
+        String newCode = generateUniqueCode(DEFAULT_CODE_LEN);
+        classRoom.setClassCode(newCode);
+        classRoomRepository.save(classRoom);
+        return newCode;
+    }
+
+    private String generateUniqueCode(int length) {
+        int tries = 0;
+        while (tries++ < 100) {
+            String candidate = randomCode(length);
+            if (!classRoomRepository.existsByClassCode(candidate)) {
+                return candidate;
+            }
+        }
+        // fallback: tăng độ dài nếu hiếm khi bị trùng
+        return randomCode(length + 2);
+    }
+
+    private String randomCode(int length) {
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int idx = secureRandom.nextInt(CODE_CHARS.length());
+            sb.append(CODE_CHARS.charAt(idx));
+        }
+        return sb.toString();
     }
 
     // ==================== Delete By ID ====================
