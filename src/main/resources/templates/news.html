@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tin tức - EduQuiz</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/Header n footer.css}">
+    <link rel="stylesheet" th:href="@{/css/news.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/Header :: header}"></div>
+
+<section class="news-page">
+
+    <h1>Tin tức EduQuiz</h1>
+
+    <div class="news-container">
+
+        <div class="news-card">
+            <img src="/img/public.png">
+            <h3>EduQuiz ra mắt hệ thống thi online</h3>
+            <p>
+                Hệ thống EduQuiz giúp giáo viên và học sinh
+                tạo bài thi trắc nghiệm nhanh chóng.
+            </p>
+        </div>
+
+        <div class="news-card">
+            <img src="/img/public.png">
+            <h3>AI hỗ trợ tạo câu hỏi</h3>
+            <p>
+                EduQuiz sẽ tích hợp AI giúp tạo câu hỏi trắc nghiệm
+                tự động từ nội dung tài liệu.
+            </p>
+        </div>
+
+        <div class="news-card">
+            <img src="/img/public.png">
+            <h3>Cập nhật ngân hàng câu hỏi</h3>
+            <p>
+                Hệ thống đã cập nhật thêm nhiều câu hỏi
+                cho các môn học phổ biến.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<div th:replace="~{fragments/Footer :: footer}"></div>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chính sách - EduQuiz</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/Header n footer.css}">
+    <link rel="stylesheet" th:href="@{/css/policy.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/Header :: header}"></div>
+
+<section class="policy-page">
+
+    <h1>Chính sách sử dụng</h1>
+
+    <div class="policy-box">
+
+        <h2>1. Điều khoản sử dụng</h2>
+        <p>
+            Khi sử dụng hệ thống EduQuiz, người dùng đồng ý tuân thủ
+            các quy định và điều khoản của hệ thống.
+        </p>
+
+        <h2>2. Bảo mật thông tin</h2>
+        <p>
+            EduQuiz cam kết bảo mật thông tin cá nhân của người dùng
+            và không chia sẻ dữ liệu cho bên thứ ba.
+        </p>
+
+        <h2>3. Quy định thi online</h2>
+        <p>
+            Người dùng phải tuân thủ các quy định khi tham gia thi
+            trực tuyến trên hệ thống.
+        </p>
+
+        <h2>4. Bản quyền nội dung</h2>
+        <p>
+            Nội dung câu hỏi và tài liệu thuộc quyền sở hữu của
+            người tạo bài thi.
+        </p>
+
+    </div>
+
+</section>
+
+<div th:replace="~{fragments/Footer :: footer}"></div>
+
+</body>
+</html>
