@@ -11,11 +11,11 @@ import com.EduQuiz.Project_intel.service.ClassRoomService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.format.DateTimeFormatter;
@@ -43,23 +43,29 @@ public class StudentController {
                               HttpSession session,
                               Model model) {
         User user = (User) session.getAttribute("user");
-        if (user == null) return "redirect:/auth";
+        if (user == null) {
+            return "redirect:/auth";
+        }
 
-        // tránh lỗi nếu role null
         if (user.getRole() == null) {
             session.invalidate();
             return "redirect:/auth";
         }
 
-        if (user.getRole() != Role.STUDENT) return "redirect:/teacher";
+        if (user.getRole() != Role.STUDENT) {
+            return "redirect:/teacher";
+        }
 
         String normalizedTab = tab == null ? "news" : tab.trim().toLowerCase();
-        if (!normalizedTab.equals("news") && !normalizedTab.equals("history") && !normalizedTab.equals("classes")) {
+        if (!normalizedTab.equals("news")
+                && !normalizedTab.equals("history")
+                && !normalizedTab.equals("classes")) {
             normalizedTab = "news";
         }
+
         model.addAttribute("studentActiveTab", normalizedTab);
 
-        // Lấy lịch sử bài làm của học sinh (mới nhất lên đầu)
+        // Lịch sử bài làm của học sinh (mới nhất -> cũ nhất)
         List<ExamAttempt> attempts = attemptRepository.findByStudentIdOrderBySubmittedAtDesc(user.getId());
         model.addAttribute("attempts", attempts);
 
@@ -69,10 +75,13 @@ public class StudentController {
         List<ClassRoom> joinedClasses = enrollments.stream()
                 .map(ClassEnrollment::getClassRoom)
                 .collect(Collectors.toList());
+
         model.addAttribute("joinedClasses", joinedClasses);
         model.addAttribute(
                 "joinedClassMemberCounts",
-                classEnrollmentService.countMembersByClassIds(joinedClasses.stream().map(ClassRoom::getId).toList())
+                classEnrollmentService.countMembersByClassIds(
+                        joinedClasses.stream().map(ClassRoom::getId).toList()
+                )
         );
 
         return "student";
@@ -80,12 +89,22 @@ public class StudentController {
 
     @PostMapping("/classes/join")
     public String joinClassByCode(@RequestParam("code") String code,
-                                 HttpSession session,
-                                 RedirectAttributes redirectAttributes) {
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
 
         User user = (User) session.getAttribute("user");
-        if (user == null) return "redirect:/auth";
-        if (user.getRole() != Role.STUDENT) return "redirect:/teacher";
+        if (user == null) {
+            return "redirect:/auth";
+        }
+
+        if (user.getRole() == null) {
+            session.invalidate();
+            return "redirect:/auth";
+        }
+
+        if (user.getRole() != Role.STUDENT) {
+            return "redirect:/teacher";
+        }
 
         String normalized = code == null ? "" : code.trim();
         if (normalized.isEmpty()) {
@@ -115,7 +134,8 @@ public class StudentController {
     }
 
     /**
-     * Trang chi tiết một lần làm bài (chỉ học sinh sở hữu attempt mới xem được)
+     * Trang chi tiết một lần làm bài
+     * Chỉ học sinh sở hữu attempt mới xem được
      * URL: /student/attempts/{attemptId}
      */
     @GetMapping("/attempts/{attemptId}")
@@ -124,24 +144,30 @@ public class StudentController {
                                 Model model) {
 
         User user = (User) session.getAttribute("user");
-        if (user == null) return "redirect:/auth";
+        if (user == null) {
+            return "redirect:/auth";
+        }
 
         if (user.getRole() == null) {
             session.invalidate();
             return "redirect:/auth";
         }
 
-        if (user.getRole() != Role.STUDENT) return "redirect:/teacher";
+        if (user.getRole() != Role.STUDENT) {
+            return "redirect:/teacher";
+        }
 
         ExamAttempt attempt = attemptRepository
                 .findByIdAndStudentId(attemptId, user.getId())
                 .orElse(null);
 
-        if (attempt == null) return "redirect:/student";
+        if (attempt == null) {
+            return "redirect:/student?tab=history";
+        }
 
         Double attemptPercent = attempt.getPercent();
         double pct = attemptPercent != null ? attemptPercent : 0.0;
-        boolean passed = pct >= 50; // ✅ đổi ngưỡng pass ở đây nếu bạn muốn
+        boolean passed = pct >= 50;
 
         String submittedAtText = "";
         if (attempt.getSubmittedAt() != null) {
@@ -150,6 +176,8 @@ public class StudentController {
         }
 
         model.addAttribute("attempt", attempt);
+        model.addAttribute("exam", attempt.getExam());
+        model.addAttribute("student", attempt.getStudent());
         model.addAttribute("pct", pct);
         model.addAttribute("passed", passed);
         model.addAttribute("submittedAtText", submittedAtText);

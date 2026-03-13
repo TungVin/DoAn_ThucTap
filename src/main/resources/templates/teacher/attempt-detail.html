@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết bài làm</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .page {
+            max-width: 1050px;
+            margin: 30px auto;
+            padding: 0 16px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 20px;
+            padding: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .hero p {
+            margin: 0;
+            opacity: 0.95;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: white;
+            color: #111827;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .sub {
+            margin-top: 8px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 18px;
+            padding: 24px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .detail-card h2 {
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-key {
+            color: #6b7280;
+            font-weight: bold;
+        }
+
+        .detail-value {
+            color: #111827;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .good {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .fail {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .detail-row {
+                flex-direction: column;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <div class="hero">
+        <div>
+            <h1>Chi tiết bài làm</h1>
+            <p th:text="${exam.title}">Tên bài kiểm tra</p>
+        </div>
+
+        <a class="back-btn" th:href="@{/teacher/exams/{id}/stats(id=${exam.id})}">← Quay lại thống kê</a>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="label">Điểm</div>
+            <div class="value" th:text="${attempt.score != null ? attempt.score : 0}">0</div>
+            <div class="sub" th:text="${attempt.total != null ? 'Tổng điểm: ' + attempt.total : 'Tổng điểm: 0'}">Tổng điểm</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Tỷ lệ đúng</div>
+            <div class="value" th:text="${pct + '%'}">0%</div>
+            <div class="sub">Kết quả làm bài</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Thời gian nộp</div>
+            <div class="value" th:text="${attempt.submittedAtText}">13/03/2026 10:20</div>
+            <div class="sub">Thời điểm hoàn thành</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Xếp loại</div>
+            <div>
+                <span class="badge good" th:if="${passed}">Đạt</span>
+                <span class="badge fail" th:if="${!passed}">Chưa đạt</span>
+            </div>
+            <div class="sub">Đánh giá theo tỷ lệ đúng</div>
+        </div>
+    </div>
+
+    <div class="detail-card">
+        <h2>Thông tin chi tiết</h2>
+
+        <div class="detail-row">
+            <div class="detail-key">Sinh viên</div>
+            <div class="detail-value" th:text="${student.name}">Nguyễn Văn A</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-key">Email</div>
+            <div class="detail-value" th:text="${student.email}">student@gmail.com</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-key">Bài kiểm tra</div>
+            <div class="detail-value" th:text="${exam.title}">Tên bài kiểm tra</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-key">Số câu đúng</div>
+            <div class="detail-value"
+                 th:text="${(attempt.correctCount != null ? attempt.correctCount : 0) + ' / ' + (attempt.questionCount != null ? attempt.questionCount : 0)}">
+                0 / 0
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-key">Số câu đã trả lời</div>
+            <div class="detail-value" th:text="${attempt.answeredCount != null ? attempt.answeredCount : 0}">0</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-key">Thời gian làm bài</div>
+            <div class="detail-value"
+                 th:text="${exam.timeLimit != null ? exam.timeLimit + ' phút' : 'Không giới hạn'}">
+                Không giới hạn
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

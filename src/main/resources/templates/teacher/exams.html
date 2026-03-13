@@ -26,7 +26,7 @@
     <!-- List -->
     <div th:if="${!#lists.isEmpty(exams)}" class="exam-grid">
 
-      <!-- Card (div clickable) -->
+      <!-- Card -->
       <div class="exam-card"
            th:each="exam : ${exams}"
            th:attr="data-href=@{'/teacher/exams/' + ${exam.id} + '/edit'}"
@@ -53,7 +53,19 @@
           </div>
 
           <div class="exam-card-actions">
-            <!-- Edit: dùng link luôn cho chắc -->
+            <!-- Statistics -->
+            <a class="btn-icon btn-stats-exam"
+               th:href="@{'/teacher/exams/' + ${exam.id} + '/stats'}"
+               title="Thống kê"
+               aria-label="Thống kê">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </a>
+
+            <!-- Edit -->
             <a class="btn-icon btn-edit-exam"
                th:href="@{'/teacher/exams/' + ${exam.id} + '/edit'}"
                title="Chỉnh sửa"
@@ -80,11 +92,13 @@
         </div>
 
         <div class="exam-card-body">
-          <h3 class="exam-card-title" th:text="${exam.title != null && !#strings.isEmpty(exam.title) ? exam.title : '(Chưa đặt tên)'}">
+          <h3 class="exam-card-title"
+              th:text="${exam.title != null && !#strings.isEmpty(exam.title) ? exam.title : '(Chưa đặt tên)'}">
             Tên bài kiểm tra
           </h3>
 
-          <p class="exam-card-description" th:text="${exam.description != null && !#strings.isEmpty(exam.description) ? exam.description : 'Chưa có mô tả'}">
+          <p class="exam-card-description"
+             th:text="${exam.description != null && !#strings.isEmpty(exam.description) ? exam.description : 'Chưa có mô tả'}">
             Mô tả
           </p>
 
@@ -177,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.btn-delete-exam').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
 
       const examId = this.getAttribute('data-exam-id');
       const examTitle = this.getAttribute('data-exam-title');
@@ -188,6 +203,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const confirmBtn = document.getElementById('confirmDeleteBtn');
       if (confirmBtn) confirmBtn.focus();
+    });
+  });
+
+  document.querySelectorAll('.btn-edit-exam, .btn-stats-exam').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
     });
   });
 

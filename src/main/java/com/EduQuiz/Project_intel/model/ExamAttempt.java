@@ -12,22 +12,27 @@ public class ExamAttempt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // học sinh làm bài
+    // Học sinh làm bài
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
-    // bài kiểm tra
+    // Bài kiểm tra
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exam_id", nullable = false)
     private Exam exam;
 
-    // thời điểm nộp bài
-    @Column(name = "submitted_at")
+    // Thời điểm nộp bài
+    @Column(name = "submitted_at", nullable = false)
     private LocalDateTime submittedAt;
 
+    @Column(name = "score")
     private Double score;
+
+    @Column(name = "total")
     private Double total;
+
+    @Column(name = "percent")
     private Double percent;
 
     @Column(name = "answered_count")
@@ -39,11 +44,25 @@ public class ExamAttempt {
     @Column(name = "question_count")
     private Integer questionCount;
 
-    public ExamAttempt() {}
+    public ExamAttempt() {
+    }
+
+    public ExamAttempt(User student, Exam exam, LocalDateTime submittedAt,
+                       Double score, Double total, Double percent,
+                       Integer answeredCount, Integer correctCount, Integer questionCount) {
+        this.student = student;
+        this.exam = exam;
+        this.submittedAt = submittedAt;
+        this.score = score;
+        this.total = total;
+        this.percent = percent;
+        this.answeredCount = answeredCount;
+        this.correctCount = correctCount;
+        this.questionCount = questionCount;
+    }
 
     /**
-     * Nếu lúc lưu attempt bạn quên set submittedAt thì tự set.
-     * Không ảnh hưởng nếu bạn đã set rồi.
+     * Nếu lúc lưu attempt chưa set submittedAt thì tự động gán thời gian hiện tại.
      */
     @PrePersist
     protected void onCreate() {
@@ -52,41 +71,91 @@ public class ExamAttempt {
         }
     }
 
-    // ====== Getter hiển thị thời gian đẹp cho UI ======
+    /**
+     * Hiển thị thời gian nộp đẹp cho giao diện.
+     */
     @Transient
     public String getSubmittedAtText() {
-        if (submittedAt == null) return "";
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        return submittedAt.format(fmt);
+        if (submittedAt == null) {
+            return "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return submittedAt.format(formatter);
     }
 
-    // ===== getters/setters =====
-    public Long getId() { return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public User getStudent() { return student; }
-    public void setStudent(User student) { this.student = student; }
+    public User getStudent() {
+        return student;
+    }
 
-    public Exam getExam() { return exam; }
-    public void setExam(Exam exam) { this.exam = exam; }
+    public void setStudent(User student) {
+        this.student = student;
+    }
 
-    public LocalDateTime getSubmittedAt() { return submittedAt; }
-    public void setSubmittedAt(LocalDateTime submittedAt) { this.submittedAt = submittedAt; }
+    public Exam getExam() {
+        return exam;
+    }
 
-    public Double getScore() { return score; }
-    public void setScore(Double score) { this.score = score; }
+    public void setExam(Exam exam) {
+        this.exam = exam;
+    }
 
-    public Double getTotal() { return total; }
-    public void setTotal(Double total) { this.total = total; }
+    public LocalDateTime getSubmittedAt() {
+        return submittedAt;
+    }
 
-    public Double getPercent() { return percent; }
-    public void setPercent(Double percent) { this.percent = percent; }
+    public void setSubmittedAt(LocalDateTime submittedAt) {
+        this.submittedAt = submittedAt;
+    }
 
-    public Integer getAnsweredCount() { return answeredCount; }
-    public void setAnsweredCount(Integer answeredCount) { this.answeredCount = answeredCount; }
+    public Double getScore() {
+        return score;
+    }
 
-    public Integer getCorrectCount() { return correctCount; }
-    public void setCorrectCount(Integer correctCount) { this.correctCount = correctCount; }
+    public void setScore(Double score) {
+        this.score = score;
+    }
 
-    public Integer getQuestionCount() { return questionCount; }
-    public void setQuestionCount(Integer questionCount) { this.questionCount = questionCount; }
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    public Double getPercent() {
+        return percent;
+    }
+
+    public void setPercent(Double percent) {
+        this.percent = percent;
+    }
+
+    public Integer getAnsweredCount() {
+        return answeredCount;
+    }
+
+    public void setAnsweredCount(Integer answeredCount) {
+        this.answeredCount = answeredCount;
+    }
+
+    public Integer getCorrectCount() {
+        return correctCount;
+    }
+
+    public void setCorrectCount(Integer correctCount) {
+        this.correctCount = correctCount;
+    }
+
+    public Integer getQuestionCount() {
+        return questionCount;
+    }
+
+    public void setQuestionCount(Integer questionCount) {
+        this.questionCount = questionCount;
+    }
 }

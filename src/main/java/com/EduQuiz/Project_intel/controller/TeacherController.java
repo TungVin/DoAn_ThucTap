@@ -45,11 +45,9 @@ public class TeacherController {
     }
 
     @GetMapping
-    public String teacherPage(
-            @RequestParam(defaultValue = "exams") String activeTab,
-            Model model,
-            HttpSession session
-    ) {
+    public String teacherPage(@RequestParam(defaultValue = "exams") String activeTab,
+                              Model model,
+                              HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return "redirect:/auth";
@@ -62,12 +60,15 @@ public class TeacherController {
         model.addAttribute("exams", examService.getAll());
         model.addAttribute("categories", categoryService.getAll());
         model.addAttribute("questions", questionService.findAllOrdered());
+
         classRoomService.ensureClassCodes();
         var classes = classRoomService.findAll();
-        model.addAttribute("classes", classes);  // Truyền danh sách lớp học
+        model.addAttribute("classes", classes);
         model.addAttribute(
-            "classMemberCounts",
-            classEnrollmentService.countMembersByClassIds(classes.stream().map(ClassRoom::getId).toList())
+                "classMemberCounts",
+                classEnrollmentService.countMembersByClassIds(
+                        classes.stream().map(ClassRoom::getId).toList()
+                )
         );
         model.addAttribute("schedules", scheduleService.findAll());
 
@@ -194,7 +195,8 @@ public class TeacherController {
             ClassRoom saved = classRoomService.save(classRoom);
             redirectAttributes.addFlashAttribute(
                     "classSuccess",
-                    "Thêm lớp học thành công! Mã lớp: " + (saved.getClassCode() != null ? saved.getClassCode() : "")
+                    "Thêm lớp học thành công! Mã lớp: " +
+                            (saved.getClassCode() != null ? saved.getClassCode() : "")
             );
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("classError", "Lỗi: " + e.getMessage());
@@ -274,8 +276,14 @@ public class TeacherController {
                                  @RequestParam(required = false) String autoAccept,
                                  RedirectAttributes redirectAttributes) {
         try {
-            LocalDateTime startDateTime = LocalDateTime.of(LocalDate.parse(startDate), LocalTime.parse(startTime));
-            LocalDateTime endDateTime = LocalDateTime.of(LocalDate.parse(endDate), LocalTime.parse(endTime));
+            LocalDateTime startDateTime = LocalDateTime.of(
+                    LocalDate.parse(startDate),
+                    LocalTime.parse(startTime)
+            );
+            LocalDateTime endDateTime = LocalDateTime.of(
+                    LocalDate.parse(endDate),
+                    LocalTime.parse(endTime)
+            );
 
             Schedule schedule = new Schedule();
             schedule.setTitle(title);
@@ -304,7 +312,9 @@ public class TeacherController {
     }
 
     private Category parseCategory(String categoryId) {
-        if (categoryId == null || categoryId.isBlank()) return null;
+        if (categoryId == null || categoryId.isBlank()) {
+            return null;
+        }
         try {
             return categoryService.findById(Long.parseLong(categoryId));
         } catch (NumberFormatException e) {

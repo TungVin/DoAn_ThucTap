@@ -49,7 +49,6 @@ public class QuizController {
             return redirectToAuthWithCurrentUrl(request);
         }
 
-        // chống null role (tránh redirect loop nếu DB có user role null)
         if (user.getRole() == null) {
             session.invalidate();
             return "redirect:/auth";
@@ -59,7 +58,7 @@ public class QuizController {
             return "redirect:/teacher";
         }
 
-        return null; // ok
+        return null;
     }
 
     private String redirectToAuthWithCurrentUrl(HttpServletRequest request) {
@@ -156,6 +155,13 @@ public class QuizController {
         Exam exam = examRepository.findById(examId).orElse(null);
         if (exam == null) return "redirect:/";
 
+        BlockInfo block = checkTimeWindow(exam);
+        if (block.blocked) {
+            model.addAttribute("exam", exam);
+            model.addAttribute("blockMessage", block.message);
+            return "quiz/blocked";
+        }
+
         List<ExamQuestionItem> questions = questionItemService.getByExam(examId);
 
         double total = questions.stream()
@@ -169,7 +175,10 @@ public class QuizController {
         for (ExamQuestionItem q : questions) {
             String key = "q_" + q.getId();
             String selected = params.get(key);
-            if (selected == null || selected.isBlank()) continue;
+
+            if (selected == null || selected.isBlank()) {
+                continue;
+            }
 
             answered++;
 
@@ -177,7 +186,7 @@ public class QuizController {
             try {
                 optId = Long.parseLong(selected.trim());
             } catch (Exception e) {
-                continue; // param lỗi thì bỏ qua, không crash
+                continue;
             }
 
             boolean correct = q.getOptions().stream()
@@ -192,8 +201,9 @@ public class QuizController {
         double percent = total > 0 ? (score / total) * 100.0 : 0.0;
         double percentRounded = Math.round(percent * 10.0) / 10.0;
 
-        // ===== LƯU LỊCH SỬ BÀI LÀM =====
-        User student = (User) session.getAttribute("user"); // chắc chắn != null do requireStudent
+        // Lưu lịch sử bài làm
+        User student = (User) session.getAttribute("user");
+
         ExamAttempt attempt = new ExamAttempt();
         attempt.setStudent(student);
         attempt.setExam(exam);
@@ -204,30 +214,29 @@ public class QuizController {
         attempt.setAnsweredCount(answered);
         attempt.setCorrectCount(correctCount);
         attempt.setQuestionCount(questions.size());
+
         attemptRepository.save(attempt);
 
-        // ===== TRẢ VIEW RESULT =====
+        // Trả view kết quả
         model.addAttribute("exam", exam);
         model.addAttribute("score", score);
         model.addAttribute("total", total);
-
         model.addAttribute("answeredCount", answered);
         model.addAttribute("correctCount", correctCount);
         model.addAttribute("questionCount", questions.size());
-
         model.addAttribute("percent", percentRounded);
 
         return "quiz/result";
     }
-
-    // ====== Các hàm hiện có của bạn giữ nguyên ======
 
     private boolean isTimeLimitEnabled(Exam exam) {
         try {
             var m = exam.getClass().getMethod("isTimeLimitEnabled");
             Object val = m.invoke(exam);
             if (val instanceof Boolean) return (Boolean) val;
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
+
         Integer tl = getTimeLimitMinutes(exam);
         return tl != null && tl > 0;
     }
@@ -237,7 +246,8 @@ public class QuizController {
             var m = exam.getClass().getMethod("getTimeLimit");
             Object val = m.invoke(exam);
             if (val instanceof Integer) return (Integer) val;
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
         return null;
     }
 
@@ -253,9 +263,11 @@ public class QuizController {
         if (Boolean.TRUE.equals(startEnabled) && start != null && now.isBefore(start)) {
             return new BlockInfo(true, "Bài kiểm tra chưa đến thời gian bắt đầu.");
         }
+
         if (Boolean.TRUE.equals(endEnabled) && end != null && now.isAfter(end)) {
             return new BlockInfo(true, "Bài kiểm tra đã hết hạn.");
         }
+
         return new BlockInfo(false, "");
     }
 
@@ -263,7 +275,9 @@ public class QuizController {
         String date = getString(exam, isStart ? "getStartDate" : "getEndDate");
         String time = getString(exam, isStart ? "getStartTime" : "getEndTime");
 
-        if (date == null || date.isBlank()) return null;
+        if (date == null || date.isBlank()) {
+            return null;
+        }
 
         String t = (time == null || time.isBlank())
                 ? (isStart ? "00:00" : "23:59")
@@ -292,13 +306,15 @@ public class QuizController {
             var m = exam.getClass().getMethod(boolGetter1);
             Object val = m.invoke(exam);
             if (val instanceof Boolean) return (Boolean) val;
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         try {
             var m = exam.getClass().getMethod(boolGetter2);
             Object val = m.invoke(exam);
             if (val instanceof Boolean) return (Boolean) val;
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         return null;
     }

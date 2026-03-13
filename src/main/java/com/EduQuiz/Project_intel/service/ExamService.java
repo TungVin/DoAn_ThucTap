@@ -4,8 +4,10 @@ import com.EduQuiz.Project_intel.dto.ExamCardDTO;
 import com.EduQuiz.Project_intel.dto.ExamUpsertForm;
 import com.EduQuiz.Project_intel.model.Category;
 import com.EduQuiz.Project_intel.model.Exam;
+import com.EduQuiz.Project_intel.model.ExamAttempt;
 import com.EduQuiz.Project_intel.repository.CategoryRepository;
 import com.EduQuiz.Project_intel.repository.ExamAnswerOptionRepository;
+import com.EduQuiz.Project_intel.repository.ExamAttemptRepository;
 import com.EduQuiz.Project_intel.repository.ExamQuestionItemRepository;
 import com.EduQuiz.Project_intel.repository.ExamRepository;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,9 @@ public class ExamService {
 
     private final ExamRepository examRepository;
     private final CategoryRepository categoryRepository;
-
-    // ✅ thêm để xóa con trước
     private final ExamQuestionItemRepository examQuestionItemRepository;
     private final ExamAnswerOptionRepository examAnswerOptionRepository;
+    private final ExamAttemptRepository examAttemptRepository;
 
     private static final DateTimeFormatter DATE_TIME_FMT = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final DateTimeFormatter CARD_DATE_FMT = DateTimeFormatter.ofPattern("'Thg' MM dd");
@@ -32,14 +33,14 @@ public class ExamService {
     public ExamService(ExamRepository examRepository,
                        CategoryRepository categoryRepository,
                        ExamQuestionItemRepository examQuestionItemRepository,
-                       ExamAnswerOptionRepository examAnswerOptionRepository) {
+                       ExamAnswerOptionRepository examAnswerOptionRepository,
+                       ExamAttemptRepository examAttemptRepository) {
         this.examRepository = examRepository;
         this.categoryRepository = categoryRepository;
         this.examQuestionItemRepository = examQuestionItemRepository;
         this.examAnswerOptionRepository = examAnswerOptionRepository;
+        this.examAttemptRepository = examAttemptRepository;
     }
-
-    
 
     @Transactional(readOnly = true)
     public List<ExamCardDTO> getCards() {
@@ -86,14 +87,26 @@ public class ExamService {
         }
     }
 
-    
-
     @Transactional(readOnly = true)
     public List<Exam> getAll() {
         return examRepository.findAll();
     }
 
-   
+    @Transactional(readOnly = true)
+    public Exam findById(Long id) {
+        return examRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Không tìm thấy bài kiểm tra với id = " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExamAttempt> getAttemptsByExam(Long examId) {
+        return examAttemptRepository.findByExamIdOrderBySubmittedAtDesc(examId);
+    }
+
+    @Transactional(readOnly = true)
+    public long countAttemptsByExam(Long examId) {
+        return examAttemptRepository.countByExamId(examId);
+    }
 
     @Transactional
     public Long createFromForm(ExamUpsertForm form) {
@@ -173,22 +186,14 @@ public class ExamService {
         examRepository.save(exam);
     }
 
-    
     @Transactional
     public void deleteById(Long id) {
         if (!examRepository.existsById(id)) return;
 
-       
         examAnswerOptionRepository.deleteByExamId(id);
-
-        
         examQuestionItemRepository.deleteByExamId(id);
-
-        
         examRepository.deleteById(id);
     }
-
-    
 
     private void applyForm(Exam exam, ExamUpsertForm f) {
         exam.setTitle(f.getTitle());
